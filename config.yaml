@@ -1,30 +1,31 @@
 
 # url 里填写自己的订阅,名称不能重复
 proxy-providers:
-  provider1:
-    url: "url" # 你的订阅地址
+  节点1: #更改名称为你想要的名称
+    url: "" # 你的订阅地址
     type: http
     interval: 1800 # 更新间隔 单位秒
     health-check: {enable: true,url: "https://www.gstatic.com/generate_204", interval: 100} # 健康检查 单位秒
     override:
-      additional-prefix: "[provider]" # 节点前缀
+      additional-prefix: "[]" # 节点前缀
 
-  provider2:
-    url: ""
-    type: http
-    interval: 1800
-    health-check: {enable: true,url: "https://www.gstatic.com/generate_204",interval: 100}
-    override:
-      additional-prefix: "[provider]"
-  provider3:
-    url: ""
-    type: http
-    interval: 1800
-    health-check: {enable: true,url: "https://www.gstatic.com/generate_204",interval: 100}
-    override:
-     additional-prefix: "[provider]"
+#可添加多个订阅链接,取消注释即可
+  # 节点2:
+  #   url: ""
+  #   type: http
+  #   interval: 1800
+  #   health-check: {enable: true,url: "https://www.gstatic.com/generate_204",interval: 100}
+  #   override:
+  #     additional-prefix: "[]"
+  # 节点3:
+  #   url: ""
+  #   type: http
+  #   interval: 1800
+  #   health-check: {enable: true,url: "https://www.gstatic.com/generate_204",interval: 100}
+  #   override:
+  #    additional-prefix: "[]"
 
-# 更新订阅链接方式
+# 更新订阅链接方式,默认直连
 proxies: 
   - name: "直连"
     type: direct
