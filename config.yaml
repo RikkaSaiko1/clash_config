@@ -617,7 +617,6 @@ proxy-groups:
 rules:
   # 私有网络直连
   - RULE-SET,private,DIRECT
-
   # 国内直连
   - RULE-SET,geolocation-cn,DIRECT
   - RULE-SET,games_cn,DIRECT # 已包含 steam 下载域名
@@ -673,8 +672,8 @@ rules:
   - RULE-SET,ehentai,EHentai
 
   # 兜底规则
+  - RULE-SET,dns,PROXY
   - RULE-SET,geolocation-!cn,PROXY
   - RULE-SET,cn_ip,DIRECT
   - RULE-SET,private_ip,DIRECT
-  - RULE-SET,dns,MATCH
   - MATCH,PROXY
