@@ -262,6 +262,14 @@ your_subscription_url
 
 本项目的配置思路、规则集及相关实现参考了以下优秀项目，感谢各位开发者的开源与分享：
 
+### [ACL4SSR/ACL4SSR](https://github.com/ACL4SSR/ACL4SSR)
+
+提供 Clash / Mihomo 配置框架、规则集以及相关分流方案，是本配置的重要参考来源之一。
+
+### [blackmatrix7/ios_rule_script](https://github.com/blackmatrix7/ios_rule_script)
+
+提供大量适用于 Clash、Surge、Loon 等代理工具的规则集，本配置中的部分服务规则来源于该项目。
+
 ### [AIsouler/MyClash](https://github.com/AIsouler/MyClash)
 
 提供 Mihomo（Clash Meta）覆写脚本和配置文件，包含 DNS 防泄漏、多项分流策略、地区策略、节点倍率识别等功能。
