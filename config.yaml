@@ -358,7 +358,16 @@ rule-providers:
     url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/cn.mrs'
     path: './ruleset/cn.mrs'
     path-in-bundle: 'geo/geosite/cn.mrs'
+  dns:
+    url: 'https://raw.githubusercontent.com/xishang0128/rules/main/clash%20or%20stash/prevent_dns_leak/prevent_dns_leak_domain.list'
+    path: './ruleset/dns.list'
+    path-in-bundle: 'geo/geosite/dns.list'
+    behavior: domain
+    interval: 86400
+    format: yaml
+    type: http
 
+    
 # 策略组通用配置
 group_common:
   group_common_select:
@@ -667,4 +676,5 @@ rules:
   - RULE-SET,geolocation-!cn,PROXY
   - RULE-SET,cn_ip,DIRECT
   - RULE-SET,private_ip,DIRECT
+  - RULE-SET,dns,MATCH
   - MATCH,PROXY
