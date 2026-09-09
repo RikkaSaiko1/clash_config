@@ -332,7 +332,7 @@ proxy-groups:
   
   - name: 'AUTO'
     <<: *group_common_auto
-    hidden: false,
+    hidden: false
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png'
 
   - name: 'FCM'
@@ -420,7 +420,7 @@ proxy-groups:
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png'
   - name: 'HK AUTO'
     <<: [*group_common_auto, *HK_filter]
-    hidden: true,
+    hidden: true
 
   - name: 'JP'
     <<: [*group_common_select, *JP_filter]
@@ -429,7 +429,7 @@ proxy-groups:
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png'
   - name: 'JP AUTO'
     <<: [*group_common_auto, *JP_filter]
-    hidden: true,
+    hidden: true
 
   - name: 'US'
     <<: [*group_common_select, *US_filter]
@@ -438,7 +438,7 @@ proxy-groups:
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png'
   - name: 'US AUTO'
     <<: [*group_common_auto, *US_filter]
-    hidden: true,
+    hidden: true
 
   - name: 'SG'
     <<: [*group_common_select, *SG_filter]
@@ -447,7 +447,7 @@ proxy-groups:
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png'
   - name: 'SG AUTO'
     <<: [*group_common_auto, *SG_filter]
-    hidden: true,
+    hidden: true
 
   - name: 'TW'
     <<: [*group_common_select, *TW_filter]
@@ -456,7 +456,7 @@ proxy-groups:
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Taiwan.png'
   - name: 'TW AUTO'
     <<: [*group_common_auto, *TW_filter]
-    hidden: true,
+    hidden: true
 
   - name: 'Other'
     <<: [*group_common_select, *exclude_filter]
@@ -465,7 +465,7 @@ proxy-groups:
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/World_Map.png'
   - name: 'Other auto'
     <<: [*group_common_auto, *exclude_filter]
-    hidden: true,
+    hidden: true
 
 rules:
   # 私有网络直连
