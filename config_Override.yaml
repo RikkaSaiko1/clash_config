@@ -242,7 +242,6 @@ group_common:
       include-all: true,
       # 排除 DIRECT
       exclude-type: 'DIRECT',
-    hidden: true,
     }
 
 # 通用代理节点组
