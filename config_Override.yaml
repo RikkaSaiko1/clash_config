@@ -239,7 +239,7 @@ group_common:
       lazy: true,
       tolerance: 50,
       # 只获取原始代理节点，不获取策略组
-      include-all-proxies: true,
+      include-all: true,
       # 排除 DIRECT
       exclude-type: 'DIRECT',
     hidden: true,
