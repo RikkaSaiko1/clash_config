@@ -241,6 +241,25 @@ your_subscription_url
 
 ---
 
+## 🙏 致谢
+
+本项目的配置思路、规则集及相关实现参考了以下优秀项目，感谢各位开发者的开源与分享：
+
+* [**AIsouler/MyClash**](https://github.com/AIsouler/MyClash)
+  Mihomo（Clash Meta）覆写脚本和配置文件，提供 DNS 防泄漏、多项分流策略、地区策略、节点倍率识别等功能。
+
+* [**appshubcc/bett-rules**](https://github.com/appshubcc/bett-rules)
+  提供 Mihomo 及相关项目使用的自定义 `rules-dat` / `MRS` 规则集。
+
+* [**MetaCubeX/mihomo**](https://github.com/MetaCubeX/mihomo)
+  Mihomo 项目本身及相关生态，为本配置提供核心支持。
+
+感谢这些开源项目及贡献者的工作，使本配置能够更加完善。
+
+> 本项目仅对相关思路、配置方式及规则资源进行整理与集成，具体代码、规则集及相关资源的版权归原作者所有。
+
+---
+
 ## 📄 License
 
 本项目配置仅供个人学习与使用。
