@@ -476,8 +476,6 @@ proxy-groups:
     hidden: true
 
 rules:
-  # dns防泄漏
-  - RULE-SET,dns,MATCH
   # 私有网络直连
   - RULE-SET,private,DIRECT
 
@@ -534,7 +532,10 @@ rules:
   - RULE-SET,spotify_ip,Spotify,no-resolve
   - RULE-SET,cryptocurrency,Crypto
   - RULE-SET,ehentai,EHentai
-
+  
+  # dns防泄漏
+  - RULE-SET,dns,PROXY
+  
   # 兜底规则
   - RULE-SET,geolocation-!cn,PROXY
   - RULE-SET,cn_ip,DIRECT
