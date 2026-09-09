@@ -476,6 +476,8 @@ proxy-groups:
     hidden: true
 
 rules:
+  # dns防泄漏
+  - RULE-SET,dns,MATCH
   # 私有网络直连
   - RULE-SET,private,DIRECT
 
@@ -537,5 +539,5 @@ rules:
   - RULE-SET,geolocation-!cn,PROXY
   - RULE-SET,cn_ip,DIRECT
   - RULE-SET,private_ip,DIRECT
-  - RULE-SET,dns,MATCH
+
   - MATCH,PROXY
