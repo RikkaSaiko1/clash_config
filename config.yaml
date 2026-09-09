@@ -34,7 +34,7 @@ proxies:
     type: direct
     udp: true
 
-external-controller: 127.0.0.1:7890
+external-controller: 127.0.0.1:9091
 external-ui: ui
 external-ui-url: https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip
 external-controller-cors:
