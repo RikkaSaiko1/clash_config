@@ -1,6 +1,6 @@
-## 作者 RikkaSaiko1
+## clash 覆写文件 全规则
 ## 仓库 https://github.com/RikkaSaiko1/clash_config
-## 对"https://github.com/AIsouler/MyClash" 的配置文化, 进行了小部分修改
+## 基于"https://github.com/AIsouler/MyClash" 的配置, 进行了小部分修改
 
 # Rule Provider 通用配置
 rule_providers_common:
@@ -265,161 +265,67 @@ rule-providers:
 # 策略组通用配置
 group_common:
   group_common_select:
-    &group_common_select {
-      type: select,
-      interval: 600,
-      timeout: 3000,
-      max-failed-times: 3,
-      empty-fallback: REJECT,
-      url: 'https://www.apple.com/library/test/success.html',
-      lazy: true,
-    }
+    &group_common_select {type: select,interval: 300,timeout: 1500,max-failed-times: 5,empty-fallback: REJECT,url: 'https://www.apple.com/library/test/success.html',lazy: true}
 
   group_common_auto:
-    &group_common_auto {
-      type: url-test,
-      interval: 600,
-      timeout: 3000,
-      max-failed-times: 3,
-      empty-fallback: REJECT,
-      url: 'https://www.apple.com/library/test/success.html',
-      lazy: true,
-      tolerance: 50,
-      # 只获取原始代理节点，不获取策略组
-      include-all: true,
-      # 排除 DIRECT
-      exclude-type: 'DIRECT',
-    }
+    &group_common_auto {type: url-test,interval: 60,timeout: 1500,max-failed-times: 5,empty-fallback: REJECT,url: 'https://www.apple.com/library/test/success.html',lazy: true,tolerance: 50,include-all: true,exclude-type: 'DIRECT'}
 
 
 # 通用代理节点组
 proxies_common:
-
   proxies_default:
-    &proxies_default
-    {
-      proxies:
-        [
-          'PROXY',
-          'AUTO',
-          'HK',
-          'SG',
-          'JP',
-          'US',
-          'TW',
-          'KR',
-          'Other',
-        ],
-    }
+    &proxies_default {proxies:['PROXY','AUTO','HK','SG','JP','US','TW','KR','Other']}
 
   proxies_direct:
-    &proxies_direct
-    {
-      proxies:
-        [
-          'PROXY',
-          'AUTO',
-          'HK',
-          'SG',
-          'JP',
-          'US',
-          'TW',
-          'KR',
-          'Other',
-          'DIRECT',
-        ],
-    }
+    &proxies_direct {proxies:['PROXY','AUTO','HK','SG','JP','US','TW','KR','Other','DIRECT']}
 
   proxies_AI:
-    &proxies_AI
-    {
-      proxies:
-        [
-          'PROXY',
-          'SG',
-          'JP',
-          'US',
-          'KR',
-        ],
-    }
+    &proxies_AI {proxies:['PROXY','SG','JP','US','KR',]}
+  
+  proxies_proxy:
+    &proxies_proxy {proxies:['AUTO','HK','JP','US','SG','TW','KR','Other']}
 
-  proxies_reject: &proxies_reject
-    { proxies: ['REJECT', 'REJECT-DROP', 'PASS'] }
+  proxies_reject: 
+    &proxies_reject {proxies:['REJECT', 'REJECT-DROP', 'PASS']}
 
 
 # 地区过滤器正则表达式定义
 group_filter:
 
   HK_filter:
-    &HK_filter
-    { filter: '(?i)(🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|hong\s*kong)' }
+    &HK_filter {filter: '(?i)(🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|hong\s*kong)'}
 
   JP_filter:
-    &JP_filter
-    { filter: '(?i)(🇯🇵|日本|东京|大阪|京都|(?<![A-Za-z])JPN?(?![A-Za-z])|japan)' }
+    &JP_filter {filter: '(?i)(🇯🇵|日本|东京|大阪|京都|(?<![A-Za-z])JPN?(?![A-Za-z])|japan)'}
 
   US_filter:
-    &US_filter
-    {
-      filter: '(?i)(🇺🇸|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|拉斯维加斯|圣何塞|圣地亚哥|(?<![A-Za-z])USA?(?![A-Za-z])|america|united\s*states)',
-    }
+    &US_filter {filter: '(?i)(🇺🇸|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|拉斯维加斯|圣何塞|圣地亚哥|(?<![A-Za-z])USA?(?![A-Za-z])|america|united\s*states)'}
 
   SG_filter:
-    &SG_filter
-    { filter: '(?i)(🇸🇬|新加坡|狮城|(?<![A-Za-z])SGP?(?![A-Za-z])|singapore)' }
+    &SG_filter {filter: '(?i)(🇸🇬|新加坡|狮城|(?<![A-Za-z])SGP?(?![A-Za-z])|singapore)'}
 
   TW_filter:
-    &TW_filter
-    { filter: '(?i)(🇹🇼|台湾|台北|高雄|(?<![A-Za-z])TWN?(?![A-Za-z])|taiwan)' }
+    &TW_filter {filter: '(?i)(🇹🇼|台湾|台北|高雄|(?<![A-Za-z])TWN?(?![A-Za-z])|taiwan)'}
 
   KR_filter:
-    &KR_filter
-    {
-      filter: '(?i)(🇰🇷|韩国|首尔|釜山|仁川|大邱|(?<![A-Za-z])KOR?(?![A-Za-z])|korea|south\s*korea)',
-    }
-
-  low_filter:
-    &low_filter
-    {
-      filter: '(?i)(^(?!.*(?:剩|期)).*(?:(?<!\d)0\.[0-5]|(?<=[ |｜丨∣┃\-‐–—−－﹣])0[*×✕✖⨯⨉x倍])|(?:(?<=[ |｜丨∣┃\-‐–—−－﹣])[*×✕✖⨯⨉x]0(?= |倍|$))|^(?!.*(?:客户端|软件)).*下载|低倍|免费|(?<![A-Za-z])free(?![A-Za-z]))',
-    }
-
-  high_filter:
-    &high_filter
-    {
-      filter: '(?i)(?<=[ |｜丨∣┃\-‐–—−－﹣])((?:[*×✕✖⨯⨉x]\s*(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?)|(?:(?<![\d.])(?:[2-9]\d*|[1-9]\d+)(?:\.\d+)?\s*(?:倍|[*×✕✖⨯⨉x])))',
-    }
+    &KR_filter {filter: '(?i)(🇰🇷|韩国|首尔|釜山|仁川|大邱|(?<![A-Za-z])KOR?(?![A-Za-z])|korea|south\s*korea)'}
 
   exclude_filter:
-    &exclude_filter
-    {
-      exclude-filter: '(?i)(🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|hong\s*kong|🇯🇵|日本|东京|大阪|京都|(?<![A-Za-z])JPN?(?![A-Za-z])|japan|🇺🇸|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|拉斯维加斯|圣何塞|圣地亚哥|(?<![A-Za-z])USA?(?![A-Za-z])|america|united\s*states|🇸🇬|新加坡|狮城|(?<![A-Za-z])SGP?(?![A-Za-z])|singapore|🇹🇼|台湾|台北|高雄|(?<![A-Za-z])TWN?(?![A-Za-z])|taiwan|🇰🇷|韩国|首尔|釜山|仁川|大邱|(?<![A-Za-z])KOR?(?![A-Za-z])|korea|south\s*korea)',
-      exclude-type: 'DIRECT',
-    }
+    &exclude_filter {exclude-filter: '(?i)(🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|hong\s*kong|🇯🇵|日本|东京|大阪|京都|(?<![A-Za-z])JPN?(?![A-Za-z])|japan|🇺🇸|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|拉斯维加斯|圣何塞|圣地亚哥|(?<![A-Za-z])USA?(?![A-Za-z])|america|united\s*states|🇸🇬|新加坡|狮城|(?<![A-Za-z])SGP?(?![A-Za-z])|singapore|🇹🇼|台湾|台北|高雄|(?<![A-Za-z])TWN?(?![A-Za-z])|taiwan|🇰🇷|韩国|首尔|釜山|仁川|大邱|(?<![A-Za-z])KOR?(?![A-Za-z])|korea|south\s*korea)',exclude-type: 'DIRECT'}
 
 
 # 定义分流策略组
 proxy-groups:
 
   - name: 'PROXY'
-    <<: *group_common_select
+    <<: [*group_common_select, *proxies_proxy]
     include-all-proxies: true
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png'
-    proxies:
-      - AUTO
-      - HK
-      - JP
-      - US
-      - SG
-      - TW
-      - KR
-      - Other
 
   - name: 'AUTO'
     <<: *group_common_auto
     hidden: false
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png'
-
 
   - name: 'FCM'
     <<: [*group_common_select, *proxies_direct]
@@ -546,7 +452,6 @@ proxy-groups:
     <<: [*group_common_auto, *SG_filter]
     hidden: true
 
-
   - name: 'TW'
     <<: [*group_common_select, *TW_filter]
     include-all: true
@@ -557,7 +462,6 @@ proxy-groups:
     <<: [*group_common_auto, *TW_filter]
     hidden: true
 
-  ## 韩国
   - name: 'KR'
     <<: [*group_common_select, *KR_filter]
     include-all: true
@@ -620,7 +524,7 @@ rules:
   - RULE-SET,instagram,Instagram
   - RULE-SET,netflix,Netflix
   - RULE-SET,netflix_ip,Netflix,no-resolve
-
+  # emby
   - RULE-SET,emby,Emby
   - RULE-SET,emos,Emby
   - DOMAIN-SUFFIX,mb3admin.com,Emby
