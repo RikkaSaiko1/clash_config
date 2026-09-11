@@ -44,11 +44,15 @@
 
 2. 用 Mihomo / Clash Meta 加载配置并启动。
 
-| 参数 | 值 |
-| --- | --- |
-| 混合端口 | `7890` |
-| API 地址 | `127.0.0.1:9091` |
-| API 密钥 | 配置文件中的 `secret`（建议修改） |
+
+```
+proxy-providers:
+
+\&#x20; 节点1:
+
+\&#x20;   url: "你的订阅链接"   # 替换 your\\\_subscription\\\_url
+```
+
 
 ### 覆写配置（Override）
 
