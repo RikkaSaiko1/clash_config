@@ -45,14 +45,6 @@
 2. 用 Mihomo / Clash Meta 加载配置并启动。
 
 
-```
-proxy-providers:
-
-\&#x20; 节点1:
-
-\&#x20;   url: "你的订阅链接"   # 替换 your\\\_subscription\\\_url
-```
-
 
 ### 覆写配置（Override）
 
