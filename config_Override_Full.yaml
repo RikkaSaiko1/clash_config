@@ -505,11 +505,11 @@ rules:
   - RULE-SET,adblockmihomolite,AdBlock
 
   # 代理规则
+  - RULE-SET,ai,AI
   - RULE-SET,googlefcm,FCM
   - RULE-SET,youtube,YouTube
   - RULE-SET,google,Google
   - RULE-SET,google_ip,Google,no-resolve
-  - RULE-SET,ai,AI
   - RULE-SET,github,PROXY
   - RULE-SET,microsoft,Microsoft
   - RULE-SET,apple,Apple
