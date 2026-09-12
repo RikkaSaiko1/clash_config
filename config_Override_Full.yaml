@@ -4,8 +4,8 @@
 
 # Rule Provider 通用配置
 rule_providers_common:
-  rule_providers_domain: &rule_providers_domain { type: http, format: mrs, interval: 86400, behavior: domain }
-  rule_providers_ip: &rule_providers_ip { type: http, format: mrs, interval: 86400, behavior: ipcidr }
+  rule_providers_domain: &rule_providers_domain {type: http, format: mrs, interval: 86400, behavior: domain}
+  rule_providers_ip: &rule_providers_ip {type: http, format: mrs, interval: 86400, behavior: ipcidr}
 
 # 定义 Rule Providers
 rule-providers:
