@@ -10,11 +10,11 @@
 
 | 文件 | 说明 |
 | --- | --- |
-| [`config.yaml`](./config.yaml) | 完整配置（直接加载使用） |
-| [`config_Override_Full.yaml`](./config_Override_Full.yaml) | 覆写配置（全规则版） |
-| [`config_Override_lite.yaml`](./config_Override_lite.yaml) | 覆写配置（轻量版） |
-| [`SubConverter_config_Full.ini`](./SubConverter_config_Full.ini) | SubConverter 订阅转换（全规则版） |
-| [`SubConverter_config_lite.ini`](./SubConverter_config_lite.ini) | SubConverter 订阅转换（轻量版） |
+| [`config.yaml`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config.yaml) | 完整配置（直接加载使用） |
+| [`config_Override_Full.yaml`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_Full.yaml) | 覆写配置（全规则版） |
+| [`config_Override_lite.yaml`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_lite.yaml) | 覆写配置（轻量版） |
+| [`SubConverter_config_Full.ini`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/SubConverter_config_Full.ini) | SubConverter 订阅转换（全规则版） |
+| [`SubConverter_config_lite.ini`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/SubConverter_config_lite.ini) | SubConverter 订阅转换（轻量版） |
 
 > **Full** 规则覆盖全面，**Lite** 精简规则、占用更低，按需选用。
 
