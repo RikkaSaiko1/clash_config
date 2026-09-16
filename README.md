@@ -1,8 +1,8 @@
 # clash_config
 
-自用的 Mihomo / Clash Meta 配置，开箱即用。
+自用的 Mihomo 内核配置，开箱即用。
 
-`多订阅管理` `规则分流` `fake-ip DNS` `TUN 模式` `广告拦截`
+`多订阅管理` `规则分流`
 
 ---
 
