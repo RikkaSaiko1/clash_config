@@ -419,16 +419,16 @@ group_common:
 # 通用代理节点组
 proxies_common:
   proxies_default:
-    &proxies_default {proxies:['PROXY','AUTO','HK','SG','JP','US','TW','KR','Other']}
+    &proxies_default {proxies:['PROXY','AUTO','HK Group','SG Group','JP Group','US Group','TW Group','KR Group','Other Group']}
 
   proxies_direct:
-    &proxies_direct {proxies:['PROXY','AUTO','HK','SG','JP','US','TW','KR','Other','DIRECT']}
+    &proxies_direct {proxies:['PROXY','AUTO','HK Group','SG Group','JP Group','US Group','TW Group','KR Group','Other Group','DIRECT']}
 
   proxies_AI:
-    &proxies_AI {proxies:['PROXY','SG','JP','US','KR',]}
+    &proxies_AI {proxies:['PROXY','SG Group','JP Group','US Group','KR Group',]}
   
   proxies_proxy:
-    &proxies_proxy {proxies:['AUTO','HK','JP','US','SG','TW','KR','Other']}
+    &proxies_proxy {proxies:['AUTO','HK Group','JP Group','US Group','SG Group','TW Group','KR Group','Other Group']}
 
   proxies_reject: 
     &proxies_reject {proxies:['REJECT', 'REJECT-DROP', 'PASS']}
@@ -487,7 +487,7 @@ proxy-groups:
 
   - name: 'AI'
     <<: [*group_common_select, *proxies_AI]
-    default-selected: 'US'
+    default-selected: 'US Group'
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/ChatGPT.png'
 
   - name: 'Microsoft'
@@ -507,7 +507,7 @@ proxy-groups:
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Steam.png'
 
   - name: 'TikTok'
-    default-selected: 'JP'
+    default-selected: 'JP Group'
     <<: [*group_common_select, *proxies_default]
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/TikTok.png'
 
@@ -536,12 +536,12 @@ proxy-groups:
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Spotify.png'
 
   - name: 'Crypto'
-    default-selected: 'JP'
+    default-selected: 'JP Group'
     <<: [*group_common_select, *proxies_default]
     icon: 'https://fastly.jsdelivr.net/gh/lige47/QuanX-icon-rule@main/icon/04ProxySoft/Bitcoin.png'
 
   - name: 'EHentai'
-    default-selected: 'US'
+    default-selected: 'US Group'
     <<: [*group_common_select, *proxies_default]
     icon: 'https://fastly.jsdelivr.net/gh/lige47/QuanX-icon-rule@main/icon/04ProxySoft/exhentai.png'
 
@@ -554,77 +554,77 @@ proxy-groups:
   # 地区策略组
   # ==============================
 
-  - name: 'HK'
+  - name: 'HK Group'
     <<: [*group_common_select, *HK_filter]
     include-all: true
-    proxies: ['HK AUTO']
+    proxies: ['HK Auto Group']
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png'
 
-  - name: 'HK AUTO'
+  - name: 'HK Auto Group'
     <<: [*group_common_auto, *HK_filter]
     hidden: true
 
 
-  - name: 'JP'
+  - name: 'JP Group'
     <<: [*group_common_select, *JP_filter]
     include-all: true
-    proxies: ['JP AUTO']
+    proxies: ['JP Auto Group']
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png'
 
-  - name: 'JP AUTO'
+  - name: 'JP Auto Group'
     <<: [*group_common_auto, *JP_filter]
     hidden: true
 
 
-  - name: 'US'
+  - name: 'US Group'
     <<: [*group_common_select, *US_filter]
     include-all: true
-    proxies: ['US AUTO']
+    proxies: ['US Auto Group']
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png'
 
-  - name: 'US AUTO'
+  - name: 'US Auto Group'
     <<: [*group_common_auto, *US_filter]
     hidden: true
 
 
-  - name: 'SG'
+  - name: 'SG Group'
     <<: [*group_common_select, *SG_filter]
     include-all: true
-    proxies: ['SG AUTO']
+    proxies: ['SG Auto Group']
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png'
 
-  - name: 'SG AUTO'
+  - name: 'SG Auto Group'
     <<: [*group_common_auto, *SG_filter]
     hidden: true
 
-  - name: 'TW'
+  - name: 'TW Group'
     <<: [*group_common_select, *TW_filter]
     include-all: true
-    proxies: ['TW AUTO']
+    proxies: ['TW Auto Group']
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Taiwan.png'
 
-  - name: 'TW AUTO'
+  - name: 'TW Auto Group'
     <<: [*group_common_auto, *TW_filter]
     hidden: true
 
-  - name: 'KR'
+  - name: 'KR Group'
     <<: [*group_common_select, *KR_filter]
     include-all: true
-    proxies: ['KR AUTO']
+    proxies: ['KR Auto Group']
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Korea.png'
 
-  - name: 'KR AUTO'
+  - name: 'KR Auto Group'
     <<: [*group_common_auto, *KR_filter]
     hidden: true
 
   ## 其他地区
-  - name: 'Other'
+  - name: 'Other Group'
     <<: [*group_common_select, *exclude_filter]
     include-all: true
-    proxies: ['Other auto']
+    proxies: ['Other Auto Group']
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/World_Map.png'
 
-  - name: 'Other auto'
+  - name: 'Other Auto Group'
     <<: [*group_common_auto, *exclude_filter]
     hidden: true
 
