@@ -81,30 +81,57 @@ tun:
   strict-route: true
   disable-icmp-forwarding: false
 dns:
+  # 启用 DNS 模块
   enable: true
+  # 关闭 IPv6 解析
   ipv6: false
-  respect-rules: false
+  # DNS 遵循 rules 分流
+  respect-rules: true
+  # fake-ip 模式
   enhanced-mode: fake-ip
+  # fake-ip 地址段
   fake-ip-range: 198.18.0.1/16
+  # fake-ip 过滤名单
   fake-ip-filter:
-    - "*"
-    - +.lan
-    - +.local
-    - time.*.com
-    - ntp.*.com
-    - +.market.xiaomi.com
+    - "+.lan"
+    - "+.local"
+    - "+.localhost"
+    - "+.msftconnecttest.com"
+    - "+.msftncsi.com"
+    - "time.*.com"
+    - "ntp.*.com"
+    - "+.market.xiaomi.com"
+  # 不使用系统 hosts
   use-hosts: false
   use-system-hosts: false
+  # 默认 DNS（用于解析下面的 DoH/DoT 服务器）
   default-nameserver:
-    - tls://223.5.5.5
+    - 223.5.5.5
+    - 119.29.29.29
+    - 8.8.8.8
+  # 主 DNS
   nameserver:
     - https://doh.pub/dns-query
     - https://dns.alidns.com/dns-query
-  nameserver-policy: {}
-  proxy-server-nameserver: []
-  proxy-server-nameserver-policy: {}
-  direct-nameserver: []
-  fake-ip-range6: ""
+  # 代理节点域名解析
+  proxy-server-nameserver:
+    - https://doh.pub/dns-query
+    - https://dns.alidns.com/dns-query
+  # 直连域名 DNS
+  direct-nameserver:
+    - https://doh.pub/dns-query
+    - https://dns.alidns.com/dns-query
+  # 按域名指定 DNS
+  nameserver-policy:
+    "geosite:cn":
+      - https://doh.pub/dns-query
+      - https://dns.alidns.com/dns-query
+    "geosite:private":
+      - 223.5.5.5
+      - 119.29.29.29
+    "geosite:geolocation-!cn":
+      - https://dns.google/dns-query
+      - https://1.1.1.1/dns-query
 sniffer:
   enable: true
   parse-pure-ip: true
