@@ -70,7 +70,7 @@ skip-auth-prefixes:
 tun:
   enable: true
   device: mihomo
-  stack: mixed
+  stack: mixed # mpis需最新核心
   auto-route: true
   auto-redirect: false
   auto-detect-interface: true
