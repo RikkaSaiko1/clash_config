@@ -72,6 +72,12 @@ rule-providers:
     path: './ruleset/youtube.mrs'
     path-in-bundle: 'geo/geosite/youtube.mrs'
 
+  googlefcm:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/googlefcm.mrs'
+    path: './ruleset/googlefcm.mrs'
+    path-in-bundle: 'geo/geosite/googlefcm.mrs'
+
   google:
     <<: *rule_providers_domain
     url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/google.mrs'
@@ -216,6 +222,7 @@ proxy-groups:  # 定义分流策略组
     <<: [*group_common_select, *proxies_default]
     icon: 'https://fastly.jsdelivr.net/gh/MiToverG422/Qure@master/IconSet/Color/YouTube.png'
 
+  # Google FCM
   - name: 'Google'
     <<: [*group_common_select, *proxies_default]
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Google_Search.png'
@@ -331,6 +338,7 @@ rules:
 
   # 代理规则
   - RULE-SET,youtube,YouTube
+  - RULE-SET,googlefcm,DIRECT
   - RULE-SET,google,Google
   - RULE-SET,google_ip,Google,no-resolve
   - RULE-SET,ai,AI

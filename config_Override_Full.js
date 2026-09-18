@@ -103,6 +103,15 @@ const main = (config) => {
       path: './ruleset/youtube.mrs',
       'path-in-bundle': 'geo/geosite/youtube.mrs',
     },
+    googlefcm: {
+      type: 'http',
+      format: 'mrs',
+      interval: 86400,
+      behavior: 'domain',
+      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/googlefcm.mrs',
+      path: './ruleset/googlefcm.mrs',
+      'path-in-bundle': 'geo/geosite/googlefcm.mrs',
+    },
     google: {
       type: 'http',
       format: 'mrs',
@@ -442,7 +451,7 @@ const main = (config) => {
       icon: 'https://fastly.jsdelivr.net/gh/MiToverG422/Qure@master/IconSet/Color/YouTube.png',
     },
 
-    // Google
+    // Google FCM
     {
       name: 'Google',
       type: 'select',
@@ -1090,6 +1099,7 @@ const main = (config) => {
     'AND,((NETWORK,UDP),(OR,((DST-PORT,3478-3481),(DST-PORT,5349),(DST-PORT,19302-19309)))),REJECT',
     'RULE-SET,ai,AI',
     'RULE-SET,youtube,YouTube',
+    'RULE-SET,googlefcm,DIRECT',
     'RULE-SET,google,Google',
     'RULE-SET,google_ip,Google,no-resolve',
     'RULE-SET,github,PROXY',
