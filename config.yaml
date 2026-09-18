@@ -237,12 +237,6 @@ rule-providers:
     path-in-bundle: 'geo/geoip/cn.mrs'
 
   # --- 代理规则集 ---
-  googlefcm:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/googlefcm.mrs'
-    path: './ruleset/googlefcm.mrs'
-    path-in-bundle: 'geo/geosite/googlefcm.mrs'
-
   youtube:
     <<: *rule_providers_domain
     url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/youtube.mrs'
@@ -446,19 +440,19 @@ group_common:
 # 通用代理节点组
 proxies_common:
   proxies_default:
-    &proxies_default {proxies:['PROXY','AUTO','HK Group','SG Group','JP Group','US Group','TW Group','KR Group','Other Group']}
+    &proxies_default {proxies: ['PROXY','AUTO','HK Group','SG Group','JP Group','US Group','TW Group','KR Group','Other Group']}
 
   proxies_direct:
-    &proxies_direct {proxies:['PROXY','AUTO','HK Group','SG Group','JP Group','US Group','TW Group','KR Group','Other Group','DIRECT']}
+    &proxies_direct {proxies: ['PROXY','AUTO','HK Group','SG Group','JP Group','US Group','TW Group','KR Group','Other Group','DIRECT']}
 
   proxies_AI:
-    &proxies_AI {proxies:['PROXY','SG Group','JP Group','US Group','KR Group',]}
+    &proxies_AI {proxies: ['PROXY','SG Group','JP Group','US Group','KR Group',]}
   
   proxies_proxy:
-    &proxies_proxy {proxies:['AUTO','HK Group','JP Group','US Group','SG Group','TW Group','KR Group','Other Group']}
+    &proxies_proxy {proxies: ['AUTO','HK Group','JP Group','US Group','SG Group','TW Group','KR Group','Other Group']}
 
   proxies_reject: 
-    &proxies_reject {proxies:['REJECT', 'REJECT-DROP', 'PASS']}
+    &proxies_reject {proxies: ['REJECT', 'REJECT-DROP', 'PASS']}
 
 
 # 地区过滤器正则表达式定义
@@ -498,11 +492,6 @@ proxy-groups:
     <<: *group_common_auto
     hidden: false
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png'
-
-  - name: 'FCM'
-    <<: [*group_common_select, *proxies_direct]
-    default-selected: 'DIRECT'
-    icon: 'https://fastly.jsdelivr.net/gh/MiToverG422/Qure@master/IconSet/Color/fcm.png'
 
   - name: 'YouTube'
     <<: [*group_common_select, *proxies_default]
@@ -676,8 +665,11 @@ rules:
   # 广告拦截
   - RULE-SET,adblockmihomolite,AdBlock
 
+  # 拦截 STUN/TURN 探测（3478-3481 STUN/TURN、5349 STUN-over-TLS、19302-19309 Google STUN）
+  - AND,((NETWORK,UDP),(OR,((DST-PORT,3478-3481),(DST-PORT,5349),(DST-PORT,19302-19309)))),REJECT
+  - DOMAIN-KEYWORD,stun,REJECT
+
   # 代理规则
-  - RULE-SET,googlefcm,FCM
   - RULE-SET,youtube,YouTube
   - RULE-SET,google,Google
   - RULE-SET,google_ip,Google,no-resolve
