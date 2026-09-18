@@ -1088,7 +1088,6 @@ const main = (config) => {
     'AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn_additional),(RULE-SET,cn_ip,no-resolve)))))),REJECT',
     'RULE-SET,adblockmihomolite,AdBlock',
     'AND,((NETWORK,UDP),(OR,((DST-PORT,3478-3481),(DST-PORT,5349),(DST-PORT,19302-19309)))),REJECT',
-    'DOMAIN-KEYWORD,stun,REJECT',
     'RULE-SET,ai,AI',
     'RULE-SET,youtube,YouTube',
     'RULE-SET,google,Google',
