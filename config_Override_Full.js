@@ -1,16 +1,65 @@
 // ============================================================================
-// clash 覆写脚本 全规则 (Bettbox JS Override)
+// clash 覆写脚本 全规则 + 自定义 DNS (mihomo JS Override)
 // 仓库 https://github.com/RikkaSaiko1/clash_config
-// 与 config_Override_Full.yaml 完全等价 (YAML 锚点已全部展开)
 //
-// 用法: Bettbox -> 配置 -> 覆写脚本 -> 导入本文件,
-//       并在该订阅的 profile 上开启 "使用脚本覆写"。
-//
-// Bettbox 运行时约定: 脚本必须定义 main(config), config 为已合并的完整配置对象,
-//       返回值即写入内核前的最终配置。
-// ============================================================================
+// - DNS 防泄漏: fake-ip + 全 DoH(无明文 UDP 53), nameserver-policy 按规则集分组,
+//   fake-ip-filter 排除私有/国内域名; nameserver / fallback 带 #PROXY, 出口分离
+// - 全规则: proxy-groups 全部策略组 + 地区组, rules 完整规则链, rule-providers 全量
+
+
 
 const main = (config) => {
+  config['allow-lan'] = true;
+  config['bind-address'] = '*';
+  config['ipv6'] = false;
+  config['unified-delay'] = true;
+  config['tcp-concurrent'] = true;
+  config['log-level'] = 'info';
+  config['keep-alive-idle'] = 600;
+  config['keep-alive-interval'] = 15; 
+  config['profile'] = {
+    'store-selected': true,
+    'store-fake-ip': true,
+  };
+  config['external-ui'] = 'ui';
+  config['external-ui-name'] = 'zashboard';
+  config['external-ui-url'] = 'https://github.com/Zephyruso/zashboard/archive/refs/heads/gh-pages.zip';
+
+  config['geox-url'] = {
+    geoip: 'https://github.com/appshubcc/bett-rules/releases/download/latest/geoip.dat',
+    geosite: 'https://github.com/appshubcc/bett-rules/releases/download/latest/geosite.dat',
+    mmdb: 'https://github.com/appshubcc/bett-rules/releases/download/latest/geoip.metadb',
+    asn: 'https://github.com/appshubcc/bett-rules/releases/download/latest/GeoLite2-ASN.mmdb',
+  };
+
+  config['ntp'] = {
+    enable: true,
+    'write-to-system': true,
+  };
+  
+  config['tun'] = {
+    enable: true,
+    stack: 'mixed',
+    'dns-hijack': ['any:53', 'tcp://any:53'],
+    'auto-route': true,
+    'auto-redirect': true,
+    'auto-detect-interface': true,
+    'route-exclude-address-set': ['cn_ip'],
+  };
+
+  config['sniffer'] = {
+    enable: true,
+    'override-destination': false,
+    'force-dns-mapping': false,
+    'parse-pure-ip': true,
+    sniff: {
+      HTTP: { ports: [80, '8080-8880'] },
+      TLS: { ports: [443, 8443] },
+      QUIC: { ports: [443, 8443] },
+    },
+    'skip-domain': ['Mijia Cloud', '+.push.apple.com'],
+  };
+
   // ------------------------------------------------ 规则集 (rule-providers)
   config['rule-providers'] = {
     private: {
@@ -93,6 +142,15 @@ const main = (config) => {
       url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/cn.mrs',
       path: './ruleset/cn_ip.mrs',
       'path-in-bundle': 'geo/geoip/cn.mrs',
+    },
+    cn: {
+      type: 'http',
+      format: 'mrs',
+      interval: 86400,
+      behavior: 'domain',
+      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/cn.mrs',
+      path: './ruleset/cn.mrs',
+      'path-in-bundle': 'geo/geosite/cn.mrs',
     },
     youtube: {
       type: 'http',
@@ -364,23 +422,22 @@ const main = (config) => {
       path: './ruleset/cn-additional-list.mrs',
       'path-in-bundle': 'geo/geosite/cn.mrs',
     },
-    cn: {
+    // --- Fake IP 过滤 (文本格式列表) ---
+    fakeipfilter_cn: {
       type: 'http',
-      format: 'mrs',
       interval: 86400,
       behavior: 'domain',
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/cn.mrs',
-      path: './ruleset/cn.mrs',
-      'path-in-bundle': 'geo/geosite/cn.mrs',
+      format: 'text',
+      url: 'https://raw.githubusercontent.com/qichiyuhub/rule/refs/heads/main/rules/fakeipfilter-cn.list',
+      path: './ruleset/fakeipfilter-cn.list',
     },
-    dns: {
-      url: 'https://raw.githubusercontent.com/xishang0128/rules/main/clash%20or%20stash/prevent_dns_leak/prevent_dns_leak_domain.list',
-      path: './ruleset/dns.list',
-      'path-in-bundle': 'geo/geosite/dns.list',
-      behavior: 'domain',
-      interval: 86400,
-      format: 'yaml',
+    'fakeipfilter_!cn': {
       type: 'http',
+      interval: 86400,
+      behavior: 'domain',
+      format: 'text',
+      url: 'https://raw.githubusercontent.com/qichiyuhub/rule/refs/heads/main/rules/fakeipfilter-!cn.list',
+      path: './ruleset/fakeipfilter-!cn.list',
     },
   };
 
@@ -1083,20 +1140,77 @@ const main = (config) => {
 
   ];
 
+  config['dns'] = {
+    enable: true,
+    'cache-algorithm': 'arc',
+    ipv6: false,
+    'enhanced-mode': 'fake-ip',
+    'fake-ip-ttl': 1,
+    'fake-ip-range': '198.18.0.0/16',
+    'fake-ip-filter-mode': 'blacklist',
+    'default-nameserver': [
+      'https://223.5.5.5/dns-query',
+    ],
+    'proxy-server-nameserver': [
+      'https://dns.alidns.com/dns-query',
+      'https://doh.pub/dns-query',
+    ],
+    'direct-nameserver': [
+      'https://dns.alidns.com/dns-query',
+      'https://doh.pub/dns-query',
+    ],
+    nameserver: [
+      'https://8.8.8.8/dns-query#PROXY&ecs=223.5.5.0/24',
+    ],
+    fallback: [
+      'https://8.8.8.8/dns-query#PROXY',
+    ],
+    'fallback-filter': {
+      geoip: true,
+      'geoip-code': 'CN',
+    },
+    // nameserver-policy
+    'nameserver-policy': {
+      'rule-set:cn,private,fakeipfilter_cn,games_cn,microsoft_cn,apple_cn': [
+        'https://dns.alidns.com/dns-query#disable-qtype-65=true',
+        'https://doh.pub/dns-query#disable-qtype-65=true',
+      ],
+      'rule-set:fakeipfilter_!cn': [
+        'https://8.8.8.8/dns-query#PROXY&disable-qtype-65=true',
+      ],
+    },
+    'fake-ip-filter': [
+      'rule-set:fakeipfilter_cn',
+      'rule-set:fakeipfilter_!cn',
+      'rule-set:private',
+      'rule-set:cn',
+      'rule-set:microsoft_cn',
+      'rule-set:apple_cn',
+      'rule-set:games_cn',
+    ],
+  };
+
   // ------------------------------------------------ 分流规则 (rules)
   config['rules'] = [
+    // 私有网络直连
     'RULE-SET,private,DIRECT',
+    'RULE-SET,private_ip,DIRECT,no-resolve',
+    // 国内直连
     'RULE-SET,geolocation-cn,DIRECT',
-    'RULE-SET,games_cn,DIRECT',
+    'RULE-SET,games_cn,DIRECT', // 已包含 steam 下载域名
     'RULE-SET,epicgames,DIRECT',
     'RULE-SET,nvidia_cn,DIRECT',
     'RULE-SET,apple_cn,DIRECT',
     'RULE-SET,microsoft_cn,DIRECT',
     'DOMAIN,fsend.cn,DIRECT',
     'DOMAIN,international-gfe.download.nvidia.com,DIRECT',
+    // 禁用国外 QUIC 流量
     'AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn_additional),(RULE-SET,cn_ip,no-resolve)))))),REJECT',
+    // 广告拦截
     'RULE-SET,adblockmihomolite,AdBlock',
+    // 拦截 STUN/TURN 探测（3478-3481 STUN/TURN、5349 STUN-over-TLS、19302-19309 Google STUN）
     'AND,((NETWORK,UDP),(OR,((DST-PORT,3478-3481),(DST-PORT,5349),(DST-PORT,19302-19309)))),REJECT',
+    // 代理规则
     'RULE-SET,ai,AI',
     'RULE-SET,youtube,YouTube',
     'RULE-SET,googlefcm,DIRECT',
@@ -1116,6 +1230,7 @@ const main = (config) => {
     'RULE-SET,instagram,Instagram',
     'RULE-SET,netflix,Netflix',
     'RULE-SET,netflix_ip,Netflix,no-resolve',
+    // emby
     'RULE-SET,emby,Emby',
     'RULE-SET,emos,Emby',
     'DOMAIN-SUFFIX,mb3admin.com,Emby',
@@ -1133,10 +1248,9 @@ const main = (config) => {
     'RULE-SET,spotify_ip,Spotify,no-resolve',
     'RULE-SET,cryptocurrency,Crypto',
     'RULE-SET,ehentai,EHentai',
-    'RULE-SET,dns,PROXY',
+    // 兜底规则
     'RULE-SET,geolocation-!cn,PROXY',
     'RULE-SET,cn_ip,DIRECT',
-    'RULE-SET,private_ip,DIRECT',
     'MATCH,PROXY',
   ];
 
