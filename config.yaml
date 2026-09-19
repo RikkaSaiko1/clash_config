@@ -27,411 +27,109 @@ proxy-providers:
   #   health-check: {enable: true,url: "https://www.gstatic.com/generate_204",interval: 100}
   #   override:
   #    additional-prefix: "[]"
-
-# 更新订阅链接方式,默认直连
 proxies: 
   - name: "直连"
     type: direct
     udp: true
 
-external-controller: 127.0.0.1:9091
-external-ui: ui
-external-ui-url: https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip
-external-controller-cors:
-  allow-origins:
-    - https://metacubex.github.io
-    - https://board.zash.run.place
-  allow-private-network: false
-secret: DDcCsB2bvp9kciZhl9um11KgAfoRE7ge
-ipv6: false
-mode: rule
 mixed-port: 7890
-socks-port: 0
-port: 0
-redir-port: 0
-tproxy-port: 0
-allow-lan: false
-unified-delay: false
-tcp-concurrent: false
-log-level: info
-find-process-mode: always
-interface-name: ""
-bind-address: "*"
-keep-alive-idle: 0
-keep-alive-interval: 0
-disable-keep-alive: false
-lan-allowed-ips:
-  - 0.0.0.0/0
-  - ::/0
-lan-disallowed-ips: []
-authentication: []
+authentication:
+- "user:passwd"
 skip-auth-prefixes:
-  - 127.0.0.1/32
-tun:
-  enable: true
-  device: mihomo
-  stack: mixed # mpis需最新核心
-  auto-route: true
-  auto-redirect: false
-  auto-detect-interface: true
-  dns-hijack:
-    - any:53
-  route-exclude-address: []
-  mtu: 1500
-  strict-route: true
-  disable-icmp-forwarding: false
-dns:
-  # 启用 DNS 模块
-  enable: true
-  # 关闭 IPv6 解析
-  ipv6: false
-  # DNS 遵循 rules 分流
-  respect-rules: true
-  # fake-ip 模式
-  enhanced-mode: fake-ip
-  # fake-ip 地址段
-  fake-ip-range: 198.18.0.1/16
-  # fake-ip 过滤名单
-  fake-ip-filter:
-    - "+.lan"
-    - "+.local"
-    - "+.localhost"
-    - "+.msftconnecttest.com"
-    - "+.msftncsi.com"
-    - "time.*.com"
-    - "ntp.*.com"
-    - "+.market.xiaomi.com"
-  # 不使用系统 hosts
-  use-hosts: false
-  use-system-hosts: false
-  # 默认 DNS（用于解析下面的 DoH/DoT 服务器）
-  default-nameserver:
-    - 223.5.5.5
-    - 119.29.29.29
-    - 8.8.8.8
-  # 主 DNS
-  nameserver:
-    - https://doh.pub/dns-query
-    - https://dns.alidns.com/dns-query
-  # 代理节点域名解析
-  proxy-server-nameserver:
-    - https://doh.pub/dns-query
-    - https://dns.alidns.com/dns-query
-  # 直连域名 DNS
-  direct-nameserver:
-    - https://doh.pub/dns-query
-    - https://dns.alidns.com/dns-query
-  # 按域名指定 DNS
-  nameserver-policy:
-    "geosite:cn":
-      - https://doh.pub/dns-query
-      - https://dns.alidns.com/dns-query
-    "geosite:private":
-      - 223.5.5.5
-      - 119.29.29.29
-    "geosite:geolocation-!cn":
-      - https://dns.google/dns-query
-      - https://1.1.1.1/dns-query
-sniffer:
-  enable: true
-  parse-pure-ip: true
-  force-dns-mapping: true
-  override-destination: false
-  sniff:
-    HTTP:
-      ports:
-        - 80
-        - 443
-      override-destination: false
-    TLS:
-      ports:
-        - 443
-  skip-domain:
-    - +.push.apple.com
-  skip-dst-address:
-    - 91.105.192.0/23
-    - 91.108.4.0/22
-    - 91.108.8.0/21
-    - 91.108.16.0/21
-    - 91.108.56.0/22
-    - 95.161.64.0/20
-    - 149.154.160.0/20
-    - 185.76.151.0/24
-    - 2001:67c:4e8::/48
-    - 2001:b28:f23c::/47
-    - 2001:b28:f23f::/48
-    - 2a0a:f280:203::/48
+- 127.0.0.0/8
+- 192.168.0.0/16
+allow-lan: true
+bind-address: "*"
+ipv6: false
+unified-delay: true
+tcp-concurrent: true
+log-level: info
+keep-alive-idle: 600
+keep-alive-interval: 15
 profile:
   store-selected: true
   store-fake-ip: true
-geo-auto-update: true
-geo-update-interval: 24
-geodata-mode: false
+
+external-controller: 0.0.0.0:9090
+secret: ""
+external-ui: ui
+external-ui-name: zashboard
+external-ui-url: "https://github.com/Zephyruso/zashboard/archive/refs/heads/gh-pages.zip"
 geox-url:
   geoip: https://github.com/appshubcc/bett-rules/releases/download/latest/geoip.dat
   geosite: https://github.com/appshubcc/bett-rules/releases/download/latest/geosite.dat
   mmdb: https://github.com/appshubcc/bett-rules/releases/download/latest/geoip.metadb
   asn: https://github.com/appshubcc/bett-rules/releases/download/latest/GeoLite2-ASN.mmdb
 
+ntp:
+  enable: true
+  write-to-system: true
+tun:
+  enable: true
+  stack: mixed   ##如果内核版本大于v1.19.31，此处可以改为自研协议栈 mips ，理论上性能更好。
+  dns-hijack: ["any:53", "tcp://any:53"]
+  auto-route: true
+  auto-redirect: true
+  auto-detect-interface: true
+  route-exclude-address-set:
+    - cn_ip
 
-# Rule Provider 通用配置
-rule_providers_common:
-  rule_providers_domain: &rule_providers_domain { type: http, format: mrs, interval: 86400, behavior: domain }
-  rule_providers_ip: &rule_providers_ip { type: http, format: mrs, interval: 86400, behavior: ipcidr }
+sniffer:
+  enable: true
+  override-destination: false
+  force-dns-mapping: false
+  parse-pure-ip: true
+  sniff:
+    HTTP:
+      ports: [80, 8080-8880]
+    TLS:
+      ports: [443, 8443]
+    QUIC:
+      ports: [443, 8443]
+  skip-domain:
+    - "Mijia Cloud"
+    - "+.push.apple.com"
 
-# 定义 Rule Providers
-rule-providers:
-  # --- 直连规则集 ---
-  private:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/private.mrs'
-    path: './ruleset/private.mrs'
-    path-in-bundle: 'geo/geosite/private.mrs'
+dns:
+  enable: true
+  cache-algorithm: arc
+  ipv6: false
+  enhanced-mode: fake-ip
+  fake-ip-ttl: 1
+  fake-ip-range: 198.18.0.0/16
+  fake-ip-filter-mode: blacklist
+  default-nameserver:
+    - https://223.5.5.5/dns-query
+  proxy-server-nameserver:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+  direct-nameserver:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
 
-  private_ip:
-    <<: *rule_providers_ip
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/private.mrs'
-    path: './ruleset/private_ip.mrs'
-    path-in-bundle: 'geo/geoip/private.mrs'
+  nameserver-policy:
+    "rule-set:cn,private,fakeipfilter_cn,games_cn,microsoft_cn,apple_cn":
+    - https://dns.alidns.com/dns-query#disable-qtype-65=true
+    - https://doh.pub/dns-query#disable-qtype-65=true
+    "rule-set:fakeipfilter_!cn":
+    - https://8.8.8.8/dns-query#PROXY&disable-qtype-65=true
+  nameserver:
+    - https://8.8.8.8/dns-query#PROXY&ecs=223.5.5.0/24
+  fallback:
+    - https://8.8.8.8/dns-query#PROXY
+  fallback-filter:
+    geoip: true
+    geoip-code: CN
+  fake-ip-filter:
+    - rule-set:fakeipfilter_cn
+    - rule-set:fakeipfilter_!cn
+    - rule-set:private
+    - rule-set:cn
+    - rule-set:microsoft_cn
+    - rule-set:apple_cn
+    - rule-set:games_cn
 
-  games_cn:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-games@cn.mrs'
-    path: './ruleset/category-games@cn.mrs'
-    path-in-bundle: 'geo/geosite/category-games@cn.mrs'
 
-  epicgames:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/epicgames.mrs'
-    path: './ruleset/epicgames.mrs'
-    path-in-bundle: 'geo/geosite/epicgames.mrs'
-
-  nvidia_cn:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/nvidia@cn.mrs'
-    path: './ruleset/nvidia@cn.mrs'
-    path-in-bundle: 'geo/geosite/nvidia@cn.mrs'
-
-  apple_cn:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/apple@cn.mrs'
-    path: './ruleset/apple@cn.mrs'
-    path-in-bundle: 'geo/geosite/apple@cn.mrs'
-
-  microsoft_cn:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/microsoft@cn.mrs'
-    path: './ruleset/microsoft@cn.mrs'
-    path-in-bundle: 'geo/geosite/microsoft@cn.mrs'
-
-  geolocation-cn:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-cn.mrs'
-    path: './ruleset/geolocation-cn.mrs'
-    path-in-bundle: 'geo/geosite/geolocation-cn.mrs'
-
-  cn_ip:
-    <<: *rule_providers_ip
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/cn.mrs'
-    path: './ruleset/cn_ip.mrs'
-    path-in-bundle: 'geo/geoip/cn.mrs'
-
-  # --- 代理规则集 ---
-  youtube:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/youtube.mrs'
-    path: './ruleset/youtube.mrs'
-    path-in-bundle: 'geo/geosite/youtube.mrs'
-
-  googlefcm:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/googlefcm.mrs'
-    path: './ruleset/googlefcm.mrs'
-    path-in-bundle: 'geo/geosite/googlefcm.mrs'
-
-  google:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/google.mrs'
-    path: './ruleset/google.mrs'
-    path-in-bundle: 'geo/geosite/google.mrs'
-
-  google_ip:
-    <<: *rule_providers_ip
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/google.mrs'
-    path: './ruleset/google_ip.mrs'
-    path-in-bundle: 'geo/geoip/google.mrs'
-
-  ai:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-ai-!cn.mrs'
-    path: './ruleset/ai.mrs'
-    path-in-bundle: 'geo/geosite/category-ai-!cn.mrs'
-
-  github:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/github.mrs'
-    path: './ruleset/github.mrs'
-    path-in-bundle: 'geo/geosite/github.mrs'
-
-  microsoft:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/microsoft.mrs'
-    path: './ruleset/microsoft.mrs'
-    path-in-bundle: 'geo/geosite/microsoft.mrs'
-
-  apple:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/apple.mrs'
-    path: './ruleset/apple.mrs'
-    path-in-bundle: 'geo/geosite/apple.mrs'
-
-  telegram:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/telegram.mrs'
-    path: './ruleset/telegram.mrs'
-    path-in-bundle: 'geo/geosite/telegram.mrs'
-
-  telegram_ip:
-    <<: *rule_providers_ip
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/telegram.mrs'
-    path: './ruleset/telegram_ip.mrs'
-    path-in-bundle: 'geo/geoip/telegram.mrs'
-
-  steam:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/steam.mrs'
-    path: './ruleset/steam.mrs'
-    path-in-bundle: 'geo/geosite/steam.mrs'
-
-  steam_ip:
-    <<: *rule_providers_ip
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/steam.mrs'
-    path: './ruleset/steam_ip.mrs'
-    path-in-bundle: 'geo/geoip/steam.mrs'
-
-  tiktok:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/tiktok.mrs'
-    path: './ruleset/tiktok.mrs'
-    path-in-bundle: 'geo/geosite/tiktok.mrs'
-
-  tiktok_ip:
-    <<: *rule_providers_ip
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/tiktok.mrs'
-    path: './ruleset/tiktok_ip.mrs'
-    path-in-bundle: 'geo/geoip/tiktok.mrs'
-
-  twitter:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/twitter.mrs'
-    path: './ruleset/twitter.mrs'
-    path-in-bundle: 'geo/geosite/twitter.mrs'
-
-  twitter_ip:
-    <<: *rule_providers_ip
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/twitter.mrs'
-    path: './ruleset/twitter_ip.mrs'
-    path-in-bundle: 'geo/geoip/twitter.mrs'
-
-  instagram:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/instagram.mrs'
-    path: './ruleset/instagram.mrs'
-    path-in-bundle: 'geo/geosite/instagram.mrs'
-
-  netflix:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/netflix.mrs'
-    path: './ruleset/netflix.mrs'
-    path-in-bundle: 'geo/geosite/netflix.mrs'
-
-  netflix_ip:
-    <<: *rule_providers_ip
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/netflix.mrs'
-    path: './ruleset/netflix_ip.mrs'
-    path-in-bundle: 'geo/geoip/netflix.mrs'
-
-  emby:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/666OS/rules@release/mihomo/domain/Emby.mrs'
-    path: './ruleset/emby.mrs'
-    path-in-bundle: 'geo/geosite/category-emby.mrs'
-
-  emos:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/binaryu/emos-proxy-rule@main/rules/emos-mihomo.mrs'
-    path: './ruleset/emos.mrs'
-    path-in-bundle: 'geo/geosite/category-emby.mrs'
-
-  pikpak:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/pikpak.mrs'
-    path: './ruleset/pikpak.mrs'
-    path-in-bundle: 'geo/geosite/pikpak.mrs'
-
-  spotify:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/spotify.mrs'
-    path: './ruleset/spotify.mrs'
-    path-in-bundle: 'geo/geosite/spotify.mrs'
-
-  spotify_ip:
-    <<: *rule_providers_ip
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/spotify.mrs'
-    path: './ruleset/spotify_ip.mrs'
-    path-in-bundle: 'geo/geoip/spotify.mrs'
-
-  cryptocurrency:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-cryptocurrency.mrs'
-    path: './ruleset/cryptocurrency.mrs'
-    path-in-bundle: 'geo/geosite/category-cryptocurrency.mrs'
-
-  ehentai:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/ehentai.mrs'
-    path: './ruleset/ehentai.mrs'
-    path-in-bundle: 'geo/geosite/ehentai.mrs'
-
-  geolocation-!cn:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-!cn.mrs'
-    path: './ruleset/geolocation-!cn.mrs'
-    path-in-bundle: 'geo/geosite/geolocation-!cn.mrs'
-
-  # --- 其他规则集 ---
-  adblockmihomolite:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.mrs'
-    path: './ruleset/adblockmihomolite.mrs'
-    path-in-bundle: 'geo/geosite/category-ads-all.mrs'
-
-  fakeip_filter:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/fakeip-filter.mrs'
-    path: './ruleset/fakeip-filter.mrs'
-    path-in-bundle: 'geo/geosite/fakeip-filter.mrs'
-
-  cn_additional:
-    <<: *rule_providers_domain
-    url: 'https://static-file-global.353355.xyz/rules/cn-additional-list.mrs'
-    path: './ruleset/cn-additional-list.mrs'
-    path-in-bundle: 'geo/geosite/cn.mrs'
-
-  cn:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/cn.mrs'
-    path: './ruleset/cn.mrs'
-    path-in-bundle: 'geo/geosite/cn.mrs'
-
-  dns:
-    url: 'https://raw.githubusercontent.com/xishang0128/rules/main/clash%20or%20stash/prevent_dns_leak/prevent_dns_leak_domain.list'
-    path: './ruleset/dns.list'
-    path-in-bundle: 'geo/geosite/dns.list'
-    behavior: domain
-    interval: 86400
-    format: yaml
-    type: http
 
 
 # 策略组通用配置
@@ -655,7 +353,7 @@ proxy-groups:
 rules:
   # 私有网络直连
   - RULE-SET,private,DIRECT
-
+  - RULE-SET,private_ip,DIRECT,no-resolve
   # 国内直连
   - RULE-SET,geolocation-cn,DIRECT
   - RULE-SET,games_cn,DIRECT # 已包含 steam 下载域名
@@ -676,11 +374,12 @@ rules:
   - AND,((NETWORK,UDP),(OR,((DST-PORT,3478-3481),(DST-PORT,5349),(DST-PORT,19302-19309)))),REJECT
 
   # 代理规则
+  - RULE-SET,ai,AI
   - RULE-SET,youtube,YouTube
   - RULE-SET,googlefcm,DIRECT
   - RULE-SET,google,Google
   - RULE-SET,google_ip,Google,no-resolve
-  - RULE-SET,ai,AI
+
   - RULE-SET,github,PROXY
   - RULE-SET,microsoft,Microsoft
   - RULE-SET,apple,Apple
@@ -715,12 +414,274 @@ rules:
   - RULE-SET,cryptocurrency,Crypto
   - RULE-SET,ehentai,EHentai
 
-  # dns防泄漏
-  - RULE-SET,dns,PROXY
-
   # 兜底规则
   - RULE-SET,geolocation-!cn,PROXY
   - RULE-SET,cn_ip,DIRECT
-  - RULE-SET,private_ip,DIRECT
-
   - MATCH,PROXY
+
+  # Rule Provider 通用配置
+rule_providers_common:
+  rule_providers_domain: &rule_providers_domain { type: http, format: mrs, interval: 86400, behavior: domain }
+  rule_providers_ip: &rule_providers_ip { type: http, format: mrs, interval: 86400, behavior: ipcidr }
+
+# 定义 Rule Providers
+rule-providers:
+  # --- 直连规则集 ---
+  private:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/private.mrs'
+    path: './ruleset/private.mrs'
+    path-in-bundle: 'geo/geosite/private.mrs'
+
+  private_ip:
+    <<: *rule_providers_ip
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/private.mrs'
+    path: './ruleset/private_ip.mrs'
+    path-in-bundle: 'geo/geoip/private.mrs'
+
+  games_cn:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-games@cn.mrs'
+    path: './ruleset/category-games@cn.mrs'
+    path-in-bundle: 'geo/geosite/category-games@cn.mrs'
+
+  epicgames:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/epicgames.mrs'
+    path: './ruleset/epicgames.mrs'
+    path-in-bundle: 'geo/geosite/epicgames.mrs'
+
+  nvidia_cn:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/nvidia@cn.mrs'
+    path: './ruleset/nvidia@cn.mrs'
+    path-in-bundle: 'geo/geosite/nvidia@cn.mrs'
+
+  apple_cn:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/apple@cn.mrs'
+    path: './ruleset/apple@cn.mrs'
+    path-in-bundle: 'geo/geosite/apple@cn.mrs'
+
+  microsoft_cn:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/microsoft@cn.mrs'
+    path: './ruleset/microsoft@cn.mrs'
+    path-in-bundle: 'geo/geosite/microsoft@cn.mrs'
+
+  geolocation-cn:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-cn.mrs'
+    path: './ruleset/geolocation-cn.mrs'
+    path-in-bundle: 'geo/geosite/geolocation-cn.mrs'
+
+  cn_ip:
+    <<: *rule_providers_ip
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/cn.mrs'
+    path: './ruleset/cn_ip.mrs'
+    path-in-bundle: 'geo/geoip/cn.mrs'
+
+  cn:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/cn.mrs'
+    path: './ruleset/cn.mrs'
+    path-in-bundle: 'geo/geosite/cn.mrs'
+
+  # --- 代理规则集 ---
+  youtube:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/youtube.mrs'
+    path: './ruleset/youtube.mrs'
+    path-in-bundle: 'geo/geosite/youtube.mrs'
+
+  googlefcm:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/googlefcm.mrs'
+    path: './ruleset/googlefcm.mrs'
+    path-in-bundle: 'geo/geosite/googlefcm.mrs'
+
+  google:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/google.mrs'
+    path: './ruleset/google.mrs'
+    path-in-bundle: 'geo/geosite/google.mrs'
+
+  google_ip:
+    <<: *rule_providers_ip
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/google.mrs'
+    path: './ruleset/google_ip.mrs'
+    path-in-bundle: 'geo/geoip/google.mrs'
+
+  ai:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-ai-!cn.mrs'
+    path: './ruleset/ai.mrs'
+    path-in-bundle: 'geo/geosite/category-ai-!cn.mrs'
+
+  github:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/github.mrs'
+    path: './ruleset/github.mrs'
+    path-in-bundle: 'geo/geosite/github.mrs'
+
+  microsoft:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/microsoft.mrs'
+    path: './ruleset/microsoft.mrs'
+    path-in-bundle: 'geo/geosite/microsoft.mrs'
+
+  apple:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/apple.mrs'
+    path: './ruleset/apple.mrs'
+    path-in-bundle: 'geo/geosite/apple.mrs'
+
+  telegram:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/telegram.mrs'
+    path: './ruleset/telegram.mrs'
+    path-in-bundle: 'geo/geosite/telegram.mrs'
+
+  telegram_ip:
+    <<: *rule_providers_ip
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/telegram.mrs'
+    path: './ruleset/telegram_ip.mrs'
+    path-in-bundle: 'geo/geoip/telegram.mrs'
+
+  steam:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/steam.mrs'
+    path: './ruleset/steam.mrs'
+    path-in-bundle: 'geo/geosite/steam.mrs'
+
+  steam_ip:
+    <<: *rule_providers_ip
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/steam.mrs'
+    path: './ruleset/steam_ip.mrs'
+    path-in-bundle: 'geo/geoip/steam.mrs'
+
+  tiktok:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/tiktok.mrs'
+    path: './ruleset/tiktok.mrs'
+    path-in-bundle: 'geo/geosite/tiktok.mrs'
+
+  tiktok_ip:
+    <<: *rule_providers_ip
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/tiktok.mrs'
+    path: './ruleset/tiktok_ip.mrs'
+    path-in-bundle: 'geo/geoip/tiktok.mrs'
+
+  twitter:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/twitter.mrs'
+    path: './ruleset/twitter.mrs'
+    path-in-bundle: 'geo/geosite/twitter.mrs'
+
+  twitter_ip:
+    <<: *rule_providers_ip
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/twitter.mrs'
+    path: './ruleset/twitter_ip.mrs'
+    path-in-bundle: 'geo/geoip/twitter.mrs'
+
+  instagram:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/instagram.mrs'
+    path: './ruleset/instagram.mrs'
+    path-in-bundle: 'geo/geosite/instagram.mrs'
+
+  netflix:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/netflix.mrs'
+    path: './ruleset/netflix.mrs'
+    path-in-bundle: 'geo/geosite/netflix.mrs'
+
+  netflix_ip:
+    <<: *rule_providers_ip
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/netflix.mrs'
+    path: './ruleset/netflix_ip.mrs'
+    path-in-bundle: 'geo/geoip/netflix.mrs'
+
+  emby:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/666OS/rules@release/mihomo/domain/Emby.mrs'
+    path: './ruleset/emby.mrs'
+    path-in-bundle: 'geo/geosite/category-emby.mrs'
+
+  emos:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/binaryu/emos-proxy-rule@main/rules/emos-mihomo.mrs'
+    path: './ruleset/emos.mrs'
+    path-in-bundle: 'geo/geosite/category-emby.mrs'
+
+  pikpak:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/pikpak.mrs'
+    path: './ruleset/pikpak.mrs'
+    path-in-bundle: 'geo/geosite/pikpak.mrs'
+
+  spotify:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/spotify.mrs'
+    path: './ruleset/spotify.mrs'
+    path-in-bundle: 'geo/geosite/spotify.mrs'
+
+  spotify_ip:
+    <<: *rule_providers_ip
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/spotify.mrs'
+    path: './ruleset/spotify_ip.mrs'
+    path-in-bundle: 'geo/geoip/spotify.mrs'
+
+  cryptocurrency:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-cryptocurrency.mrs'
+    path: './ruleset/cryptocurrency.mrs'
+    path-in-bundle: 'geo/geosite/category-cryptocurrency.mrs'
+
+  ehentai:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/ehentai.mrs'
+    path: './ruleset/ehentai.mrs'
+    path-in-bundle: 'geo/geosite/ehentai.mrs'
+
+  geolocation-!cn:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-!cn.mrs'
+    path: './ruleset/geolocation-!cn.mrs'
+    path-in-bundle: 'geo/geosite/geolocation-!cn.mrs'
+
+  # --- 其他规则集 ---
+  adblockmihomolite:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.mrs'
+    path: './ruleset/adblockmihomolite.mrs'
+    path-in-bundle: 'geo/geosite/category-ads-all.mrs'
+
+  fakeip_filter:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/fakeip-filter.mrs'
+    path: './ruleset/fakeip-filter.mrs'
+    path-in-bundle: 'geo/geosite/fakeip-filter.mrs'
+
+  cn_additional:
+    <<: *rule_providers_domain
+    url: 'https://static-file-global.353355.xyz/rules/cn-additional-list.mrs'
+    path: './ruleset/cn-additional-list.mrs'
+    path-in-bundle: 'geo/geosite/cn.mrs'
+
+  # --- Fake IP 过滤 ---
+  fakeipfilter_cn: 
+    type: http
+    interval: 86400
+    behavior: domain
+    format: text
+    url: 'https://raw.githubusercontent.com/qichiyuhub/rule/refs/heads/main/rules/fakeipfilter-cn.list'
+    path: './ruleset/fakeipfilter-cn.list'
+
+  fakeipfilter_!cn:
+    type: http
+    interval: 86400
+    behavior: domain
+    format: text
+    url: 'https://raw.githubusercontent.com/qichiyuhub/rule/refs/heads/main/rules/fakeipfilter-!cn.list'
+    path: './ruleset/fakeipfilter-!cn.list'
