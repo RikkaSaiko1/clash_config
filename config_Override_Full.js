@@ -9,34 +9,7 @@
 
 
 const main = (config) => {
-  config['allow-lan'] = true;
-  config['bind-address'] = '*';
-  config['ipv6'] = false;
-  config['unified-delay'] = true;
-  config['tcp-concurrent'] = true;
-  config['log-level'] = 'info';
-  config['keep-alive-idle'] = 600;
-  config['keep-alive-interval'] = 15; 
-  config['profile'] = {
-    'store-selected': true,
-    'store-fake-ip': true,
-  };
-  config['external-ui'] = 'ui';
-  config['external-ui-name'] = 'zashboard';
-  config['external-ui-url'] = 'https://github.com/Zephyruso/zashboard/archive/refs/heads/gh-pages.zip';
 
-  config['geox-url'] = {
-    geoip: 'https://github.com/appshubcc/bett-rules/releases/download/latest/geoip.dat',
-    geosite: 'https://github.com/appshubcc/bett-rules/releases/download/latest/geosite.dat',
-    mmdb: 'https://github.com/appshubcc/bett-rules/releases/download/latest/geoip.metadb',
-    asn: 'https://github.com/appshubcc/bett-rules/releases/download/latest/GeoLite2-ASN.mmdb',
-  };
-
-  config['ntp'] = {
-    enable: true,
-    'write-to-system': true,
-  };
-  
   config['tun'] = {
     enable: true,
     stack: 'mixed',

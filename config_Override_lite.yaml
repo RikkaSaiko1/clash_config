@@ -5,33 +5,6 @@
 # - DNS 防泄漏: fake-ip + 全 DoH, nameserver-policy 分组, 出口分离
 # - 轻量规则集: 精简策略组 + 精简规则链 + 裁剪 rule-providers
 
-allow-lan: true
-bind-address: "*"
-ipv6: false
-unified-delay: true
-tcp-concurrent: true
-log-level: info
-keep-alive-idle: 600
-keep-alive-interval: 15
-
-profile:
-  store-selected: true
-  store-fake-ip: true
-
-external-ui: ui
-external-ui-name: zashboard
-external-ui-url: "https://github.com/Zephyruso/zashboard/archive/refs/heads/gh-pages.zip"
-
-geox-url:
-  geoip: https://github.com/appshubcc/bett-rules/releases/download/latest/geoip.dat
-  geosite: https://github.com/appshubcc/bett-rules/releases/download/latest/geosite.dat
-  mmdb: https://github.com/appshubcc/bett-rules/releases/download/latest/geoip.metadb
-  asn: https://github.com/appshubcc/bett-rules/releases/download/latest/GeoLite2-ASN.mmdb
-
-ntp:
-  enable: true
-  write-to-system: true
-
 tun!:
   enable: true
   stack: mixed
