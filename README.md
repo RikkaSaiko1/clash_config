@@ -11,23 +11,35 @@
 - **DNS 防泄漏**：fake-ip + 全 DoH（无明文 UDP 53），`nameserver-policy` 按规则集分组，`fake-ip-filter` 排除私有/国内域名，`nameserver` / `fallback` 带 `#PROXY` 实现国内外出口分离。
 - **规则分流**：rule-providers 按需加载 `.mrs`，覆盖常用服务与地区策略组，支持 `RULE-SET` / `GEOSITE` / `PROCESS-NAME` 等。
 - **开箱即用**：`config.yaml` 改完订阅地址即可运行，覆写版可叠加在任意订阅上。
+- **源站走 CDN**：配置内所有远程资源（`.mrs` 规则集、图标）统一走 `cdn.jsdelivr.net`，避开 `raw.githubusercontent.com` 的不稳定。
 
 ---
 
 ## 📦 配置文件
 
-| 文件 | 说明 |
-| --- | --- |
-| [`config.yaml`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config.yaml) | 完整配置（直接加载使用） |
-| [`config_Override_Full.yaml`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_Full.yaml) | YAML 覆写配置（全规则版） |
-| [`config_Override_lite.yaml`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_lite.yaml) | YAML 覆写配置（轻量版） |
-| [`config_Override_Full.js`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_Full.js) | JS 覆写脚本（全规则版） |
-| [`config_Override_lite.js`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_lite.js) | JS 覆写脚本（轻量版） |
-| [`SubConverter_config_Full.ini`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/SubConverter_config_Full.ini) | SubConverter 订阅转换（全规则版） |
-| [`SubConverter_config_lite.ini`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/SubConverter_config_lite.ini) | SubConverter 订阅转换（轻量版） |
+| 文件 | 策略组 | 说明 |
+| --- | :---: | --- |
+| [`config.yaml`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config.yaml) | — | 完整配置，**直接加载使用**（含 `proxy-providers` 模板，是三个 JS 脚本渲染的基准） |
+| [`Full_control.yaml`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Full_control.yaml) | 37 | YAML 覆写配置，**全规则权威模板**（保留 YAML 锚点写法） |
+| [`Full_control.js`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Full_control.js) | 37 | JS 覆写脚本，`Full_control.yaml` 的等价实现（锚点已展开） |
+| [`config_Override_Full.yaml`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config_Override_Full.yaml) | 33 | YAML 覆写配置，全规则精简版（较 `Full_control` 少 Twitch / Pixiv / Line / Discord） |
+| [`config_Override_Full.js`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config_Override_Full.js) | 33 | JS 覆写脚本，`config_Override_Full.yaml` 的等价实现 |
+| [`config_Override_lite.yaml`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config_Override_lite.yaml) | 18 | YAML 覆写配置，轻量版（手工维护，规则最精简） |
+| [`config_Override_lite.js`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config_Override_lite.js) | 18 | JS 覆写脚本，轻量版 |
+| [`SubConverter_config_Full.ini`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/SubConverter_config_Full.ini) | — | SubConverter 订阅转换配置，全规则版 |
+| [`SubConverter_config_lite.ini`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/SubConverter_config_lite.ini) | — | SubConverter 订阅转换配置，轻量版 |
 
-> **Full** 规则覆盖全面，**Lite** 精简规则、占用更低，按需选用。
-> YAML 与 JS 为同一份配置的两种书写形式，内容完全等价：[`config_Override_Full.yaml`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_Full.yaml) ↔ [`config_Override_Full.js`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_Full.js)，lite 同理。
+### 三个规则量级怎么选
+
+| 档位 | 配置文件 | 规则集 | 策略组 | 适用 |
+| --- | --- | :---: | :---: | --- |
+| 全量 | `Full_control.*` | 46 | 37 | 需要 Twitch / Pixiv / Line / Discord 等细分分流，内存充裕 |
+| 全量精简 | `config_Override_Full.*` | 42 | 33 | 常用服务全覆盖，去掉低频平台 |
+| 轻量 | `config_Override_lite.*` | 23 | 18 | 只求基础分流，占用最低 |
+
+> **Full** 覆盖全面，**Lite** 精简省资源，按需选用。
+> **`Full_control` 是权威模板**：`config_Override_Full` 由它裁掉 Twitch / Pixiv / Line / Discord 得到，YAML 锚点也随之展开为显式写法。
+> YAML 与 JS 是同一份配置的两种书写形式：`Full_control.yaml` ↔ `Full_control.js`、`config_Override_Full.yaml` ↔ `config_Override_Full.js`，lite 同理。
 
 ---
 
@@ -54,12 +66,13 @@
    需添加多个订阅时，复制 `节点1` 整块，改名为 `节点2`、`节点3` 即可（名称不可重复）。
 
 2. 用 Mihomo / Clash Meta 加载配置并启动。
-=
+
 ### JS 覆写脚本（Bettbox / Sparkle）
 
-[`config_Override_Full.js`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_Full.js) 与
-[`config_Override_lite.js`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_lite.js)
-是上述两份 YAML 覆写的 **JS 等价版本**（锚点已展开，产物一一对应）：
+[`Full_control.js`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Full_control.js)、
+[`config_Override_Full.js`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config_Override_Full.js) 与
+[`config_Override_lite.js`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config_Override_lite.js)
+是上述 YAML 覆写的 **JS 等价版本**（锚点已展开，产物一一对应）：
 
 1. 下载对应 js 文件到本地
 2. 在客户端「覆写脚本」中导入该文件
@@ -70,12 +83,14 @@
 JS 为**整段赋值**语义（`config['dns'] = {...}` 等价于 YAML 的 `dns!:`），覆写范围比 YAML 版多出运行参数、`tun`、`sniffer`、`dns`：
 
 | 覆写项 | YAML 版 | JS 版 |
-| --- | --- | --- |
+| --- | :---: | :---: |
 | `rule-providers` / `proxy-groups` / `rules` | ✅ | ✅ |
 | 运行参数 / `tun` / `sniffer` / `dns`（含防泄漏配置） | ✅ | ✅ |
 | `proxy-providers` / `proxies` / `mixed-port` / 认证 / `secret` / `external-controller` | ❌ 交由订阅与客户端接管 | ❌ 同左 |
 
 > JS 文件不含 `!` / `+` 后缀——这些是 YAML 专有语法，在 JS 中直接赋值即为整体替换。
+
+脚本头部内嵌完整的「规则集 → 策略组」分流对照表（AI / 油管 / 谷歌 / 微软 / 苹果 / 电报 / 游戏平台 / 短视频 / 推特 / 图享 / 奈飞 / 影音 / 网盘 / 音乐 / 加密货币 / 图站 / 直播 / 插画 / 通讯 / 语音 / 代码托管），改规则前可直接查阅。
 
 ### SubConverter 配置
 
