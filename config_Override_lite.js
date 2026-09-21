@@ -82,66 +82,49 @@ const main = (config) => {
   };
 
   // ------------------------------------------------ 规则集 (rule-providers)
-  config['rule-providers'] = {
+const RULE_BASE = { type: 'http', format: 'mrs', interval: 86400 };
+const RULE_DOMAIN = { ...RULE_BASE, behavior: 'domain' };
+const RULE_IPCIDR = { ...RULE_BASE, behavior: 'ipcidr' };
+
+config['rule-providers'] = {
     private: {
-      type: 'http',
-      format: 'mrs',
-      interval: 86400,
-      behavior: 'domain',
+      ...RULE_DOMAIN,
       url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/private.mrs',
       path: './ruleset/private.mrs',
       'path-in-bundle': 'geo/geosite/private.mrs',
     },
     private_ip: {
-      type: 'http',
-      format: 'mrs',
-      interval: 86400,
-      behavior: 'ipcidr',
+      ...RULE_IPCIDR,
       url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/private.mrs',
       path: './ruleset/private_ip.mrs',
       'path-in-bundle': 'geo/geoip/private.mrs',
     },
     games_cn: {
-      type: 'http',
-      format: 'mrs',
-      interval: 86400,
-      behavior: 'domain',
+      ...RULE_DOMAIN,
       url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-games@cn.mrs',
       path: './ruleset/category-games@cn.mrs',
       'path-in-bundle': 'geo/geosite/category-games@cn.mrs',
     },
     epicgames: {
-      type: 'http',
-      format: 'mrs',
-      interval: 86400,
-      behavior: 'domain',
+      ...RULE_DOMAIN,
       url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/epicgames.mrs',
       path: './ruleset/epicgames.mrs',
       'path-in-bundle': 'geo/geosite/epicgames.mrs',
     },
     nvidia_cn: {
-      type: 'http',
-      format: 'mrs',
-      interval: 86400,
-      behavior: 'domain',
+      ...RULE_DOMAIN,
       url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/nvidia@cn.mrs',
       path: './ruleset/nvidia@cn.mrs',
       'path-in-bundle': 'geo/geosite/nvidia@cn.mrs',
     },
     apple_cn: {
-      type: 'http',
-      format: 'mrs',
-      interval: 86400,
-      behavior: 'domain',
+      ...RULE_DOMAIN,
       url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/apple@cn.mrs',
       path: './ruleset/apple@cn.mrs',
       'path-in-bundle': 'geo/geosite/apple@cn.mrs',
     },
     microsoft_cn: {
-      type: 'http',
-      format: 'mrs',
-      interval: 86400,
-      behavior: 'domain',
+      ...RULE_DOMAIN,
       url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/microsoft@cn.mrs',
       path: './ruleset/microsoft@cn.mrs',
       'path-in-bundle': 'geo/geosite/microsoft@cn.mrs',
@@ -156,91 +139,61 @@ const main = (config) => {
       'path-in-bundle': 'geo/geosite/geolocation-cn.mrs',
     },
     cn_ip: {
-      type: 'http',
-      format: 'mrs',
-      interval: 86400,
-      behavior: 'ipcidr',
+      ...RULE_IPCIDR,
       url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/cn.mrs',
       path: './ruleset/cn_ip.mrs',
       'path-in-bundle': 'geo/geoip/cn.mrs',
     },
     youtube: {
-      type: 'http',
-      format: 'mrs',
-      interval: 86400,
-      behavior: 'domain',
+      ...RULE_DOMAIN,
       url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/youtube.mrs',
       path: './ruleset/youtube.mrs',
       'path-in-bundle': 'geo/geosite/youtube.mrs',
     },
     googlefcm: {
-      type: 'http',
-      format: 'mrs',
-      interval: 86400,
-      behavior: 'domain',
+      ...RULE_DOMAIN,
       url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/googlefcm.mrs',
       path: './ruleset/googlefcm.mrs',
       'path-in-bundle': 'geo/geosite/googlefcm.mrs',
     },
     google: {
-      type: 'http',
-      format: 'mrs',
-      interval: 86400,
-      behavior: 'domain',
+      ...RULE_DOMAIN,
       url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/google.mrs',
       path: './ruleset/google.mrs',
       'path-in-bundle': 'geo/geosite/google.mrs',
     },
     google_ip: {
-      type: 'http',
-      format: 'mrs',
-      interval: 86400,
-      behavior: 'ipcidr',
+      ...RULE_IPCIDR,
       url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/google.mrs',
       path: './ruleset/google_ip.mrs',
       'path-in-bundle': 'geo/geoip/google.mrs',
     },
     ai: {
-      type: 'http',
-      format: 'mrs',
-      interval: 86400,
-      behavior: 'domain',
+      ...RULE_DOMAIN,
       url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-ai-!cn.mrs',
       path: './ruleset/ai.mrs',
       'path-in-bundle': 'geo/geosite/category-ai-!cn.mrs',
     },
     telegram: {
-      type: 'http',
-      format: 'mrs',
-      interval: 86400,
-      behavior: 'domain',
+      ...RULE_DOMAIN,
       url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/telegram.mrs',
       path: './ruleset/telegram.mrs',
       'path-in-bundle': 'geo/geosite/telegram.mrs',
     },
     telegram_ip: {
-      type: 'http',
-      format: 'mrs',
-      interval: 86400,
-      behavior: 'ipcidr',
+      ...RULE_IPCIDR,
       url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/telegram.mrs',
       path: './ruleset/telegram_ip.mrs',
       'path-in-bundle': 'geo/geoip/telegram.mrs',
     },
     twitter: {
-      type: 'http',
-      format: 'mrs',
-      interval: 86400,
-      behavior: 'domain',
+      ...RULE_DOMAIN,
       url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/twitter.mrs',
       path: './ruleset/twitter.mrs',
       'path-in-bundle': 'geo/geosite/twitter.mrs',
     },
     twitter_ip: {
-      type: 'http',
-      format: 'mrs',
-      interval: 86400,
-      behavior: 'ipcidr',
+      ...RULE_IPCIDR,
       url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/twitter.mrs',
       path: './ruleset/twitter_ip.mrs',
       'path-in-bundle': 'geo/geoip/twitter.mrs',
@@ -255,28 +208,19 @@ const main = (config) => {
       'path-in-bundle': 'geo/geosite/geolocation-!cn.mrs',
     },
     adblockmihomolite: {
-      type: 'http',
-      format: 'mrs',
-      interval: 86400,
-      behavior: 'domain',
+      ...RULE_DOMAIN,
       url: 'https://fastly.jsdelivr.net/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.mrs',
       path: './ruleset/adblockmihomolite.mrs',
       'path-in-bundle': 'geo/geosite/category-ads-all.mrs',
     },
     cn_additional: {
-      type: 'http',
-      format: 'mrs',
-      interval: 86400,
-      behavior: 'domain',
+      ...RULE_DOMAIN,
       url: 'https://static-file-global.353355.xyz/rules/cn-additional-list.mrs',
       path: './ruleset/cn-additional-list.mrs',
       'path-in-bundle': 'geo/geosite/cn.mrs',
     },
     cn: {
-      type: 'http',
-      format: 'mrs',
-      interval: 86400,
-      behavior: 'domain',
+      ...RULE_DOMAIN,
       url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/cn.mrs',
       path: './ruleset/cn.mrs',
       'path-in-bundle': 'geo/geosite/cn.mrs',
@@ -300,17 +244,34 @@ const main = (config) => {
   };
 
   // ------------------------------------------------ 策略组 (proxy-groups)
-  config['proxy-groups'] = [
+const GROUP_COMMON = {
+  timeout: 1500,
+  'max-failed-times': 5,
+  'empty-fallback': 'REJECT',
+  url: 'https://www.apple.com/library/test/success.html',
+  lazy: true,
+};
+const RULE_GROUP = { type: 'select', interval: 300, ...GROUP_COMMON };
+const RULE_GROUP_TEST = { type: 'url-test', interval: 60, ...GROUP_COMMON, tolerance: 50 };
+
+const PROXIES_ALL = [
+  'PROXY',
+  'AUTO',
+  'HK Group',
+  'SG Group',
+  'JP Group',
+  'US Group',
+  'TW Group',
+  'KR Group',
+  'Other Group',
+];
+const PROXIES_ALL_DIRECT = [...PROXIES_ALL, 'DIRECT'];
+
+config['proxy-groups'] = [
     // PROXY
     {
       name: 'PROXY',
-      type: 'select',
-      interval: 300,
-      timeout: 1500,
-      'max-failed-times': 5,
-      'empty-fallback': 'REJECT',
-      url: 'https://www.apple.com/library/test/success.html',
-      lazy: true,
+      ...RULE_GROUP,
       proxies: [
         'AUTO',
         'HK Group',
@@ -328,14 +289,7 @@ const main = (config) => {
     // AUTO
     {
       name: 'AUTO',
-      type: 'url-test',
-      interval: 60,
-      timeout: 1500,
-      'max-failed-times': 5,
-      'empty-fallback': 'REJECT',
-      url: 'https://www.apple.com/library/test/success.html',
-      lazy: true,
-      tolerance: 50,
+      ...RULE_GROUP_TEST,
       'include-all': true,
       'exclude-type': 'DIRECT',
       hidden: false,
@@ -345,61 +299,23 @@ const main = (config) => {
     // YouTube
     {
       name: 'YouTube',
-      type: 'select',
-      interval: 300,
-      timeout: 1500,
-      'max-failed-times': 5,
-      'empty-fallback': 'REJECT',
-      url: 'https://www.apple.com/library/test/success.html',
-      lazy: true,
-      proxies: [
-        'PROXY',
-        'AUTO',
-        'HK Group',
-        'SG Group',
-        'JP Group',
-        'US Group',
-        'TW Group',
-        'KR Group',
-        'Other Group',
-      ],
+      ...RULE_GROUP,
+      proxies: [...PROXIES_ALL],
       icon: 'https://fastly.jsdelivr.net/gh/MiToverG422/Qure@master/IconSet/Color/YouTube.png',
     },
 
     // Google
     {
       name: 'Google',
-      type: 'select',
-      interval: 300,
-      timeout: 1500,
-      'max-failed-times': 5,
-      'empty-fallback': 'REJECT',
-      url: 'https://www.apple.com/library/test/success.html',
-      lazy: true,
-      proxies: [
-        'PROXY',
-        'AUTO',
-        'HK Group',
-        'SG Group',
-        'JP Group',
-        'US Group',
-        'TW Group',
-        'KR Group',
-        'Other Group',
-      ],
+      ...RULE_GROUP,
+      proxies: [...PROXIES_ALL],
       icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Google_Search.png',
     },
 
     // AI
     {
       name: 'AI',
-      type: 'select',
-      interval: 300,
-      timeout: 1500,
-      'max-failed-times': 5,
-      'empty-fallback': 'REJECT',
-      url: 'https://www.apple.com/library/test/success.html',
-      lazy: true,
+      ...RULE_GROUP,
       proxies: [
         'PROXY',
         'SG Group',
@@ -414,61 +330,23 @@ const main = (config) => {
     // Telegram
     {
       name: 'Telegram',
-      type: 'select',
-      interval: 300,
-      timeout: 1500,
-      'max-failed-times': 5,
-      'empty-fallback': 'REJECT',
-      url: 'https://www.apple.com/library/test/success.html',
-      lazy: true,
-      proxies: [
-        'PROXY',
-        'AUTO',
-        'HK Group',
-        'SG Group',
-        'JP Group',
-        'US Group',
-        'TW Group',
-        'KR Group',
-        'Other Group',
-      ],
+      ...RULE_GROUP,
+      proxies: [...PROXIES_ALL],
       icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram.png',
     },
 
     // Twitter
     {
       name: 'Twitter',
-      type: 'select',
-      interval: 300,
-      timeout: 1500,
-      'max-failed-times': 5,
-      'empty-fallback': 'REJECT',
-      url: 'https://www.apple.com/library/test/success.html',
-      lazy: true,
-      proxies: [
-        'PROXY',
-        'AUTO',
-        'HK Group',
-        'SG Group',
-        'JP Group',
-        'US Group',
-        'TW Group',
-        'KR Group',
-        'Other Group',
-      ],
+      ...RULE_GROUP,
+      proxies: [...PROXIES_ALL],
       icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Twitter.png',
     },
 
     // HK Group
     {
       name: 'HK Group',
-      type: 'select',
-      interval: 300,
-      timeout: 1500,
-      'max-failed-times': 5,
-      'empty-fallback': 'REJECT',
-      url: 'https://www.apple.com/library/test/success.html',
-      lazy: true,
+      ...RULE_GROUP,
       filter: '(?i)(🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|hong\\s*kong)',
       'include-all': true,
       proxies: [
@@ -480,14 +358,7 @@ const main = (config) => {
     // HK Auto Group
     {
       name: 'HK Auto Group',
-      type: 'url-test',
-      interval: 60,
-      timeout: 1500,
-      'max-failed-times': 5,
-      'empty-fallback': 'REJECT',
-      url: 'https://www.apple.com/library/test/success.html',
-      lazy: true,
-      tolerance: 50,
+      ...RULE_GROUP_TEST,
       'include-all': true,
       'exclude-type': 'DIRECT',
       filter: '(?i)(🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|hong\\s*kong)',
@@ -497,13 +368,7 @@ const main = (config) => {
     // JP Group
     {
       name: 'JP Group',
-      type: 'select',
-      interval: 300,
-      timeout: 1500,
-      'max-failed-times': 5,
-      'empty-fallback': 'REJECT',
-      url: 'https://www.apple.com/library/test/success.html',
-      lazy: true,
+      ...RULE_GROUP,
       filter: '(?i)(🇯🇵|日本|东京|大阪|京都|(?<![A-Za-z])JPN?(?![A-Za-z])|japan)',
       'include-all': true,
       proxies: [
@@ -515,14 +380,7 @@ const main = (config) => {
     // JP Auto Group
     {
       name: 'JP Auto Group',
-      type: 'url-test',
-      interval: 60,
-      timeout: 1500,
-      'max-failed-times': 5,
-      'empty-fallback': 'REJECT',
-      url: 'https://www.apple.com/library/test/success.html',
-      lazy: true,
-      tolerance: 50,
+      ...RULE_GROUP_TEST,
       'include-all': true,
       'exclude-type': 'DIRECT',
       filter: '(?i)(🇯🇵|日本|东京|大阪|京都|(?<![A-Za-z])JPN?(?![A-Za-z])|japan)',
@@ -532,13 +390,7 @@ const main = (config) => {
     // US Group
     {
       name: 'US Group',
-      type: 'select',
-      interval: 300,
-      timeout: 1500,
-      'max-failed-times': 5,
-      'empty-fallback': 'REJECT',
-      url: 'https://www.apple.com/library/test/success.html',
-      lazy: true,
+      ...RULE_GROUP,
       filter: '(?i)(🇺🇸|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|拉斯维加斯|圣何塞|圣地亚哥|(?<![A-Za-z])USA?(?![A-Za-z])|america|united\\s*states)',
       'include-all': true,
       proxies: [
@@ -550,14 +402,7 @@ const main = (config) => {
     // US Auto Group
     {
       name: 'US Auto Group',
-      type: 'url-test',
-      interval: 60,
-      timeout: 1500,
-      'max-failed-times': 5,
-      'empty-fallback': 'REJECT',
-      url: 'https://www.apple.com/library/test/success.html',
-      lazy: true,
-      tolerance: 50,
+      ...RULE_GROUP_TEST,
       'include-all': true,
       'exclude-type': 'DIRECT',
       filter: '(?i)(🇺🇸|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|拉斯维加斯|圣何塞|圣地亚哥|(?<![A-Za-z])USA?(?![A-Za-z])|america|united\\s*states)',
@@ -567,13 +412,7 @@ const main = (config) => {
     // SG Group
     {
       name: 'SG Group',
-      type: 'select',
-      interval: 300,
-      timeout: 1500,
-      'max-failed-times': 5,
-      'empty-fallback': 'REJECT',
-      url: 'https://www.apple.com/library/test/success.html',
-      lazy: true,
+      ...RULE_GROUP,
       filter: '(?i)(🇸🇬|新加坡|狮城|(?<![A-Za-z])SGP?(?![A-Za-z])|singapore)',
       'include-all': true,
       proxies: [
@@ -585,14 +424,7 @@ const main = (config) => {
     // SG Auto Group
     {
       name: 'SG Auto Group',
-      type: 'url-test',
-      interval: 60,
-      timeout: 1500,
-      'max-failed-times': 5,
-      'empty-fallback': 'REJECT',
-      url: 'https://www.apple.com/library/test/success.html',
-      lazy: true,
-      tolerance: 50,
+      ...RULE_GROUP_TEST,
       'include-all': true,
       'exclude-type': 'DIRECT',
       filter: '(?i)(🇸🇬|新加坡|狮城|(?<![A-Za-z])SGP?(?![A-Za-z])|singapore)',
@@ -602,13 +434,7 @@ const main = (config) => {
     // TW Group
     {
       name: 'TW Group',
-      type: 'select',
-      interval: 300,
-      timeout: 1500,
-      'max-failed-times': 5,
-      'empty-fallback': 'REJECT',
-      url: 'https://www.apple.com/library/test/success.html',
-      lazy: true,
+      ...RULE_GROUP,
       filter: '(?i)(🇹🇼|台湾|台北|高雄|(?<![A-Za-z])TWN?(?![A-Za-z])|taiwan)',
       'include-all': true,
       proxies: [
@@ -620,14 +446,7 @@ const main = (config) => {
     // TW Auto Group
     {
       name: 'TW Auto Group',
-      type: 'url-test',
-      interval: 60,
-      timeout: 1500,
-      'max-failed-times': 5,
-      'empty-fallback': 'REJECT',
-      url: 'https://www.apple.com/library/test/success.html',
-      lazy: true,
-      tolerance: 50,
+      ...RULE_GROUP_TEST,
       'include-all': true,
       'exclude-type': 'DIRECT',
       filter: '(?i)(🇹🇼|台湾|台北|高雄|(?<![A-Za-z])TWN?(?![A-Za-z])|taiwan)',
@@ -637,13 +456,7 @@ const main = (config) => {
     // KR Group
     {
       name: 'KR Group',
-      type: 'select',
-      interval: 300,
-      timeout: 1500,
-      'max-failed-times': 5,
-      'empty-fallback': 'REJECT',
-      url: 'https://www.apple.com/library/test/success.html',
-      lazy: true,
+      ...RULE_GROUP,
       filter: '(?i)(🇰🇷|韩国|首尔|釜山|仁川|大邱|(?<![A-Za-z])KOR?(?![A-Za-z])|korea|south\\s*korea)',
       'include-all': true,
       proxies: [
@@ -655,14 +468,7 @@ const main = (config) => {
     // KR Auto Group
     {
       name: 'KR Auto Group',
-      type: 'url-test',
-      interval: 60,
-      timeout: 1500,
-      'max-failed-times': 5,
-      'empty-fallback': 'REJECT',
-      url: 'https://www.apple.com/library/test/success.html',
-      lazy: true,
-      tolerance: 50,
+      ...RULE_GROUP_TEST,
       'include-all': true,
       'exclude-type': 'DIRECT',
       filter: '(?i)(🇰🇷|韩国|首尔|釜山|仁川|大邱|(?<![A-Za-z])KOR?(?![A-Za-z])|korea|south\\s*korea)',
@@ -672,13 +478,7 @@ const main = (config) => {
     // Other Group
     {
       name: 'Other Group',
-      type: 'select',
-      interval: 300,
-      timeout: 1500,
-      'max-failed-times': 5,
-      'empty-fallback': 'REJECT',
-      url: 'https://www.apple.com/library/test/success.html',
-      lazy: true,
+      ...RULE_GROUP,
       'exclude-filter': '(?i)(🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|hong\\s*kong|🇯🇵|日本|东京|大阪|京都|(?<![A-Za-z])JPN?(?![A-Za-z])|japan|🇺🇸|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|拉斯维加斯|圣何塞|圣地亚哥|(?<![A-Za-z])USA?(?![A-Za-z])|america|united\\s*states|🇸🇬|新加坡|狮城|(?<![A-Za-z])SGP?(?![A-Za-z])|singapore|🇹🇼|台湾|台北|高雄|(?<![A-Za-z])TWN?(?![A-Za-z])|taiwan|🇰🇷|韩国|首尔|釜山|仁川|大邱|(?<![A-Za-z])KOR?(?![A-Za-z])|korea|south\\s*korea)',
       'exclude-type': 'DIRECT',
       'include-all': true,
@@ -691,14 +491,7 @@ const main = (config) => {
     // Other Auto Group
     {
       name: 'Other Auto Group',
-      type: 'url-test',
-      interval: 60,
-      timeout: 1500,
-      'max-failed-times': 5,
-      'empty-fallback': 'REJECT',
-      url: 'https://www.apple.com/library/test/success.html',
-      lazy: true,
-      tolerance: 50,
+      ...RULE_GROUP_TEST,
       'include-all': true,
       'exclude-type': 'DIRECT',
       'exclude-filter': '(?i)(🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|hong\\s*kong|🇯🇵|日本|东京|大阪|京都|(?<![A-Za-z])JPN?(?![A-Za-z])|japan|🇺🇸|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|拉斯维加斯|圣何塞|圣地亚哥|(?<![A-Za-z])USA?(?![A-Za-z])|america|united\\s*states|🇸🇬|新加坡|狮城|(?<![A-Za-z])SGP?(?![A-Za-z])|singapore|🇹🇼|台湾|台北|高雄|(?<![A-Za-z])TWN?(?![A-Za-z])|taiwan|🇰🇷|韩国|首尔|釜山|仁川|大邱|(?<![A-Za-z])KOR?(?![A-Za-z])|korea|south\\s*korea)',
