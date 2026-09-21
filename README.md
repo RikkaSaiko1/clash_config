@@ -10,24 +10,26 @@
 
 - **DNS 防泄漏**：fake-ip + 全 DoH（无明文 UDP 53），`nameserver-policy` 按规则集分组，`fake-ip-filter` 排除私有/国内域名，`nameserver` / `fallback` 带 `#PROXY` 实现国内外出口分离。
 - **规则分流**：rule-providers 按需加载 `.mrs`，覆盖常用服务与地区策略组，支持 `RULE-SET` / `GEOSITE` / `PROCESS-NAME` 等。
-- **开箱即用**：`config.yaml` 改完订阅地址即可运行，覆写版可叠加在任意订阅上。
+- **开箱即用**：只有 `config.yaml` 需要改订阅地址即可运行；其余 6 个 `Full_control` / `config_Override_*` 覆写文件（YAML + JS）可叠加在任意订阅上。
 - **CDN 与 raw 双通道**：配置内所有远程资源（`.mrs` 规则集、图标）统一走 `cdn.jsdelivr.net`，避开 `raw.githubusercontent.com` 的国内不稳定；README 里每个文件都同时提供 CDN 与 raw 两种下载地址。
 
 ---
 
 ## 📦 配置文件
 
-| 文件 | 策略组 | 说明 |
-| --- | :---: | --- |
-| `config.yaml` | — | 完整配置，**直接加载使用**（含 `proxy-providers` 模板，是三个 JS 脚本渲染的基准） |
-| `Full_control.yaml` | 37 | YAML 覆写配置，**全规则权威模板**（保留 YAML 锚点写法） |
-| `Full_control.js` | 37 | JS 覆写脚本，`Full_control.yaml` 的等价实现（锚点已展开） |
-| `config_Override_Full.yaml` | 33 | YAML 覆写配置，全规则精简版（较 `Full_control` 少 Twitch / Pixiv / Line / Discord） |
-| `config_Override_Full.js` | 33 | JS 覆写脚本，`config_Override_Full.yaml` 的等价实现 |
-| `config_Override_lite.yaml` | 18 | YAML 覆写配置，轻量版（手工维护，规则最精简） |
-| `config_Override_lite.js` | 18 | JS 覆写脚本，轻量版 |
-| `SubConverter_config_Full.ini` | — | SubConverter 订阅转换配置，全规则版 |
-| `SubConverter_config_lite.ini` | — | SubConverter 订阅转换配置，轻量版 |
+只有 [`config.yaml`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config.yaml) 是**可直接加载的完整配置**，其余 8 个**全为覆写文件 / 覆写脚本**，需叠加在订阅上使用，不能单独加载。
+
+| 文件 | 性质 | 策略组 | 说明 |
+| --- | :---: | :---: | --- |
+| `config.yaml` | 完整配置 | — | **直接加载使用**（含 `proxy-providers` 模板，是三个 JS 脚本渲染的基准） |
+| `Full_control.yaml` | 覆写配置 | 37 | YAML 覆写，**全规则权威模板**（保留 YAML 锚点写法） |
+| `Full_control.js` | 覆写脚本 | 37 | JS 覆写，`Full_control.yaml` 的等价实现（锚点已展开） |
+| `config_Override_Full.yaml` | 覆写配置 | 33 | YAML 覆写，全规则精简版（较 `Full_control` 少 Twitch / Pixiv / Line / Discord） |
+| `config_Override_Full.js` | 覆写脚本 | 33 | JS 覆写，`config_Override_Full.yaml` 的等价实现 |
+| `config_Override_lite.yaml` | 覆写配置 | 18 | YAML 覆写，轻量版（手工维护，规则最精简） |
+| `config_Override_lite.js` | 覆写脚本 | 18 | JS 覆写，轻量版 |
+| `SubConverter_config_Full.ini` | 转换配置 | — | SubConverter 订阅转换配置，全规则版（非覆写，供转换服务读取） |
+| `SubConverter_config_lite.ini` | 转换配置 | — | SubConverter 订阅转换配置，轻量版 |
 
 **下载地址（CDN 与 raw 二选一，内容完全一致）**
 
@@ -53,6 +55,8 @@
 | 全量精简 | `config_Override_Full.*` | 42 | 33 | 常用服务全覆盖，去掉低频平台 |
 | 轻量 | `config_Override_lite.*` | 23 | 18 | 只求基础分流，占用最低 |
 
+> 上表三档均为**覆写**（YAML / JS 各一份），需叠加订阅使用；**只有 `config.yaml` 是可直接加载的完整配置**。
+
 > **Full** 覆盖全面，**Lite** 精简省资源，按需选用。
 > **`Full_control` 是权威模板**：`config_Override_Full` 由它裁掉 Twitch / Pixiv / Line / Discord 得到，YAML 锚点也随之展开为显式写法。
 > YAML 与 JS 是同一份配置的两种书写形式：`Full_control.yaml` ↔ `Full_control.js`、`config_Override_Full.yaml` ↔ `config_Override_Full.js`，lite 同理。
@@ -61,7 +65,9 @@
 
 ## 🚀 使用方式
 
-### config.yaml（直接使用）
+### config.yaml（唯一的完整配置，直接使用）
+
+> 其余文件均为覆写，不在此列，见下方两节。
 
 1. 下载 `config.yaml`，修改 `proxy-providers` 中的订阅地址：
 
@@ -82,6 +88,23 @@
    需添加多个订阅时，复制 `节点1` 整块，改名为 `节点2`、`节点3` 即可（名称不可重复）。
 
 2. 用 Mihomo / Clash Meta 加载配置并启动。
+
+### YAML / JS 覆写（叠加在订阅上使用）
+
+`Full_control.*`、`config_Override_Full.*`、`config_Override_lite.*` 共 6 个文件**都是覆写**，两种用法：
+
+- **YAML 覆写**：客户端支持「覆写配置 / 覆写 YAML」时，导入对应 `.yaml`
+- **JS 覆写**：客户端支持「覆写脚本」时，导入对应 `.js`
+
+YAML 与 JS 是同一份配置的两种书写形式，产物一一对应：
+
+| 档位 | YAML 覆写 | JS 覆写 |
+| --- | --- | --- |
+| 全量 | `Full_control.yaml` | `Full_control.js` |
+| 全量精简 | `config_Override_Full.yaml` | `config_Override_Full.js` |
+| 轻量 | `config_Override_lite.yaml` | `config_Override_lite.js` |
+
+下载链接见上方下载表（CDN / raw 二选一）。
 
 ### JS 覆写脚本（Bettbox / Sparkle）
 
@@ -106,7 +129,7 @@ JS 为**整段赋值**语义（`config['dns'] = {...}` 等价于 YAML 的 `dns!:
 
 脚本头部内嵌完整的「规则集 → 策略组」分流对照表（AI / 油管 / 谷歌 / 微软 / 苹果 / 电报 / 游戏平台 / 短视频 / 推特 / 图享 / 奈飞 / 影音 / 网盘 / 音乐 / 加密货币 / 图站 / 直播 / 插画 / 通讯 / 语音 / 代码托管），改规则前可直接查阅。
 
-### SubConverter 配置
+### SubConverter 配置（订阅转换，非覆写）
 
 适用于自建 SubConverter 订阅转换服务：
 
