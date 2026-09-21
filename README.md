@@ -11,7 +11,7 @@
 - **DNS 防泄漏**：fake-ip + 全 DoH（无明文 UDP 53），`nameserver-policy` 按规则集分组，`fake-ip-filter` 排除私有/国内域名，`nameserver` / `fallback` 带 `#PROXY` 实现国内外出口分离。
 - **规则分流**：rule-providers 按需加载 `.mrs`，覆盖常用服务与地区策略组，支持 `RULE-SET` / `GEOSITE` / `PROCESS-NAME` 等。
 - **开箱即用**：只有 `config.yaml` 需要改订阅地址即可运行；其余 6 个 `Full_control` / `config_Override_*` 覆写文件（YAML + JS）可叠加在任意订阅上。
-- **CDN 与 raw 双通道**：配置内所有远程资源（`.mrs` 规则集、图标）统一走 `cdn.jsdelivr.net`，避开 `raw.githubusercontent.com` 的国内不稳定；README 里每个文件都同时提供 CDN 与 raw 两种下载地址。
+- **CDN 与 raw 双通道**：配置内所有远程资源（`.mrs` 规则集、图标）统一走 `cdn.jsdelivr.net`，避开 `raw.githubusercontent.com` 的国内不稳定；每个文件在 [配置文件说明](./配置文件说明.md) 中都同时提供 CDN 与 raw 两种下载地址。
 
 ---
 
@@ -19,45 +19,7 @@
 
 只有 [`config.yaml`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config.yaml) 是**可直接加载的完整配置**，其余 8 个**全为覆写文件 / 覆写脚本**，需叠加在订阅上使用，不能单独加载。
 
-| 文件 | 性质 | 策略组 | 说明 |
-| --- | :---: | :---: | --- |
-| `config.yaml` | 完整配置 | — | **直接加载使用**（含 `proxy-providers` 模板，是三个 JS 脚本渲染的基准） |
-| `Full_control.yaml` | 覆写配置 | 37 | YAML 覆写，**全规则权威模板**（保留 YAML 锚点写法） |
-| `Full_control.js` | 覆写脚本 | 37 | JS 覆写，`Full_control.yaml` 的等价实现（锚点已展开） |
-| `config_Override_Full.yaml` | 覆写配置 | 33 | YAML 覆写，全规则精简版（较 `Full_control` 少 Twitch / Pixiv / Line / Discord） |
-| `config_Override_Full.js` | 覆写脚本 | 33 | JS 覆写，`config_Override_Full.yaml` 的等价实现 |
-| `config_Override_lite.yaml` | 覆写配置 | 18 | YAML 覆写，轻量版（手工维护，规则最精简） |
-| `config_Override_lite.js` | 覆写脚本 | 18 | JS 覆写，轻量版 |
-| `SubConverter_config_Full.ini` | 转换配置 | — | SubConverter 订阅转换配置，全规则版（非覆写，供转换服务读取） |
-| `SubConverter_config_lite.ini` | 转换配置 | — | SubConverter 订阅转换配置，轻量版 |
-
-**下载地址（CDN 与 raw 二选一，内容完全一致）**
-
-| 文件 | CDN（推荐） | raw |
-| --- | --- | --- |
-| `config.yaml` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config.yaml) |
-| `Full_control.yaml` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Full_control.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Full_control.yaml) |
-| `Full_control.js` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Full_control.js) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Full_control.js) |
-| `config_Override_Full.yaml` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config_Override_Full.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_Full.yaml) |
-| `config_Override_Full.js` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config_Override_Full.js) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_Full.js) |
-| `config_Override_lite.yaml` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config_Override_lite.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_lite.yaml) |
-| `config_Override_lite.js` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config_Override_lite.js) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_lite.js) |
-| `SubConverter_config_Full.ini` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/SubConverter_config_Full.ini) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/SubConverter_config_Full.ini) |
-| `SubConverter_config_lite.ini` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/SubConverter_config_lite.ini) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/SubConverter_config_lite.ini) |
-
-> **两者怎么选**：`cdn.jsdelivr.net` 有全球节点缓存，国内访问更稳更快，**日常推荐**；`raw.githubusercontent.com` 是 GitHub 官方源，无缓存延迟、内容最新，但国内直连常被墙，需代理才能访问。两者指向同一份文件，随时可互换。
-
-### 三个规则量级怎么选
-
-| 档位 | 配置文件 | 规则集 | 策略组 | 适用 |
-| --- | --- | :---: | :---: | --- |
-| 全量 | `Full_control.*` | 46 | 37 | 需要 Twitch / Pixiv / Line / Discord 等细分分流，内存充裕 |
-| 全量精简 | `config_Override_Full.*` | 42 | 33 | 常用服务全覆盖，去掉低频平台 |
-| 轻量 | `config_Override_lite.*` | 23 | 18 | 只求基础分流，占用最低 |
-
-> 上表三档均为**覆写**（YAML / JS 各一份），需叠加订阅使用；**只有 `config.yaml` 是可直接加载的完整配置**。
-
-> **Full** 覆盖全面，**Lite** 精简省资源，按需选用。
+> 📄 全部 9 个文件的清单、下载地址（CDN / raw）、三档规则量级对比与使用方式速查，见 **[配置文件说明](./配置文件说明.md)**。
 > **`Full_control` 是权威模板**：`config_Override_Full` 由它裁掉 Twitch / Pixiv / Line / Discord 得到，YAML 锚点也随之展开为显式写法。
 > YAML 与 JS 是同一份配置的两种书写形式：`Full_control.yaml` ↔ `Full_control.js`、`config_Override_Full.yaml` ↔ `config_Override_Full.js`，lite 同理。
 
@@ -104,11 +66,11 @@ YAML 与 JS 是同一份配置的两种书写形式，产物一一对应：
 | 全量精简 | `config_Override_Full.yaml` | `config_Override_Full.js` |
 | 轻量 | `config_Override_lite.yaml` | `config_Override_lite.js` |
 
-下载链接见上方下载表（CDN / raw 二选一）。
+下载链接见 [配置文件说明](./配置文件说明.md)（CDN / raw 二选一）。
 
 ### JS 覆写脚本（Bettbox / Sparkle）
 
-三个 JS 脚本（`Full_control.js`、`config_Override_Full.js`、`config_Override_lite.js`，下载地址见上方表格的 CDN / raw 双链接）
+三个 JS 脚本（`Full_control.js`、`config_Override_Full.js`、`config_Override_lite.js`，下载地址见 [配置文件说明](./配置文件说明.md)）
 是上述 YAML 覆写的 **JS 等价版本**（锚点已展开，产物一一对应）：
 
 1. 下载对应 js 文件到本地
