@@ -5,6 +5,27 @@
 // - DNS 防泄漏: fake-ip + 全 DoH(无明文 UDP 53), nameserver-policy 按规则集分组,
 //   fake-ip-filter 排除私有/国内域名; nameserver / fallback 带 #PROXY, 出口分离
 // - 全规则: proxy-groups 全部策略组 + 地区组, rules 完整规则链, rule-providers 全量
+//
+// ◆ 分流到策略组
+//     分类        规则集                                策略组
+//     ─────────────────────────────────────────────────────────────────────
+//     AI          ai                                    AI（默认 PROXY）
+//     油管        youtube                               YouTube
+//     谷歌        google / google_ip                    Google
+//     微软        microsoft                             Microsoft
+//     苹果        apple                                 Apple
+//     电报        telegram / telegram_ip                Telegram
+//     游戏平台    steam / steam_ip                      Steam
+//     短视频      tiktok / tiktok_ip                    TikTok
+//     推特        twitter / twitter_ip                  Twitter
+//     图享        instagram                             Instagram
+//     奈飞        netflix / netflix_ip                  Netflix
+//     影音        emby / emos + Emby 相关域名与 9 条进程名   Emby
+//     网盘        pikpak                                PikPak
+//     音乐        spotify / spotify_ip                  Spotify
+//     加密货币    cryptocurrency                        Crypto（默认 PROXY）
+//     图站        ehentai                               EHentai（默认 PROXY）
+//     代码托管    github                                PROXY
 
 
 
@@ -41,241 +62,235 @@ const RULE_IPCIDR = { ...RULE_BASE, behavior: 'ipcidr' };
 config['rule-providers'] = {
     private: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/private.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/private.mrs',
       path: './ruleset/private.mrs',
       'path-in-bundle': 'geo/geosite/private.mrs',
     },
     private_ip: {
       ...RULE_IPCIDR,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/private.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/private.mrs',
       path: './ruleset/private_ip.mrs',
       'path-in-bundle': 'geo/geoip/private.mrs',
     },
     games_cn: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-games@cn.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-games@cn.mrs',
       path: './ruleset/category-games@cn.mrs',
       'path-in-bundle': 'geo/geosite/category-games@cn.mrs',
     },
     epicgames: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/epicgames.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/epicgames.mrs',
       path: './ruleset/epicgames.mrs',
       'path-in-bundle': 'geo/geosite/epicgames.mrs',
     },
     nvidia_cn: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/nvidia@cn.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/nvidia@cn.mrs',
       path: './ruleset/nvidia@cn.mrs',
       'path-in-bundle': 'geo/geosite/nvidia@cn.mrs',
     },
     apple_cn: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/apple@cn.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/apple@cn.mrs',
       path: './ruleset/apple@cn.mrs',
       'path-in-bundle': 'geo/geosite/apple@cn.mrs',
     },
     microsoft_cn: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/microsoft@cn.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/microsoft@cn.mrs',
       path: './ruleset/microsoft@cn.mrs',
       'path-in-bundle': 'geo/geosite/microsoft@cn.mrs',
     },
     'geolocation-cn': {
-      type: 'http',
-      format: 'mrs',
-      interval: 86400,
-      behavior: 'domain',
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-cn.mrs',
+      ...RULE_DOMAIN,
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-cn.mrs',
       path: './ruleset/geolocation-cn.mrs',
       'path-in-bundle': 'geo/geosite/geolocation-cn.mrs',
     },
     cn_ip: {
       ...RULE_IPCIDR,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/cn.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/cn.mrs',
       path: './ruleset/cn_ip.mrs',
       'path-in-bundle': 'geo/geoip/cn.mrs',
     },
     cn: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/cn.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/cn.mrs',
       path: './ruleset/cn.mrs',
       'path-in-bundle': 'geo/geosite/cn.mrs',
     },
     youtube: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/youtube.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/youtube.mrs',
       path: './ruleset/youtube.mrs',
       'path-in-bundle': 'geo/geosite/youtube.mrs',
     },
     googlefcm: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/googlefcm.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/googlefcm.mrs',
       path: './ruleset/googlefcm.mrs',
       'path-in-bundle': 'geo/geosite/googlefcm.mrs',
     },
     google: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/google.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/google.mrs',
       path: './ruleset/google.mrs',
       'path-in-bundle': 'geo/geosite/google.mrs',
     },
     google_ip: {
       ...RULE_IPCIDR,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/google.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/google.mrs',
       path: './ruleset/google_ip.mrs',
       'path-in-bundle': 'geo/geoip/google.mrs',
     },
     ai: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-ai-!cn.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-ai-!cn.mrs',
       path: './ruleset/ai.mrs',
       'path-in-bundle': 'geo/geosite/category-ai-!cn.mrs',
     },
     github: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/github.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/github.mrs',
       path: './ruleset/github.mrs',
       'path-in-bundle': 'geo/geosite/github.mrs',
     },
     microsoft: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/microsoft.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/microsoft.mrs',
       path: './ruleset/microsoft.mrs',
       'path-in-bundle': 'geo/geosite/microsoft.mrs',
     },
     apple: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/apple.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/apple.mrs',
       path: './ruleset/apple.mrs',
       'path-in-bundle': 'geo/geosite/apple.mrs',
     },
     telegram: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/telegram.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/telegram.mrs',
       path: './ruleset/telegram.mrs',
       'path-in-bundle': 'geo/geosite/telegram.mrs',
     },
     telegram_ip: {
       ...RULE_IPCIDR,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/telegram.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/telegram.mrs',
       path: './ruleset/telegram_ip.mrs',
       'path-in-bundle': 'geo/geoip/telegram.mrs',
     },
     steam: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/steam.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/steam.mrs',
       path: './ruleset/steam.mrs',
       'path-in-bundle': 'geo/geosite/steam.mrs',
     },
     steam_ip: {
       ...RULE_IPCIDR,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/steam.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/steam.mrs',
       path: './ruleset/steam_ip.mrs',
       'path-in-bundle': 'geo/geoip/steam.mrs',
     },
     tiktok: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/tiktok.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/tiktok.mrs',
       path: './ruleset/tiktok.mrs',
       'path-in-bundle': 'geo/geosite/tiktok.mrs',
     },
     tiktok_ip: {
       ...RULE_IPCIDR,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/tiktok.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/tiktok.mrs',
       path: './ruleset/tiktok_ip.mrs',
       'path-in-bundle': 'geo/geoip/tiktok.mrs',
     },
     twitter: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/twitter.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/twitter.mrs',
       path: './ruleset/twitter.mrs',
       'path-in-bundle': 'geo/geosite/twitter.mrs',
     },
     twitter_ip: {
       ...RULE_IPCIDR,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/twitter.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/twitter.mrs',
       path: './ruleset/twitter_ip.mrs',
       'path-in-bundle': 'geo/geoip/twitter.mrs',
     },
     instagram: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/instagram.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/instagram.mrs',
       path: './ruleset/instagram.mrs',
       'path-in-bundle': 'geo/geosite/instagram.mrs',
     },
     netflix: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/netflix.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/netflix.mrs',
       path: './ruleset/netflix.mrs',
       'path-in-bundle': 'geo/geosite/netflix.mrs',
     },
     netflix_ip: {
       ...RULE_IPCIDR,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/netflix.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/netflix.mrs',
       path: './ruleset/netflix_ip.mrs',
       'path-in-bundle': 'geo/geoip/netflix.mrs',
     },
     emby: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/666OS/rules@release/mihomo/domain/Emby.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/666OS/rules@release/mihomo/domain/Emby.mrs',
       path: './ruleset/emby.mrs',
       'path-in-bundle': 'geo/geosite/category-emby.mrs',
     },
     emos: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/binaryu/emos-proxy-rule@main/rules/emos-mihomo.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/binaryu/emos-proxy-rule@main/rules/emos-mihomo.mrs',
       path: './ruleset/emos.mrs',
       'path-in-bundle': 'geo/geosite/category-emby.mrs',
     },
     pikpak: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/pikpak.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/pikpak.mrs',
       path: './ruleset/pikpak.mrs',
       'path-in-bundle': 'geo/geosite/pikpak.mrs',
     },
     spotify: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/spotify.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/spotify.mrs',
       path: './ruleset/spotify.mrs',
       'path-in-bundle': 'geo/geosite/spotify.mrs',
     },
     spotify_ip: {
       ...RULE_IPCIDR,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/spotify.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/spotify.mrs',
       path: './ruleset/spotify_ip.mrs',
       'path-in-bundle': 'geo/geoip/spotify.mrs',
     },
     cryptocurrency: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-cryptocurrency.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-cryptocurrency.mrs',
       path: './ruleset/cryptocurrency.mrs',
       'path-in-bundle': 'geo/geosite/category-cryptocurrency.mrs',
     },
     ehentai: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/ehentai.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/ehentai.mrs',
       path: './ruleset/ehentai.mrs',
       'path-in-bundle': 'geo/geosite/ehentai.mrs',
     },
     'geolocation-!cn': {
-      type: 'http',
-      format: 'mrs',
-      interval: 86400,
-      behavior: 'domain',
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-!cn.mrs',
+      ...RULE_DOMAIN,
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-!cn.mrs',
       path: './ruleset/geolocation-!cn.mrs',
       'path-in-bundle': 'geo/geosite/geolocation-!cn.mrs',
     },
     adblockmihomolite: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.mrs',
       path: './ruleset/adblockmihomolite.mrs',
       'path-in-bundle': 'geo/geosite/category-ads-all.mrs',
     },
     fakeip_filter: {
       ...RULE_DOMAIN,
-      url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/fakeip-filter.mrs',
+      url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/fakeip-filter.mrs',
       path: './ruleset/fakeip-filter.mrs',
       'path-in-bundle': 'geo/geosite/fakeip-filter.mrs',
     },
@@ -291,7 +306,7 @@ config['rule-providers'] = {
       interval: 86400,
       behavior: 'domain',
       format: 'text',
-      url: 'https://raw.githubusercontent.com/qichiyuhub/rule/refs/heads/main/rules/fakeipfilter-cn.list',
+      url: 'https://cdn.jsdelivr.net/gh/qichiyuhub/rule@main/rules/fakeipfilter-cn.list',
       path: './ruleset/fakeipfilter-cn.list',
     },
     'fakeipfilter_!cn': {
@@ -299,7 +314,7 @@ config['rule-providers'] = {
       interval: 86400,
       behavior: 'domain',
       format: 'text',
-      url: 'https://raw.githubusercontent.com/qichiyuhub/rule/refs/heads/main/rules/fakeipfilter-!cn.list',
+      url: 'https://cdn.jsdelivr.net/gh/qichiyuhub/rule@main/rules/fakeipfilter-!cn.list',
       path: './ruleset/fakeipfilter-!cn.list',
     },
   };
@@ -344,7 +359,7 @@ config['proxy-groups'] = [
         'Other Group',
       ],
       'include-all-proxies': true,
-      icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png',
+      icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Static.png',
     },
 
     // AUTO
@@ -354,7 +369,7 @@ config['proxy-groups'] = [
       'include-all': true,
       'exclude-type': 'DIRECT',
       hidden: false,
-      icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png',
+      icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Roundrobin.png',
     },
 
     // YouTube
@@ -362,7 +377,7 @@ config['proxy-groups'] = [
       name: 'YouTube',
       ...RULE_GROUP,
       proxies: [...PROXIES_ALL],
-      icon: 'https://fastly.jsdelivr.net/gh/MiToverG422/Qure@master/IconSet/Color/YouTube.png',
+      icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/youtube.svg',
     },
 
     // Google FCM
@@ -370,7 +385,7 @@ config['proxy-groups'] = [
       name: 'Google',
       ...RULE_GROUP,
       proxies: [...PROXIES_ALL],
-      icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Google_Search.png',
+      icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/google.svg',
     },
 
     // AI
@@ -385,7 +400,7 @@ config['proxy-groups'] = [
         'KR Group',
       ],
       'default-selected': 'US Group',
-      icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/ChatGPT.png',
+      icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/deepseek.svg',
     },
 
     // Microsoft
@@ -393,7 +408,7 @@ config['proxy-groups'] = [
       name: 'Microsoft',
       ...RULE_GROUP,
       proxies: [...PROXIES_ALL_DIRECT],
-      icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Microsoft.png',
+      icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/microsoft.svg',
     },
 
     // Apple
@@ -401,7 +416,7 @@ config['proxy-groups'] = [
       name: 'Apple',
       ...RULE_GROUP,
       proxies: [...PROXIES_ALL_DIRECT],
-      icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Apple.png',
+      icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/apple.svg',
     },
 
     // Telegram
@@ -409,7 +424,7 @@ config['proxy-groups'] = [
       name: 'Telegram',
       ...RULE_GROUP,
       proxies: [...PROXIES_ALL],
-      icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram.png',
+      icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/telegram.svg',
     },
 
     // Steam
@@ -417,7 +432,7 @@ config['proxy-groups'] = [
       name: 'Steam',
       ...RULE_GROUP,
       proxies: [...PROXIES_ALL_DIRECT],
-      icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Steam.png',
+      icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/steam.svg',
     },
 
     // TikTok
@@ -426,7 +441,7 @@ config['proxy-groups'] = [
       ...RULE_GROUP,
       proxies: [...PROXIES_ALL],
       'default-selected': 'JP Group',
-      icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/TikTok.png',
+      icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/tiktok.svg',
     },
 
     // Twitter
@@ -434,7 +449,7 @@ config['proxy-groups'] = [
       name: 'Twitter',
       ...RULE_GROUP,
       proxies: [...PROXIES_ALL],
-      icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Twitter.png',
+      icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/twitter.svg',
     },
 
     // Instagram
@@ -442,7 +457,7 @@ config['proxy-groups'] = [
       name: 'Instagram',
       ...RULE_GROUP,
       proxies: [...PROXIES_ALL],
-      icon: 'https://fastly.jsdelivr.net/gh/MiToverG422/Qure@master/IconSet/Color/Instagram.png',
+      icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/instagram.svg',
     },
 
     // Netflix
@@ -450,7 +465,7 @@ config['proxy-groups'] = [
       name: 'Netflix',
       ...RULE_GROUP,
       proxies: [...PROXIES_ALL],
-      icon: 'https://fastly.jsdelivr.net/gh/MiToverG422/Qure@master/IconSet/Color/Netflix.png',
+      icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/netflix.svg',
     },
 
     // Emby
@@ -458,7 +473,7 @@ config['proxy-groups'] = [
       name: 'Emby',
       ...RULE_GROUP,
       proxies: [...PROXIES_ALL_DIRECT],
-      icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Emby.png',
+      icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/emby.svg',
     },
 
     // PikPak
@@ -466,7 +481,7 @@ config['proxy-groups'] = [
       name: 'PikPak',
       ...RULE_GROUP,
       proxies: [...PROXIES_ALL_DIRECT],
-      icon: 'https://fastly.jsdelivr.net/gh/lige47/QuanX-icon-rule@main/icon/03CNSoft/pikpak.png',
+      icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/pikpak.svg',
     },
 
     // Spotify
@@ -474,7 +489,7 @@ config['proxy-groups'] = [
       name: 'Spotify',
       ...RULE_GROUP,
       proxies: [...PROXIES_ALL_DIRECT],
-      icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Spotify.png',
+      icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/spotify.svg',
     },
 
     // Crypto
@@ -483,7 +498,7 @@ config['proxy-groups'] = [
       ...RULE_GROUP,
       proxies: [...PROXIES_ALL],
       'default-selected': 'JP Group',
-      icon: 'https://fastly.jsdelivr.net/gh/lige47/QuanX-icon-rule@main/icon/04ProxySoft/Bitcoin.png',
+      icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/Crypto.svg',
     },
 
     // EHentai
@@ -492,7 +507,7 @@ config['proxy-groups'] = [
       ...RULE_GROUP,
       proxies: [...PROXIES_ALL],
       'default-selected': 'US Group',
-      icon: 'https://fastly.jsdelivr.net/gh/lige47/QuanX-icon-rule@main/icon/04ProxySoft/exhentai.png',
+      icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/EHentai.svg',
     },
 
     // AdBlock
@@ -504,7 +519,7 @@ config['proxy-groups'] = [
         'REJECT-DROP',
         'PASS',
       ],
-      icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Advertising.png',
+      icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Adblock.png',
     },
 
     // HK Group
@@ -516,7 +531,7 @@ config['proxy-groups'] = [
       proxies: [
         'HK Auto Group',
       ],
-      icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png',
+      icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/HK.png',
     },
 
     // HK Auto Group
@@ -538,7 +553,7 @@ config['proxy-groups'] = [
       proxies: [
         'JP Auto Group',
       ],
-      icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png',
+      icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/JP.png',
     },
 
     // JP Auto Group
@@ -560,7 +575,7 @@ config['proxy-groups'] = [
       proxies: [
         'US Auto Group',
       ],
-      icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png',
+      icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/US.png',
     },
 
     // US Auto Group
@@ -582,7 +597,7 @@ config['proxy-groups'] = [
       proxies: [
         'SG Auto Group',
       ],
-      icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png',
+      icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/SG.png',
     },
 
     // SG Auto Group
@@ -604,7 +619,7 @@ config['proxy-groups'] = [
       proxies: [
         'TW Auto Group',
       ],
-      icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Taiwan.png',
+      icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/TW.png',
     },
 
     // TW Auto Group
@@ -626,7 +641,7 @@ config['proxy-groups'] = [
       proxies: [
         'KR Auto Group',
       ],
-      icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Korea.png',
+      icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/KR.png',
     },
 
     // KR Auto Group
@@ -649,7 +664,7 @@ config['proxy-groups'] = [
       proxies: [
         'Other Auto Group',
       ],
-      icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/World_Map.png',
+      icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Global.png',
     },
 
     // Other Auto Group
@@ -730,10 +745,22 @@ config['proxy-groups'] = [
     'DOMAIN,international-gfe.download.nvidia.com,DIRECT',
     // 禁用国外 QUIC 流量
     'AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn_additional),(RULE-SET,cn_ip,no-resolve)))))),REJECT',
-    // 广告拦截
+    // 广告拦截 | 拦截 STUN/TURN 探测
     'RULE-SET,adblockmihomolite,AdBlock',
-    // 拦截 STUN/TURN 探测（3478-3481 STUN/TURN、5349 STUN-over-TLS、19302-19309 Google STUN）
     'AND,((NETWORK,UDP),(OR,((DST-PORT,3478-3481),(DST-PORT,5349),(DST-PORT,19302-19309)))),REJECT',
+    // emby
+    'RULE-SET,emby,Emby',
+    'RULE-SET,emos,Emby',
+    'DOMAIN-SUFFIX,mb3admin.com,Emby',
+    'DOMAIN-SUFFIX,nubebelle.com,Emby',
+    'DOMAIN-KEYWORD,emby,Emby',
+    'PROCESS-NAME,com.mb.android,Emby',
+    'PROCESS-NAME,tv.emby.embyatv,Emby',
+    'PROCESS-NAME,com.hush.yamby,Emby',
+    'PROCESS-NAME,com.jellycine.app,Emby',
+    'PROCESS-NAME,com.mountains.hills,Emby',
+    'PROCESS-NAME,RodelPlayer.App.exe,Emby',
+    'PROCESS-NAME,com.feifeiduck.capyplayer,Emby',
     // 代理规则
     'RULE-SET,ai,AI',
     'RULE-SET,youtube,YouTube',
@@ -754,19 +781,6 @@ config['proxy-groups'] = [
     'RULE-SET,instagram,Instagram',
     'RULE-SET,netflix,Netflix',
     'RULE-SET,netflix_ip,Netflix,no-resolve',
-    // emby
-    'RULE-SET,emby,Emby',
-    'RULE-SET,emos,Emby',
-    'DOMAIN-SUFFIX,mb3admin.com,Emby',
-    'DOMAIN-SUFFIX,nubebelle.com,Emby',
-    'DOMAIN-KEYWORD,emby,Emby',
-    'PROCESS-NAME,com.mb.android,Emby',
-    'PROCESS-NAME,tv.emby.embyatv,Emby',
-    'PROCESS-NAME,com.hush.yamby,Emby',
-    'PROCESS-NAME,com.jellycine.app,Emby',
-    'PROCESS-NAME,com.mountains.hills,Emby',
-    'PROCESS-NAME,RodelPlayer.App.exe,Emby',
-    'PROCESS-NAME,com.feifeiduck.capyplayer,Emby',
     'RULE-SET,pikpak,PikPak',
     'RULE-SET,spotify,Spotify',
     'RULE-SET,spotify_ip,Spotify,no-resolve',
