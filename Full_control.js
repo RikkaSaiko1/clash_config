@@ -32,8 +32,8 @@
 const main = (config) => {
     // ------------------------------------------------ TUN
     config['tun'] = {
-    enable: true,
-    stack: 'mixed',
+    'enable': true,
+    'stack': 'mixed',
     'dns-hijack': ['any:53', 'tcp://any:53'],
     'auto-route': true,
     'auto-redirect': true,
@@ -43,23 +43,23 @@ const main = (config) => {
 
   // ------------------------------------------------ 流量嗅探
   config['sniffer'] = {
-    enable: true,
+    'enable': true,
     'override-destination': false,
     'force-dns-mapping': false,
     'parse-pure-ip': true,
-    sniff: {
-      HTTP: { ports: [80, '8080-8880'] },
-      TLS: { ports: [443, 8443] },
-      QUIC: { ports: [443, 8443] },
+    'sniff': {
+      'HTTP': { 'ports': [80, '8080-8880'] },
+      'TLS': { 'ports': [443, 8443] },
+      'QUIC': { 'ports': [443, 8443] },
     },
     'skip-domain': ['Mijia Cloud', '+.push.apple.com'],
   };
 
   // ------------------------------------------------ 自定义 DNS
   config['dns'] = {
-    enable: true,
+    'enable': true,
     'cache-algorithm': 'arc',
-    ipv6: false,
+    'ipv6': false,
     'enhanced-mode': 'fake-ip',
     'fake-ip-ttl': 1,
     'fake-ip-range': '198.18.0.0/16',
@@ -82,10 +82,10 @@ const main = (config) => {
         'https://8.8.8.8/dns-query#PROXY&disable-qtype-65=true',
       ],
     },
-    nameserver: ['https://8.8.8.8/dns-query#PROXY&ecs=223.5.5.0/24'],
-    fallback: ['https://8.8.8.8/dns-query#PROXY'],
+    'nameserver': ['https://8.8.8.8/dns-query#PROXY&ecs=223.5.5.0/24'],
+    'fallback': ['https://8.8.8.8/dns-query#PROXY'],
     'fallback-filter': {
-      geoip: true,
+      'geoip': true,
       'geoip-code': 'CN',
     },
     'fake-ip-filter': [
@@ -101,121 +101,121 @@ const main = (config) => {
 
   // ------------------------------------------------ 规则集 (rule-providers)
   // 对应 yaml 的 *rule_providers_domain / *rule_providers_ip / *rule_fakeipfilter
-  const RULE_BASE = { type: 'http', interval: 86400 };
-  const RULE_DOMAIN = { ...RULE_BASE, format: 'mrs', behavior: 'domain' };
-  const RULE_IPCIDR = { ...RULE_BASE, format: 'mrs', behavior: 'ipcidr' };
-  const RULE_FAKEIP = { ...RULE_BASE, format: 'text', behavior: 'domain' };
+  const RULE_BASE = { 'type': 'http', 'interval': 86400 };
+  const RULE_DOMAIN = { ...RULE_BASE, 'format': 'mrs', 'behavior': 'domain' };
+  const RULE_IPCIDR = { ...RULE_BASE, 'format': 'mrs', 'behavior': 'ipcidr' };
+  const RULE_FAKEIP = { ...RULE_BASE, 'format': 'text', 'behavior': 'domain' };
 
   // 简写：*rule_providers_domain + appshubcc/bett-rules 的 geosite mrs
   // 单参：bundle 名即本地文件名；双参：bundle 名与本地文件名不同（如含 ! 的规则集必须显式传 file）
   const mrs_domain = (bundle, file = bundle) => ({
     ...RULE_DOMAIN,
-    url: `https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/${bundle}.mrs`,
-    path: `./ruleset/${file}.mrs`,
+    'url': `https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/${bundle}.mrs`,
+    'path': `./ruleset/${file}.mrs`,
     'path-in-bundle': `geo/geosite/${bundle}.mrs`,
   });
 
   // 简写：*rule_providers_ip + appshubcc/bett-rules 的 geoip mrs
   const mrs_ipcidr = (bundle, file) => ({
     ...RULE_IPCIDR,
-    url: `https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/${bundle}.mrs`,
-    path: `./ruleset/${file}.mrs`,
+    'url': `https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/${bundle}.mrs`,
+    'path': `./ruleset/${file}.mrs`,
     'path-in-bundle': `geo/geoip/${bundle}.mrs`,
   });
 
   config['rule-providers'] = {
-    private: mrs_domain('private'),
-    private_ip: mrs_ipcidr('private', 'private_ip'),
-    games_cn: mrs_domain('category-games@cn'),
-    epicgames: mrs_domain('epicgames'),
-    nvidia_cn: mrs_domain('nvidia@cn'),
-    apple_cn: mrs_domain('apple@cn'),
-    microsoft_cn: mrs_domain('microsoft@cn'),
+    'private': mrs_domain('private'),
+    'private_ip': mrs_ipcidr('private', 'private_ip'),
+    'games_cn': mrs_domain('category-games@cn'),
+    'epicgames': mrs_domain('epicgames'),
+    'nvidia_cn': mrs_domain('nvidia@cn'),
+    'apple_cn': mrs_domain('apple@cn'),
+    'microsoft_cn': mrs_domain('microsoft@cn'),
     'geolocation-cn': mrs_domain('geolocation-cn'),
-    cn_ip: mrs_ipcidr('cn', 'cn_ip'),
-    cn: mrs_domain('cn'),
-    youtube: mrs_domain('youtube'),
-    googlefcm: mrs_domain('googlefcm'),
-    google: mrs_domain('google'),
-    google_ip: mrs_ipcidr('google', 'google_ip'),
-    ai: mrs_domain('category-ai-!cn', 'ai'),
-    github: mrs_domain('github'),
-    microsoft: mrs_domain('microsoft'),
-    apple: mrs_domain('apple'),
-    telegram: mrs_domain('telegram'),
-    telegram_ip: mrs_ipcidr('telegram', 'telegram_ip'),
-    steam: mrs_domain('steam'),
-    steam_ip: mrs_ipcidr('steam', 'steam_ip'),
-    tiktok: mrs_domain('tiktok'),
-    tiktok_ip: mrs_ipcidr('tiktok', 'tiktok_ip'),
-    twitter: mrs_domain('twitter'),
-    twitter_ip: mrs_ipcidr('twitter', 'twitter_ip'),
-    instagram: mrs_domain('instagram'),
-    netflix: mrs_domain('netflix'),
-    netflix_ip: mrs_ipcidr('netflix', 'netflix_ip'),
-    pikpak: mrs_domain('pikpak'),
-    spotify: mrs_domain('spotify'),
-    spotify_ip: mrs_ipcidr('spotify', 'spotify_ip'),
-    cryptocurrency: mrs_domain('category-cryptocurrency', 'cryptocurrency'),
-    ehentai: mrs_domain('ehentai'),
-    twitch: mrs_domain('twitch'),
-    pixiv: mrs_domain('pixiv'),
-    line: mrs_domain('line'),
-    discord: mrs_domain('discord'),
+    'cn_ip': mrs_ipcidr('cn', 'cn_ip'),
+    'cn': mrs_domain('cn'),
+    'youtube': mrs_domain('youtube'),
+    'googlefcm': mrs_domain('googlefcm'),
+    'google': mrs_domain('google'),
+    'google_ip': mrs_ipcidr('google', 'google_ip'),
+    'ai': mrs_domain('category-ai-!cn', 'ai'),
+    'github': mrs_domain('github'),
+    'microsoft': mrs_domain('microsoft'),
+    'apple': mrs_domain('apple'),
+    'telegram': mrs_domain('telegram'),
+    'telegram_ip': mrs_ipcidr('telegram', 'telegram_ip'),
+    'steam': mrs_domain('steam'),
+    'steam_ip': mrs_ipcidr('steam', 'steam_ip'),
+    'tiktok': mrs_domain('tiktok'),
+    'tiktok_ip': mrs_ipcidr('tiktok', 'tiktok_ip'),
+    'twitter': mrs_domain('twitter'),
+    'twitter_ip': mrs_ipcidr('twitter', 'twitter_ip'),
+    'instagram': mrs_domain('instagram'),
+    'netflix': mrs_domain('netflix'),
+    'netflix_ip': mrs_ipcidr('netflix', 'netflix_ip'),
+    'pikpak': mrs_domain('pikpak'),
+    'spotify': mrs_domain('spotify'),
+    'spotify_ip': mrs_ipcidr('spotify', 'spotify_ip'),
+    'cryptocurrency': mrs_domain('category-cryptocurrency', 'cryptocurrency'),
+    'ehentai': mrs_domain('ehentai'),
+    'twitch': mrs_domain('twitch'),
+    'pixiv': mrs_domain('pixiv'),
+    'line': mrs_domain('line'),
+    'discord': mrs_domain('discord'),
     'geolocation-!cn': mrs_domain('geolocation-!cn', 'geolocation-!cn'),
-    fakeip_filter: mrs_domain('fakeip-filter'),
+    'fakeip_filter': mrs_domain('fakeip-filter'),
 
-    adblockmihomolite: {
+    'adblockmihomolite': {
       ...RULE_DOMAIN,
-      url: 'https://cdn.jsdelivr.net/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.mrs',
-      path: './ruleset/adblockmihomolite.mrs',
+      'url': 'https://cdn.jsdelivr.net/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.mrs',
+      'path': './ruleset/adblockmihomolite.mrs',
       'path-in-bundle': 'geo/geosite/category-ads-all.mrs',
     },
-    emby: {
+    'emby': {
       ...RULE_DOMAIN,
-      url: 'https://cdn.jsdelivr.net/gh/666OS/rules@release/mihomo/domain/Emby.mrs',
-      path: './ruleset/emby.mrs',
+      'url': 'https://cdn.jsdelivr.net/gh/666OS/rules@release/mihomo/domain/Emby.mrs',
+      'path': './ruleset/emby.mrs',
       'path-in-bundle': 'geo/geosite/category-emby.mrs',
     },
-    emos: {
+    'emos': {
       ...RULE_DOMAIN,
-      url: 'https://cdn.jsdelivr.net/gh/binaryu/emos-proxy-rule@main/rules/emos-mihomo.mrs',
-      path: './ruleset/emos.mrs',
+      'url': 'https://cdn.jsdelivr.net/gh/binaryu/emos-proxy-rule@main/rules/emos-mihomo.mrs',
+      'path': './ruleset/emos.mrs',
       'path-in-bundle': 'geo/geosite/category-emby.mrs',
     },
-    cn_additional: {
+    'cn_additional': {
       ...RULE_DOMAIN,
-      url: 'https://static-file-global.353355.xyz/rules/cn-additional-list.mrs',
-      path: './ruleset/cn-additional-list.mrs',
+      'url': 'https://static-file-global.353355.xyz/rules/cn-additional-list.mrs',
+      'path': './ruleset/cn-additional-list.mrs',
       'path-in-bundle': 'geo/geosite/cn.mrs',
     },
-    fakeipfilter_cn: {
+    'fakeipfilter_cn': {
       ...RULE_FAKEIP,
-      url: 'https://cdn.jsdelivr.net/gh/qichiyuhub/rule@main/rules/fakeipfilter-cn.list',
-      path: './ruleset/fakeipfilter-cn.list',
+      'url': 'https://cdn.jsdelivr.net/gh/qichiyuhub/rule@main/rules/fakeipfilter-cn.list',
+      'path': './ruleset/fakeipfilter-cn.list',
     },
     'fakeipfilter_!cn': {
       ...RULE_FAKEIP,
-      url: 'https://cdn.jsdelivr.net/gh/qichiyuhub/rule@main/rules/fakeipfilter-!cn.list',
-      path: './ruleset/fakeipfilter-!cn.list',
+      'url': 'https://cdn.jsdelivr.net/gh/qichiyuhub/rule@main/rules/fakeipfilter-!cn.list',
+      'path': './ruleset/fakeipfilter-!cn.list',
     },
   };
 
 
   // ------------------------------------------------ 策略组 (proxy-groups)
   const GROUP_COMMON = {
-    timeout: 1500,
+    'timeout': 1500,
     'max-failed-times': 5,
     'empty-fallback': 'REJECT',
-    url: 'https://www.apple.com/library/test/success.html',
-    lazy: true,
+    'url': 'https://www.apple.com/library/test/success.html',
+    'lazy': true,
   };
-  const RULE_GROUP = { type: 'select', interval: 300, ...GROUP_COMMON };
+  const RULE_GROUP = { 'type': 'select', 'interval': 300, ...GROUP_COMMON };
   const RULE_GROUP_TEST = {
-    type: 'url-test',
-    interval: 60,
+    'type': 'url-test',
+    'interval': 60,
     ...GROUP_COMMON,
-    tolerance: 50,
+    'tolerance': 50,
     'include-all': true,
     'exclude-type': 'DIRECT',
   };
@@ -261,46 +261,46 @@ const main = (config) => {
 
   config['proxy-groups'] = [
     // ---------------------------------------- 基础策略组
-    { name: 'PROXY', ...RULE_GROUP, proxies: PROXIES_PROXY, 'include-all-proxies': true, icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Static.png' },
-    { name: 'AUTO', ...RULE_GROUP_TEST, hidden: false, icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Roundrobin.png' },
+    { 'name': 'PROXY', ...RULE_GROUP, 'proxies': PROXIES_PROXY, 'include-all-proxies': true, 'icon': 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Static.png' },
+    { 'name': 'AUTO', ...RULE_GROUP_TEST, 'hidden': false, 'icon': 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Roundrobin.png' },
     // ---------------------------------------- 应用策略组
-    { name: 'YouTube', ...RULE_GROUP, proxies: PROXIES_DEFAULT, icon: svg('youtube') },
-    { name: 'Google', ...RULE_GROUP, proxies: PROXIES_DEFAULT, icon: svg('google') },
-    { name: 'AI', ...RULE_GROUP, proxies: PROXIES_AI, 'default-selected': 'US Group', icon: svg('deepseek') },
-    { name: 'Microsoft', ...RULE_GROUP, proxies: PROXIES_DIRECT, icon: svg('microsoft') },
-    { name: 'Apple', ...RULE_GROUP, proxies: PROXIES_DIRECT, icon: svg('apple') },
-    { name: 'Telegram', ...RULE_GROUP, proxies: PROXIES_DEFAULT, icon: svg('telegram') },
-    { name: 'Steam', ...RULE_GROUP, proxies: PROXIES_DIRECT, icon: svg('steam') },
-    { name: 'TikTok', ...RULE_GROUP, proxies: PROXIES_DEFAULT, 'default-selected': 'JP Group', icon: svg('tiktok') },
-    { name: 'Twitter', ...RULE_GROUP, proxies: PROXIES_DEFAULT, icon: svg('twitter') },
-    { name: 'Instagram', ...RULE_GROUP, proxies: PROXIES_DEFAULT, icon: svg('instagram') },
-    { name: 'Netflix', ...RULE_GROUP, proxies: PROXIES_DEFAULT, icon: svg('netflix') },
-    { name: 'Emby', ...RULE_GROUP, proxies: PROXIES_DIRECT, icon: svg('emby') },
-    { name: 'PikPak', ...RULE_GROUP, proxies: PROXIES_DIRECT, icon: svg('pikpak') },
-    { name: 'Spotify', ...RULE_GROUP, proxies: PROXIES_DIRECT, icon: svg('spotify') },
-    { name: 'Crypto', ...RULE_GROUP, proxies: PROXIES_DEFAULT, 'default-selected': 'JP Group', icon: svg('Crypto') },
-    { name: 'EHentai', ...RULE_GROUP, proxies: PROXIES_DEFAULT, 'default-selected': 'US Group', icon: svg('EHentai') },
-    { name: 'Twitch', ...RULE_GROUP, proxies: PROXIES_DEFAULT, icon: svg('twitch') },
-    { name: 'Pixiv', ...RULE_GROUP, proxies: PROXIES_DEFAULT, 'default-selected': 'JP Group', icon: svg('pixiv') },
-    { name: 'Line', ...RULE_GROUP, proxies: PROXIES_DEFAULT, icon: 'https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Line.png' },
-    { name: 'Discord', ...RULE_GROUP, proxies: PROXIES_DEFAULT, icon: svg('discord') },
-    { name: 'AdBlock', ...RULE_GROUP, proxies: PROXIES_REJECT, icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Adblock.png' },
+    { 'name': 'YouTube', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('youtube') },
+    { 'name': 'Google', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('google') },
+    { 'name': 'AI', ...RULE_GROUP, 'proxies': PROXIES_AI, 'default-selected': 'US Group', 'icon': svg('deepseek') },
+    { 'name': 'Microsoft', ...RULE_GROUP, 'proxies': PROXIES_DIRECT, 'icon': svg('microsoft') },
+    { 'name': 'Apple', ...RULE_GROUP, 'proxies': PROXIES_DIRECT, 'icon': svg('apple') },
+    { 'name': 'Telegram', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('telegram') },
+    { 'name': 'Steam', ...RULE_GROUP, 'proxies': PROXIES_DIRECT, 'icon': svg('steam') },
+    { 'name': 'TikTok', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'default-selected': 'JP Group', 'icon': svg('tiktok') },
+    { 'name': 'Twitter', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('twitter') },
+    { 'name': 'Instagram', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('instagram') },
+    { 'name': 'Netflix', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('netflix') },
+    { 'name': 'Emby', ...RULE_GROUP, 'proxies': PROXIES_DIRECT, 'icon': svg('emby') },
+    { 'name': 'PikPak', ...RULE_GROUP, 'proxies': PROXIES_DIRECT, 'icon': svg('pikpak') },
+    { 'name': 'Spotify', ...RULE_GROUP, 'proxies': PROXIES_DIRECT, 'icon': svg('spotify') },
+    { 'name': 'Crypto', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'default-selected': 'JP Group', 'icon': svg('Crypto') },
+    { 'name': 'EHentai', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'default-selected': 'US Group', 'icon': svg('EHentai') },
+    { 'name': 'Twitch', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('twitch') },
+    { 'name': 'Pixiv', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'default-selected': 'JP Group', 'icon': svg('pixiv') },
+    { 'name': 'Line', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': 'https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Line.png' },
+    { 'name': 'Discord', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('discord') },
+    { 'name': 'AdBlock', ...RULE_GROUP, 'proxies': PROXIES_REJECT, 'icon': 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Adblock.png' },
     // ---------------------------------------- 地区策略组
-    { name: 'HK Group', ...RULE_GROUP, filter: FILTER_HK, 'include-all': true, proxies: ['HK Auto Group'], icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/HK.png' },
-    { name: 'HK Auto Group', ...RULE_GROUP_TEST, filter: FILTER_HK, hidden: true },
-    { name: 'JP Group', ...RULE_GROUP, filter: FILTER_JP, 'include-all': true, proxies: ['JP Auto Group'], icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/JP.png' },
-    { name: 'JP Auto Group', ...RULE_GROUP_TEST, filter: FILTER_JP, hidden: true },
-    { name: 'US Group', ...RULE_GROUP, filter: FILTER_US, 'include-all': true, proxies: ['US Auto Group'], icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/US.png' },
-    { name: 'US Auto Group', ...RULE_GROUP_TEST, filter: FILTER_US, hidden: true },
-    { name: 'SG Group', ...RULE_GROUP, filter: FILTER_SG, 'include-all': true, proxies: ['SG Auto Group'], icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/SG.png' },
-    { name: 'SG Auto Group', ...RULE_GROUP_TEST, filter: FILTER_SG, hidden: true },
-    { name: 'TW Group', ...RULE_GROUP, filter: FILTER_TW, 'include-all': true, proxies: ['TW Auto Group'], icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/TW.png' },
-    { name: 'TW Auto Group', ...RULE_GROUP_TEST, filter: FILTER_TW, hidden: true },
-    { name: 'KR Group', ...RULE_GROUP, filter: FILTER_KR, 'include-all': true, proxies: ['KR Auto Group'], icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/KR.png' },
-    { name: 'KR Auto Group', ...RULE_GROUP_TEST, filter: FILTER_KR, hidden: true },
+    { 'name': 'HK Group', ...RULE_GROUP, 'filter': FILTER_HK, 'include-all': true, 'proxies': ['HK Auto Group'], 'icon': 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/HK.png' },
+    { 'name': 'HK Auto Group', ...RULE_GROUP_TEST, 'filter': FILTER_HK, 'hidden': true },
+    { 'name': 'JP Group', ...RULE_GROUP, 'filter': FILTER_JP, 'include-all': true, 'proxies': ['JP Auto Group'], 'icon': 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/JP.png' },
+    { 'name': 'JP Auto Group', ...RULE_GROUP_TEST, 'filter': FILTER_JP, 'hidden': true },
+    { 'name': 'US Group', ...RULE_GROUP, 'filter': FILTER_US, 'include-all': true, 'proxies': ['US Auto Group'], 'icon': 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/US.png' },
+    { 'name': 'US Auto Group', ...RULE_GROUP_TEST, 'filter': FILTER_US, 'hidden': true },
+    { 'name': 'SG Group', ...RULE_GROUP, 'filter': FILTER_SG, 'include-all': true, 'proxies': ['SG Auto Group'], 'icon': 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/SG.png' },
+    { 'name': 'SG Auto Group', ...RULE_GROUP_TEST, 'filter': FILTER_SG, 'hidden': true },
+    { 'name': 'TW Group', ...RULE_GROUP, 'filter': FILTER_TW, 'include-all': true, 'proxies': ['TW Auto Group'], 'icon': 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/TW.png' },
+    { 'name': 'TW Auto Group', ...RULE_GROUP_TEST, 'filter': FILTER_TW, 'hidden': true },
+    { 'name': 'KR Group', ...RULE_GROUP, 'filter': FILTER_KR, 'include-all': true, 'proxies': ['KR Auto Group'], 'icon': 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/KR.png' },
+    { 'name': 'KR Auto Group', ...RULE_GROUP_TEST, 'filter': FILTER_KR, 'hidden': true },
     // ---------------------------------------- 其他地区
-    { name: 'Other Group', ...RULE_GROUP, 'exclude-filter': EXCLUDE_FILTER, 'exclude-type': 'DIRECT', 'include-all': true, proxies: ['Other Auto Group'], icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Global.png' },
-    { name: 'Other Auto Group', ...RULE_GROUP_TEST, 'exclude-filter': EXCLUDE_FILTER, hidden: true },
+    { 'name': 'Other Group', ...RULE_GROUP, 'exclude-filter': EXCLUDE_FILTER, 'exclude-type': 'DIRECT', 'include-all': true, 'proxies': ['Other Auto Group'], 'icon': 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Global.png' },
+    { 'name': 'Other Auto Group', ...RULE_GROUP_TEST, 'exclude-filter': EXCLUDE_FILTER, 'hidden': true },
   ];
 
   // ------------------------------------------------ 路由规则 (rules)

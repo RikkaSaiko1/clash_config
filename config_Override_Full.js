@@ -26,8 +26,8 @@
 const main = (config) => {
 
   config['tun'] = {
-    enable: true,
-    stack: 'mixed',
+    'enable': true,
+    'stack': 'mixed',
     'dns-hijack': ['any:53', 'tcp://any:53'],
     'auto-route': true,
     'auto-redirect': true,
@@ -36,127 +36,127 @@ const main = (config) => {
   };
 
   config['sniffer'] = {
-    enable: true,
+    'enable': true,
     'override-destination': false,
     'force-dns-mapping': false,
     'parse-pure-ip': true,
-    sniff: {
-      HTTP: { ports: [80, '8080-8880'] },
-      TLS: { ports: [443, 8443] },
-      QUIC: { ports: [443, 8443] },
+    'sniff': {
+      'HTTP': { 'ports': [80, '8080-8880'] },
+      'TLS': { 'ports': [443, 8443] },
+      'QUIC': { 'ports': [443, 8443] },
     },
     'skip-domain': ['Mijia Cloud', '+.push.apple.com'],
   };
 
   // ------------------------------------------------ 规则集 (rule-providers)
-  const RULE_BASE = { type: 'http', format: 'mrs', interval: 86400 };
-  const RULE_DOMAIN = { ...RULE_BASE, behavior: 'domain' };
-  const RULE_IPCIDR = { ...RULE_BASE, behavior: 'ipcidr' };
+  const RULE_BASE = { 'type': 'http', 'format': 'mrs', 'interval': 86400 };
+  const RULE_DOMAIN = { ...RULE_BASE, 'behavior': 'domain' };
+  const RULE_IPCIDR = { ...RULE_BASE, 'behavior': 'ipcidr' };
 
   const mrs_domain = (bundle, file = bundle) => ({
     ...RULE_DOMAIN,
-    url: `https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/${bundle}.mrs`,
-    path: `./ruleset/${file}.mrs`,
+    'url': `https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/${bundle}.mrs`,
+    'path': `./ruleset/${file}.mrs`,
     'path-in-bundle': `geo/geosite/${bundle}.mrs`,
   });
 
   const mrs_ipcidr = (bundle, file) => ({
     ...RULE_IPCIDR,
-    url: `https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/${bundle}.mrs`,
-    path: `./ruleset/${file}.mrs`,
+    'url': `https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/${bundle}.mrs`,
+    'path': `./ruleset/${file}.mrs`,
     'path-in-bundle': `geo/geoip/${bundle}.mrs`,
   });
 
 
   config['rule-providers'] = {
-    private: mrs_domain('private'),
-    private_ip: mrs_ipcidr('private', 'private_ip'),
-    games_cn: mrs_domain('category-games@cn'),
-    epicgames: mrs_domain('epicgames'),
-    nvidia_cn: mrs_domain('nvidia@cn'),
-    apple_cn: mrs_domain('apple@cn'),
-    microsoft_cn: mrs_domain('microsoft@cn'),
+    'private': mrs_domain('private'),
+    'private_ip': mrs_ipcidr('private', 'private_ip'),
+    'games_cn': mrs_domain('category-games@cn'),
+    'epicgames': mrs_domain('epicgames'),
+    'nvidia_cn': mrs_domain('nvidia@cn'),
+    'apple_cn': mrs_domain('apple@cn'),
+    'microsoft_cn': mrs_domain('microsoft@cn'),
     'geolocation-cn': mrs_domain('geolocation-cn'),
-    cn_ip: mrs_ipcidr('cn', 'cn_ip'),
-    cn: mrs_domain('cn'),
-    youtube: mrs_domain('youtube'),
-    googlefcm: mrs_domain('googlefcm'),
-    google: mrs_domain('google'),
-    google_ip: mrs_ipcidr('google', 'google_ip'),
-    ai: mrs_domain('category-ai-!cn', 'ai'),
-    github: mrs_domain('github'),
-    microsoft: mrs_domain('microsoft'),
-    apple: mrs_domain('apple'),
-    telegram: mrs_domain('telegram'),
-    telegram_ip: mrs_ipcidr('telegram', 'telegram_ip'),
-    steam: mrs_domain('steam'),
-    steam_ip: mrs_ipcidr('steam', 'steam_ip'),
-    tiktok: mrs_domain('tiktok'),
-    tiktok_ip: mrs_ipcidr('tiktok', 'tiktok_ip'),
-    twitter: mrs_domain('twitter'),
-    twitter_ip: mrs_ipcidr('twitter', 'twitter_ip'),
-    instagram: mrs_domain('instagram'),
-    netflix: mrs_domain('netflix'),
-    netflix_ip: mrs_ipcidr('netflix', 'netflix_ip'),
-    emby: {
+    'cn_ip': mrs_ipcidr('cn', 'cn_ip'),
+    'cn': mrs_domain('cn'),
+    'youtube': mrs_domain('youtube'),
+    'googlefcm': mrs_domain('googlefcm'),
+    'google': mrs_domain('google'),
+    'google_ip': mrs_ipcidr('google', 'google_ip'),
+    'ai': mrs_domain('category-ai-!cn', 'ai'),
+    'github': mrs_domain('github'),
+    'microsoft': mrs_domain('microsoft'),
+    'apple': mrs_domain('apple'),
+    'telegram': mrs_domain('telegram'),
+    'telegram_ip': mrs_ipcidr('telegram', 'telegram_ip'),
+    'steam': mrs_domain('steam'),
+    'steam_ip': mrs_ipcidr('steam', 'steam_ip'),
+    'tiktok': mrs_domain('tiktok'),
+    'tiktok_ip': mrs_ipcidr('tiktok', 'tiktok_ip'),
+    'twitter': mrs_domain('twitter'),
+    'twitter_ip': mrs_ipcidr('twitter', 'twitter_ip'),
+    'instagram': mrs_domain('instagram'),
+    'netflix': mrs_domain('netflix'),
+    'netflix_ip': mrs_ipcidr('netflix', 'netflix_ip'),
+    'emby': {
       ...RULE_DOMAIN,
-      url: 'https://cdn.jsdelivr.net/gh/666OS/rules@release/mihomo/domain/Emby.mrs',
-      path: './ruleset/emby.mrs',
+      'url': 'https://cdn.jsdelivr.net/gh/666OS/rules@release/mihomo/domain/Emby.mrs',
+      'path': './ruleset/emby.mrs',
       'path-in-bundle': 'geo/geosite/category-emby.mrs',
     },
-    emos: {
+    'emos': {
       ...RULE_DOMAIN,
-      url: 'https://cdn.jsdelivr.net/gh/binaryu/emos-proxy-rule@main/rules/emos-mihomo.mrs',
-      path: './ruleset/emos.mrs',
+      'url': 'https://cdn.jsdelivr.net/gh/binaryu/emos-proxy-rule@main/rules/emos-mihomo.mrs',
+      'path': './ruleset/emos.mrs',
       'path-in-bundle': 'geo/geosite/category-emby.mrs',
     },
-    pikpak: mrs_domain('pikpak'),
-    spotify: mrs_domain('spotify'),
-    spotify_ip: mrs_ipcidr('spotify', 'spotify_ip'),
-    cryptocurrency: mrs_domain('category-cryptocurrency', 'cryptocurrency'),
-    ehentai: mrs_domain('ehentai'),
+    'pikpak': mrs_domain('pikpak'),
+    'spotify': mrs_domain('spotify'),
+    'spotify_ip': mrs_ipcidr('spotify', 'spotify_ip'),
+    'cryptocurrency': mrs_domain('category-cryptocurrency', 'cryptocurrency'),
+    'ehentai': mrs_domain('ehentai'),
     'geolocation-!cn': mrs_domain('geolocation-!cn', 'geolocation-!cn'),
-    adblockmihomolite: {
+    'adblockmihomolite': {
       ...RULE_DOMAIN,
-      url: 'https://cdn.jsdelivr.net/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.mrs',
-      path: './ruleset/adblockmihomolite.mrs',
+      'url': 'https://cdn.jsdelivr.net/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.mrs',
+      'path': './ruleset/adblockmihomolite.mrs',
       'path-in-bundle': 'geo/geosite/category-ads-all.mrs',
     },
-    fakeip_filter: mrs_domain('fakeip-filter'),
-    cn_additional: {
+    'fakeip_filter': mrs_domain('fakeip-filter'),
+    'cn_additional': {
       ...RULE_DOMAIN,
-      url: 'https://static-file-global.353355.xyz/rules/cn-additional-list.mrs',
-      path: './ruleset/cn-additional-list.mrs',
+      'url': 'https://static-file-global.353355.xyz/rules/cn-additional-list.mrs',
+      'path': './ruleset/cn-additional-list.mrs',
       'path-in-bundle': 'geo/geosite/cn.mrs',
     },
-    fakeipfilter_cn: {
-      type: 'http',
-      interval: 86400,
-      behavior: 'domain',
-      format: 'text',
-      url: 'https://cdn.jsdelivr.net/gh/qichiyuhub/rule@main/rules/fakeipfilter-cn.list',
-      path: './ruleset/fakeipfilter-cn.list',
+    'fakeipfilter_cn': {
+      'type': 'http',
+      'interval': 86400,
+      'behavior': 'domain',
+      'format': 'text',
+      'url': 'https://cdn.jsdelivr.net/gh/qichiyuhub/rule@main/rules/fakeipfilter-cn.list',
+      'path': './ruleset/fakeipfilter-cn.list',
     },
     'fakeipfilter_!cn': {
-      type: 'http',
-      interval: 86400,
-      behavior: 'domain',
-      format: 'text',
-      url: 'https://cdn.jsdelivr.net/gh/qichiyuhub/rule@main/rules/fakeipfilter-!cn.list',
-      path: './ruleset/fakeipfilter-!cn.list',
+      'type': 'http',
+      'interval': 86400,
+      'behavior': 'domain',
+      'format': 'text',
+      'url': 'https://cdn.jsdelivr.net/gh/qichiyuhub/rule@main/rules/fakeipfilter-!cn.list',
+      'path': './ruleset/fakeipfilter-!cn.list',
     },
   };
 
   // ------------------------------------------------ 策略组 (proxy-groups)
   const GROUP_COMMON = {
-    timeout: 1500,
+    'timeout': 1500,
     'max-failed-times': 5,
     'empty-fallback': 'REJECT',
-    url: 'https://www.apple.com/library/test/success.html',
-    lazy: true,
+    'url': 'https://www.apple.com/library/test/success.html',
+    'lazy': true,
   };
-  const RULE_GROUP = { type: 'select', interval: 300, ...GROUP_COMMON };
-  const RULE_GROUP_TEST = { type: 'url-test', interval: 60, ...GROUP_COMMON, tolerance: 50 };
+  const RULE_GROUP = { 'type': 'select', 'interval': 300, ...GROUP_COMMON };
+  const RULE_GROUP_TEST = { 'type': 'url-test', 'interval': 60, ...GROUP_COMMON, 'tolerance': 50 };
 
   const PROXIES_ALL = [
     'PROXY',
@@ -201,45 +201,45 @@ const main = (config) => {
 
 
   config['proxy-groups'] = [
-    { name: 'PROXY', ...RULE_GROUP, proxies: list(PROXIES_PROXY), 'include-all-proxies': true, icon: png('Static') }, // PROXY
-    { name: 'AUTO', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', hidden: false, icon: png('Roundrobin') }, // AUTO
-    { name: 'YouTube', ...RULE_GROUP, proxies: list(PROXIES_ALL), icon: svg('youtube') }, // YouTube
-    { name: 'Google', ...RULE_GROUP, proxies: list(PROXIES_ALL), icon: svg('google') }, // Google FCM
-    { name: 'AI', ...RULE_GROUP, proxies: list(PROXIES_AI), 'default-selected': 'US Group', icon: svg('deepseek') }, // AI
-    { name: 'Microsoft', ...RULE_GROUP, proxies: list(PROXIES_ALL_DIRECT), icon: svg('microsoft') }, // Microsoft
-    { name: 'Apple', ...RULE_GROUP, proxies: list(PROXIES_ALL_DIRECT), icon: svg('apple') }, // Apple
-    { name: 'Telegram', ...RULE_GROUP, proxies: list(PROXIES_ALL), icon: svg('telegram') }, // Telegram
-    { name: 'Steam', ...RULE_GROUP, proxies: list(PROXIES_ALL_DIRECT), icon: svg('steam') }, // Steam
-    { name: 'TikTok', ...RULE_GROUP, proxies: list(PROXIES_ALL), 'default-selected': 'JP Group', icon: svg('tiktok') }, // TikTok
-    { name: 'Twitter', ...RULE_GROUP, proxies: list(PROXIES_ALL), icon: svg('twitter') }, // Twitter
-    { name: 'Instagram', ...RULE_GROUP, proxies: list(PROXIES_ALL), icon: svg('instagram') }, // Instagram
-    { name: 'Netflix', ...RULE_GROUP, proxies: list(PROXIES_ALL), icon: svg('netflix') }, // Netflix
-    { name: 'Emby', ...RULE_GROUP, proxies: list(PROXIES_ALL_DIRECT), icon: svg('emby') }, // Emby
-    { name: 'PikPak', ...RULE_GROUP, proxies: list(PROXIES_ALL_DIRECT), icon: svg('pikpak') }, // PikPak
-    { name: 'Spotify', ...RULE_GROUP, proxies: list(PROXIES_ALL_DIRECT), icon: svg('spotify') }, // Spotify
-    { name: 'Crypto', ...RULE_GROUP, proxies: list(PROXIES_ALL), 'default-selected': 'JP Group', icon: svg('Crypto') }, // Crypto
-    { name: 'EHentai', ...RULE_GROUP, proxies: list(PROXIES_ALL), 'default-selected': 'US Group', icon: svg('EHentai') }, // EHentai
-    { name: 'AdBlock', ...RULE_GROUP, proxies: list(PROXIES_REJECT), icon: png('Adblock') }, // AdBlock
-    { name: 'HK Group', ...RULE_GROUP, filter: FILTER_HK, 'include-all': true, proxies: ['HK Auto Group'], icon: png('HK') }, // HK Group
-    { name: 'HK Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', filter: FILTER_HK, hidden: true }, // HK Auto Group
-    { name: 'JP Group', ...RULE_GROUP, filter: FILTER_JP, 'include-all': true, proxies: ['JP Auto Group'], icon: png('JP') }, // JP Group
-    { name: 'JP Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', filter: FILTER_JP, hidden: true }, // JP Auto Group
-    { name: 'US Group', ...RULE_GROUP, filter: FILTER_US, 'include-all': true, proxies: ['US Auto Group'], icon: png('US') }, // US Group
-    { name: 'US Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', filter: FILTER_US, hidden: true }, // US Auto Group
-    { name: 'SG Group', ...RULE_GROUP, filter: FILTER_SG, 'include-all': true, proxies: ['SG Auto Group'], icon: png('SG') }, // SG Group
-    { name: 'SG Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', filter: FILTER_SG, hidden: true }, // SG Auto Group
-    { name: 'TW Group', ...RULE_GROUP, filter: FILTER_TW, 'include-all': true, proxies: ['TW Auto Group'], icon: png('TW') }, // TW Group
-    { name: 'TW Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', filter: FILTER_TW, hidden: true }, // TW Auto Group
-    { name: 'KR Group', ...RULE_GROUP, filter: FILTER_KR, 'include-all': true, proxies: ['KR Auto Group'], icon: png('KR') }, // KR Group
-    { name: 'KR Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', filter: FILTER_KR, hidden: true }, // KR Auto Group
-    { name: 'Other Group', ...RULE_GROUP, 'exclude-filter': EXCLUDE_FILTER, 'exclude-type': 'DIRECT', 'include-all': true, proxies: ['Other Auto Group'], icon: png('Global') }, // Other Group
-    { name: 'Other Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'exclude-filter': EXCLUDE_FILTER, hidden: true }, // Other Auto Group
+    { 'name': 'PROXY', ...RULE_GROUP, 'proxies': list(PROXIES_PROXY), 'include-all-proxies': true, 'icon': png('Static') }, // PROXY
+    { 'name': 'AUTO', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'hidden': false, 'icon': png('Roundrobin') }, // AUTO
+    { 'name': 'YouTube', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'icon': svg('youtube') }, // YouTube
+    { 'name': 'Google', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'icon': svg('google') }, // Google FCM
+    { 'name': 'AI', ...RULE_GROUP, 'proxies': list(PROXIES_AI), 'default-selected': 'US Group', 'icon': svg('deepseek') }, // AI
+    { 'name': 'Microsoft', ...RULE_GROUP, 'proxies': list(PROXIES_ALL_DIRECT), 'icon': svg('microsoft') }, // Microsoft
+    { 'name': 'Apple', ...RULE_GROUP, 'proxies': list(PROXIES_ALL_DIRECT), 'icon': svg('apple') }, // Apple
+    { 'name': 'Telegram', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'icon': svg('telegram') }, // Telegram
+    { 'name': 'Steam', ...RULE_GROUP, 'proxies': list(PROXIES_ALL_DIRECT), 'icon': svg('steam') }, // Steam
+    { 'name': 'TikTok', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'default-selected': 'JP Group', 'icon': svg('tiktok') }, // TikTok
+    { 'name': 'Twitter', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'icon': svg('twitter') }, // Twitter
+    { 'name': 'Instagram', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'icon': svg('instagram') }, // Instagram
+    { 'name': 'Netflix', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'icon': svg('netflix') }, // Netflix
+    { 'name': 'Emby', ...RULE_GROUP, 'proxies': list(PROXIES_ALL_DIRECT), 'icon': svg('emby') }, // Emby
+    { 'name': 'PikPak', ...RULE_GROUP, 'proxies': list(PROXIES_ALL_DIRECT), 'icon': svg('pikpak') }, // PikPak
+    { 'name': 'Spotify', ...RULE_GROUP, 'proxies': list(PROXIES_ALL_DIRECT), 'icon': svg('spotify') }, // Spotify
+    { 'name': 'Crypto', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'default-selected': 'JP Group', 'icon': svg('Crypto') }, // Crypto
+    { 'name': 'EHentai', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'default-selected': 'US Group', 'icon': svg('EHentai') }, // EHentai
+    { 'name': 'AdBlock', ...RULE_GROUP, 'proxies': list(PROXIES_REJECT), 'icon': png('Adblock') }, // AdBlock
+    { 'name': 'HK Group', ...RULE_GROUP, 'filter': FILTER_HK, 'include-all': true, 'proxies': ['HK Auto Group'], 'icon': png('HK') }, // HK Group
+    { 'name': 'HK Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'filter': FILTER_HK, 'hidden': true }, // HK Auto Group
+    { 'name': 'JP Group', ...RULE_GROUP, 'filter': FILTER_JP, 'include-all': true, 'proxies': ['JP Auto Group'], 'icon': png('JP') }, // JP Group
+    { 'name': 'JP Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'filter': FILTER_JP, 'hidden': true }, // JP Auto Group
+    { 'name': 'US Group', ...RULE_GROUP, 'filter': FILTER_US, 'include-all': true, 'proxies': ['US Auto Group'], 'icon': png('US') }, // US Group
+    { 'name': 'US Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'filter': FILTER_US, 'hidden': true }, // US Auto Group
+    { 'name': 'SG Group', ...RULE_GROUP, 'filter': FILTER_SG, 'include-all': true, 'proxies': ['SG Auto Group'], 'icon': png('SG') }, // SG Group
+    { 'name': 'SG Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'filter': FILTER_SG, 'hidden': true }, // SG Auto Group
+    { 'name': 'TW Group', ...RULE_GROUP, 'filter': FILTER_TW, 'include-all': true, 'proxies': ['TW Auto Group'], 'icon': png('TW') }, // TW Group
+    { 'name': 'TW Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'filter': FILTER_TW, 'hidden': true }, // TW Auto Group
+    { 'name': 'KR Group', ...RULE_GROUP, 'filter': FILTER_KR, 'include-all': true, 'proxies': ['KR Auto Group'], 'icon': png('KR') }, // KR Group
+    { 'name': 'KR Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'filter': FILTER_KR, 'hidden': true }, // KR Auto Group
+    { 'name': 'Other Group', ...RULE_GROUP, 'exclude-filter': EXCLUDE_FILTER, 'exclude-type': 'DIRECT', 'include-all': true, 'proxies': ['Other Auto Group'], 'icon': png('Global') }, // Other Group
+    { 'name': 'Other Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'exclude-filter': EXCLUDE_FILTER, 'hidden': true }, // Other Auto Group
   ];
 
   config['dns'] = {
-    enable: true,
+    'enable': true,
     'cache-algorithm': 'arc',
-    ipv6: false,
+    'ipv6': false,
     'enhanced-mode': 'fake-ip',
     'fake-ip-ttl': 1,
     'fake-ip-range': '198.18.0.0/16',
