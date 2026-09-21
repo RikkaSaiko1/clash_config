@@ -145,12 +145,12 @@ proxy-groups:
 
   - name: 'YouTube'
     <<: [*group_common_select, *proxies_default]
-    icon: 'https://fastly.jsdelivr.net/gh/MiToverG422/Qure@master/IconSet/Color/YouTube.png'
+    icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/youtube.svg'
 
   # Google FCM
   - name: 'Google'
     <<: [*group_common_select, *proxies_default]
-    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Google_Search.png'
+    icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/google.svg'
 
   - name: 'AI'
     <<: [*group_common_select, *proxies_AI]
@@ -159,58 +159,58 @@ proxy-groups:
 
   - name: 'Microsoft'
     <<: [*group_common_select, *proxies_direct]
-    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Microsoft.png'
+    icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/microsoft.svg'
 
   - name: 'Apple'
     <<: [*group_common_select, *proxies_direct]
-    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Apple.png'
+    icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/apple.svg'
 
   - name: 'Telegram'
     <<: [*group_common_select, *proxies_default]
-    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram.png'
+    icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/telegram.svg'
 
   - name: 'Steam'
     <<: [*group_common_select, *proxies_direct]
-    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Steam.png'
+    icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/steam.svg'
 
   - name: 'TikTok'
     default-selected: 'JP Group'
     <<: [*group_common_select, *proxies_default]
-    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/TikTok.png'
+    icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/tiktok.svg'
 
   - name: 'Twitter'
     <<: [*group_common_select, *proxies_default]
-    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Twitter.png'
+    icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/twitter.svg'
 
   - name: 'Instagram'
     <<: [*group_common_select, *proxies_default]
-    icon: 'https://fastly.jsdelivr.net/gh/MiToverG422/Qure@master/IconSet/Color/Instagram.png'
+    icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/instagram.svg'
 
   - name: 'Netflix'
     <<: [*group_common_select, *proxies_default]
-    icon: 'https://fastly.jsdelivr.net/gh/MiToverG422/Qure@master/IconSet/Color/Netflix.png'
+    icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/netflix.svg'
 
   - name: 'Emby'
     <<: [*group_common_select, *proxies_direct]
-    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Emby.png'
+    icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/emby.svg'
 
   - name: 'PikPak'
     <<: [*group_common_select, *proxies_direct]
-    icon: 'https://fastly.jsdelivr.net/gh/lige47/QuanX-icon-rule@main/icon/03CNSoft/pikpak.png'
+    icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/pikpak.svg'
 
   - name: 'Spotify'
     <<: [*group_common_select, *proxies_direct]
-    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Spotify.png'
+    icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/spotify.svg'
 
   - name: 'Crypto'
     default-selected: 'JP Group'
     <<: [*group_common_select, *proxies_default]
-    icon: 'https://fastly.jsdelivr.net/gh/lige47/QuanX-icon-rule@main/icon/04ProxySoft/Bitcoin.png'
+    icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/Crypto.svg'
 
   - name: 'EHentai'
     default-selected: 'US Group'
     <<: [*group_common_select, *proxies_default]
-    icon: 'https://fastly.jsdelivr.net/gh/lige47/QuanX-icon-rule@main/icon/04ProxySoft/exhentai.png'
+    icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/EHentai.svg'
 
   - name: 'AdBlock'
     <<: [*group_common_select, *proxies_reject]
