@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="140" height="120" viewBox="0 0 140 120">
+  <!-- E as single path -->
+  <path fill="#660611" d="M0 0h50v20H20v30h30v20H20v30h30v20H0V0z"/>
+  <!-- H as single path -->
+  <path fill="#660611" d="M80 0h20v50h20V0h20v120h-20V70H100v50H80V0z"/>
+</svg>
