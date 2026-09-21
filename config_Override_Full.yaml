@@ -1,10 +1,60 @@
 #  ============================================================================
 #  clash 覆写脚本 全规则 + 自定义 DNS (mihomo JS Override)
 #  仓库 https://github.com/RikkaSaiko1/clash_config
-# 
-#  - DNS 防泄漏: fake-ip + 全 DoH(无明文 UDP 53), nameserver-policy 按规则集分组,
-#    fake-ip-filter 排除私有/国内域名; nameserver / fallback 带 #PROXY, 出口分离
-#  - 全规则: proxy-groups 全部策略组 + 地区组, rules 完整规则链, rule-providers 全量
+#
+#  ── 分流概览（按 rules 从上到下匹配） ──────────────────────────────────────
+#
+#  ◆ 直连 DIRECT
+#      私有网络    private / private_ip
+#      国内域名    geolocation-cn
+#      国内 IP     cn_ip（末尾还有一个 no-resolve 兜底）
+#      国内游戏    games_cn（已含 steam 下载域名）/ epicgames / nvidia_cn
+#      国内大厂    apple_cn / microsoft_cn
+#      Google FCM  googlefcm
+#      特例域名    fsend.cn、international-gfe.download.nvidia.com
+#
+#  ◆ 拦截 REJECT
+#      国外 QUIC   UDP 443（国内域名 cn_additional / 国内 IP cn_ip 除外）
+#      STUN/TURN   UDP 3478-3481 / 5349 / 19302-19309
+#      广告        adblockmihomolite → AdBlock 组
+#
+#  ◆ 分流到策略组
+#      分类        规则集                                策略组
+#      ─────────────────────────────────────────────────────────────────────
+#      AI          ai                                    AI（默认 PROXY）
+#      油管        youtube                               YouTube
+#      谷歌        google / google_ip                    Google
+#      微软        microsoft                             Microsoft
+#      苹果        apple                                 Apple
+#      电报        telegram / telegram_ip                Telegram
+#      游戏平台    steam / steam_ip                      Steam
+#      短视频      tiktok / tiktok_ip                    TikTok
+#      推特        twitter / twitter_ip                  Twitter
+#      图享        instagram                             Instagram
+#      奈飞        netflix / netflix_ip                  Netflix
+#      影音        emby / emos + Emby 相关域名与 9 条进程名   Emby
+#      网盘        pikpak                                PikPak
+#      音乐        spotify / spotify_ip                  Spotify
+#      加密货币    cryptocurrency                        Crypto（默认 PROXY）
+#      图站        ehentai                               EHentai（默认 PROXY）
+#      代码托管    github                                PROXY
+#
+#  ◆ 兜底
+#      geolocation-!cn → PROXY      cn_ip → DIRECT      MATCH → PROXY
+#
+#  ◆ 策略组（共 33 个）
+#      PROXY（手动总出口）、AUTO（自动测速）、
+#      YouTube / Google / AI / Microsoft / Apple / Telegram / Steam / TikTok /
+#      Twitter / Instagram / Netflix / Emby / PikPak / Spotify / Crypto /
+#      EHentai / AdBlock（分组出口）
+#      地区组 HK / JP / US / SG / TW / KR / Other
+#      （每个地区含「手动 Group」+「隐藏 Auto Group」；地区组带过滤器，
+#        自动排除中继/过期节点，Auto Group 用 url-test 自动择优）
+#
+#  ◆ 图标
+#      自有图标走 jsDelivr CDN：gh/RikkaSaiko1/clash_config@main/svg/*.svg
+#      其余沿用 Orz-3/mini 图标源
+#
 #  ============================================================================
 
 
