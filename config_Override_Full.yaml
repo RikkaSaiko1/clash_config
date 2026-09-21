@@ -155,7 +155,7 @@ proxy-groups:
   - name: 'AI'
     <<: [*group_common_select, *proxies_AI]
     default-selected: 'US Group'
-    icon: 'https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/ChatGPT.png'
+    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/deepseek.svg'
 
   - name: 'Microsoft'
     <<: [*group_common_select, *proxies_direct]
