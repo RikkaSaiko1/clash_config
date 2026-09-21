@@ -675,7 +675,7 @@ rule-providers:
     interval: 86400
     behavior: domain
     format: text
-    url: 'https://raw.githubusercontent.com/qichiyuhub/rule/refs/heads/main/rules/fakeipfilter-cn.list'
+    url: 'https://cdn.jsdelivr.net/gh/qichiyuhub/rule@main/rules/fakeipfilter-cn.list'
     path: './ruleset/fakeipfilter-cn.list'
 
   fakeipfilter_!cn:
@@ -683,5 +683,5 @@ rule-providers:
     interval: 86400
     behavior: domain
     format: text
-    url: 'https://raw.githubusercontent.com/qichiyuhub/rule/refs/heads/main/rules/fakeipfilter-!cn.list'
+    url: 'https://cdn.jsdelivr.net/gh/qichiyuhub/rule@main/rules/fakeipfilter-!cn.list'
     path: './ruleset/fakeipfilter-!cn.list'

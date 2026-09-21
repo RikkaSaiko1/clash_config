@@ -94,99 +94,44 @@ const RULE_DOMAIN = { ...RULE_BASE, behavior: 'domain' };
 const RULE_IPCIDR = { ...RULE_BASE, behavior: 'ipcidr' };
 const RULE_FAKEIPFILTER = { type: 'http', format: 'text', interval: 86400, behavior: 'domain' };
 
+const mrs_domain = (bundle, file = bundle) => ({
+  ...RULE_DOMAIN,
+  url: `https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/${bundle}.mrs`,
+  path: `./ruleset/${file}.mrs`,
+  'path-in-bundle': `geo/geosite/${bundle}.mrs`,
+});
+
+// appshubcc/bett-rules 的 geoip mrs
+const mrs_ipcidr = (bundle, file) => ({
+  ...RULE_IPCIDR,
+  url: `https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/${bundle}.mrs`,
+  path: `./ruleset/${file}.mrs`,
+  'path-in-bundle': `geo/geoip/${bundle}.mrs`,
+});
+
 config['rule-providers'] = {
   // --- 直连规则集 ---
-  private: {
-    ...RULE_DOMAIN,
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/private.mrs',
-    path: './ruleset/private.mrs',
-    'path-in-bundle': 'geo/geosite/private.mrs',
-  },
-  private_ip: {
-    ...RULE_IPCIDR,
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/private.mrs',
-    path: './ruleset/private_ip.mrs',
-    'path-in-bundle': 'geo/geoip/private.mrs',
-  },
-  games_cn: {
-    ...RULE_DOMAIN,
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-games@cn.mrs',
-    path: './ruleset/category-games@cn.mrs',
-    'path-in-bundle': 'geo/geosite/category-games@cn.mrs',
-  },
-  epicgames: {
-    ...RULE_DOMAIN,
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/epicgames.mrs',
-    path: './ruleset/epicgames.mrs',
-    'path-in-bundle': 'geo/geosite/epicgames.mrs',
-  },
-  nvidia_cn: {
-    ...RULE_DOMAIN,
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/nvidia@cn.mrs',
-    path: './ruleset/nvidia@cn.mrs',
-    'path-in-bundle': 'geo/geosite/nvidia@cn.mrs',
-  },
-  apple_cn: {
-    ...RULE_DOMAIN,
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/apple@cn.mrs',
-    path: './ruleset/apple@cn.mrs',
-    'path-in-bundle': 'geo/geosite/apple@cn.mrs',
-  },
-  microsoft_cn: {
-    ...RULE_DOMAIN,
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/microsoft@cn.mrs',
-    path: './ruleset/microsoft@cn.mrs',
-    'path-in-bundle': 'geo/geosite/microsoft@cn.mrs',
-  },
-  'geolocation-cn': {
-    ...RULE_DOMAIN,
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-cn.mrs',
-    path: './ruleset/geolocation-cn.mrs',
-    'path-in-bundle': 'geo/geosite/geolocation-cn.mrs',
-  },
-  cn: {
-    ...RULE_DOMAIN,
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/cn.mrs',
-    path: './ruleset/cn.mrs',
-    'path-in-bundle': 'geo/geosite/cn.mrs',
-  },
-  cn_ip: {
-    ...RULE_IPCIDR,
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/cn.mrs',
-    path: './ruleset/cn_ip.mrs',
-    'path-in-bundle': 'geo/geoip/cn.mrs',
-  },
+  private: mrs_domain('private'),
+  private_ip: mrs_ipcidr('private', 'private_ip'),
+  games_cn: mrs_domain('category-games@cn'),
+  epicgames: mrs_domain('epicgames'),
+  nvidia_cn: mrs_domain('nvidia@cn'),
+  apple_cn: mrs_domain('apple@cn'),
+  microsoft_cn: mrs_domain('microsoft@cn'),
+  'geolocation-cn': mrs_domain('geolocation-cn'),
+  cn: mrs_domain('cn'),
+  cn_ip: mrs_ipcidr('cn', 'cn_ip'),
 
   // --- 应用规则集 ---
-  youtube: {
-    ...RULE_DOMAIN,
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/youtube.mrs',
-    path: './ruleset/youtube.mrs',
-    'path-in-bundle': 'geo/geosite/youtube.mrs',
-  },
-  googlefcm: {
-    ...RULE_DOMAIN,
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/googlefcm.mrs',
-    path: './ruleset/googlefcm.mrs',
-    'path-in-bundle': 'geo/geosite/googlefcm.mrs',
-  },
-  ai: {
-    ...RULE_DOMAIN,
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-ai-!cn.mrs',
-    path: './ruleset/ai.mrs',
-    'path-in-bundle': 'geo/geosite/category-ai-!cn.mrs',
-  },
+  youtube: mrs_domain('youtube'),
+  googlefcm: mrs_domain('googlefcm'),
+  ai: mrs_domain('category-ai-!cn', 'ai'),
 
   // --- 其他规则集 ---
-  'geolocation-!cn': {
-    ...RULE_DOMAIN,
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-!cn.mrs',
-    path: './ruleset/geolocation-!cn.mrs',
-    'path-in-bundle': 'geo/geosite/geolocation-!cn.mrs',
-  },
+  'geolocation-!cn': mrs_domain('geolocation-!cn'),
   adblockmihomolite: {
     ...RULE_DOMAIN,
-    url: 'https://fastly.jsdelivr.net/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.mrs',
+    url: 'https://cdn.jsdelivr.net/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.mrs',
     path: './ruleset/adblockmihomolite.mrs',
     'path-in-bundle': 'geo/geosite/category-ads-all.mrs',
   },
@@ -228,29 +173,10 @@ const RULE_GROUP_TEST = {
   'exclude-type': 'DIRECT',
 };
 
-const PROXIES_DEFAULT = [
-  'PROXY',
-  'AUTO',
-  'HK Group',
-  'SG Group',
-  'JP Group',
-  'US Group',
-  'TW Group',
-  'KR Group',
-  'Other Group',
-];
+const PROXIES_DEFAULT = ['PROXY', 'AUTO', 'HK Group', 'SG Group', 'JP Group', 'US Group', 'TW Group', 'KR Group', 'Other Group'];
 const PROXIES_DIRECT = [...PROXIES_DEFAULT, 'DIRECT'];
 const PROXIES_AI = ['PROXY', 'SG Group', 'JP Group', 'US Group', 'KR Group'];
-const PROXIES_PROXY = [
-  'AUTO',
-  'HK Group',
-  'JP Group',
-  'US Group',
-  'SG Group',
-  'TW Group',
-  'KR Group',
-  'Other Group',
-];
+const PROXIES_PROXY = ['AUTO', 'HK Group', 'JP Group', 'US Group', 'SG Group', 'TW Group', 'KR Group', 'Other Group'];
 
 const FILTER_HK = '(?i)(🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|hong\\s*kong)';
 const FILTER_JP = '(?i)(🇯🇵|日本|东京|大阪|京都|(?<![A-Za-z])JPN?(?![A-Za-z])|japan)';
@@ -277,137 +203,27 @@ const svg = (name) =>
 
 config['proxy-groups'] = [
   // ---------------------------------------- 基础策略组
-  {
-    name: 'PROXY',
-    ...RULE_GROUP,
-    proxies: PROXIES_PROXY,
-    'include-all-proxies': true,
-    icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Static.png',
-  },
-  {
-    name: 'AUTO',
-    ...RULE_GROUP_TEST,
-    hidden: false,
-    icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Roundrobin.png',
-  },
-
+  { name: 'PROXY', ...RULE_GROUP, proxies: PROXIES_PROXY, 'include-all-proxies': true, icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Static.png' },
+  { name: 'AUTO', ...RULE_GROUP_TEST, hidden: false, icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Roundrobin.png' },
   // ---------------------------------------- 应用策略组
-  {
-    name: 'YouTube',
-    ...RULE_GROUP,
-    proxies: PROXIES_DEFAULT,
-    icon: svg('youtube'),
-  },
-  {
-    name: 'AI',
-    ...RULE_GROUP,
-    proxies: PROXIES_AI,
-    'default-selected': 'US Group',
-    icon: svg('deepseek'),
-  },
-
+  { name: 'YouTube', ...RULE_GROUP, proxies: PROXIES_DEFAULT, icon: svg('youtube') },
+  { name: 'AI', ...RULE_GROUP, proxies: PROXIES_AI, 'default-selected': 'US Group', icon: svg('deepseek') },
   // ---------------------------------------- 地区策略组
-  {
-    name: 'HK Group',
-    ...RULE_GROUP,
-    filter: FILTER_HK,
-    'include-all': true,
-    proxies: ['HK Auto Group'],
-    icon: regionIcons.HK,
-  },
-  {
-    name: 'HK Auto Group',
-    ...RULE_GROUP_TEST,
-    filter: FILTER_HK,
-    hidden: true,
-  },
-  {
-    name: 'JP Group',
-    ...RULE_GROUP,
-    filter: FILTER_JP,
-    'include-all': true,
-    proxies: ['JP Auto Group'],
-    icon: regionIcons.JP,
-  },
-  {
-    name: 'JP Auto Group',
-    ...RULE_GROUP_TEST,
-    filter: FILTER_JP,
-    hidden: true,
-  },
-  {
-    name: 'US Group',
-    ...RULE_GROUP,
-    filter: FILTER_US,
-    'include-all': true,
-    proxies: ['US Auto Group'],
-    icon: regionIcons.US,
-  },
-  {
-    name: 'US Auto Group',
-    ...RULE_GROUP_TEST,
-    filter: FILTER_US,
-    hidden: true,
-  },
-  {
-    name: 'SG Group',
-    ...RULE_GROUP,
-    filter: FILTER_SG,
-    'include-all': true,
-    proxies: ['SG Auto Group'],
-    icon: regionIcons.SG,
-  },
-  {
-    name: 'SG Auto Group',
-    ...RULE_GROUP_TEST,
-    filter: FILTER_SG,
-    hidden: true,
-  },
-  {
-    name: 'TW Group',
-    ...RULE_GROUP,
-    filter: FILTER_TW,
-    'include-all': true,
-    proxies: ['TW Auto Group'],
-    icon: regionIcons.TW,
-  },
-  {
-    name: 'TW Auto Group',
-    ...RULE_GROUP_TEST,
-    filter: FILTER_TW,
-    hidden: true,
-  },
-  {
-    name: 'KR Group',
-    ...RULE_GROUP,
-    filter: FILTER_KR,
-    'include-all': true,
-    proxies: ['KR Auto Group'],
-    icon: regionIcons.KR,
-  },
-  {
-    name: 'KR Auto Group',
-    ...RULE_GROUP_TEST,
-    filter: FILTER_KR,
-    hidden: true,
-  },
-
+  { name: 'HK Group', ...RULE_GROUP, filter: FILTER_HK, 'include-all': true, proxies: ['HK Auto Group'], icon: regionIcons.HK },
+  { name: 'HK Auto Group', ...RULE_GROUP_TEST, filter: FILTER_HK, hidden: true },
+  { name: 'JP Group', ...RULE_GROUP, filter: FILTER_JP, 'include-all': true, proxies: ['JP Auto Group'], icon: regionIcons.JP },
+  { name: 'JP Auto Group', ...RULE_GROUP_TEST, filter: FILTER_JP, hidden: true },
+  { name: 'US Group', ...RULE_GROUP, filter: FILTER_US, 'include-all': true, proxies: ['US Auto Group'], icon: regionIcons.US },
+  { name: 'US Auto Group', ...RULE_GROUP_TEST, filter: FILTER_US, hidden: true },
+  { name: 'SG Group', ...RULE_GROUP, filter: FILTER_SG, 'include-all': true, proxies: ['SG Auto Group'], icon: regionIcons.SG },
+  { name: 'SG Auto Group', ...RULE_GROUP_TEST, filter: FILTER_SG, hidden: true },
+  { name: 'TW Group', ...RULE_GROUP, filter: FILTER_TW, 'include-all': true, proxies: ['TW Auto Group'], icon: regionIcons.TW },
+  { name: 'TW Auto Group', ...RULE_GROUP_TEST, filter: FILTER_TW, hidden: true },
+  { name: 'KR Group', ...RULE_GROUP, filter: FILTER_KR, 'include-all': true, proxies: ['KR Auto Group'], icon: regionIcons.KR },
+  { name: 'KR Auto Group', ...RULE_GROUP_TEST, filter: FILTER_KR, hidden: true },
   // ---------------------------------------- 其他地区
-  {
-    name: 'Other Group',
-    ...RULE_GROUP,
-    'exclude-filter': EXCLUDE_FILTER,
-    'exclude-type': 'DIRECT',
-    'include-all': true,
-    proxies: ['Other Auto Group'],
-    icon: regionIcons.Other,
-  },
-  {
-    name: 'Other Auto Group',
-    ...RULE_GROUP_TEST,
-    'exclude-filter': EXCLUDE_FILTER,
-    hidden: true,
-  },
+  { name: 'Other Group', ...RULE_GROUP, 'exclude-filter': EXCLUDE_FILTER, 'exclude-type': 'DIRECT', 'include-all': true, proxies: ['Other Auto Group'], icon: regionIcons.Other },
+  { name: 'Other Auto Group', ...RULE_GROUP_TEST, 'exclude-filter': EXCLUDE_FILTER, hidden: true },
 ];
 
 
