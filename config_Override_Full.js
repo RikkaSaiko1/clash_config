@@ -2,10 +2,6 @@
 // clash 覆写脚本 全规则 + 自定义 DNS (mihomo JS Override)
 // 仓库 https://github.com/RikkaSaiko1/clash_config
 //
-// - DNS 防泄漏: fake-ip + 全 DoH(无明文 UDP 53), nameserver-policy 按规则集分组,
-//   fake-ip-filter 排除私有/国内域名; nameserver / fallback 带 #PROXY, 出口分离
-// - 全规则: proxy-groups 全部策略组 + 地区组, rules 完整规则链, rule-providers 全量
-//
 // ◆ 分流到策略组
 //     分类        规则集                                策略组
 //     ─────────────────────────────────────────────────────────────────────
