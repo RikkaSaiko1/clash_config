@@ -136,12 +136,12 @@ proxy-groups:
   - name: 'PROXY'
     <<: [*group_common_select, *proxies_proxy]
     include-all-proxies: true
-    icon: 'https://raw.githubusercontent.com/Orz-3/mini/master/Color/Static.png'
+    icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Static.png'
 
   - name: 'AUTO'
     <<: *group_common_auto
     hidden: false
-    icon: 'https://raw.githubusercontent.com/Orz-3/mini/master/Color/Roundrobin.png'
+    icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Roundrobin.png'
 
   - name: 'YouTube'
     <<: [*group_common_select, *proxies_default]
@@ -214,7 +214,7 @@ proxy-groups:
 
   - name: 'AdBlock'
     <<: [*group_common_select, *proxies_reject]
-    icon: 'https://raw.githubusercontent.com/Orz-3/mini/master/Color/Adblock.png'
+    icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Adblock.png'
 
 
   # ==============================
@@ -225,7 +225,7 @@ proxy-groups:
     <<: [*group_common_select, *HK_filter]
     include-all: true
     proxies: ['HK Auto Group']
-    icon: 'https://raw.githubusercontent.com/Orz-3/mini/master/Color/HK.png'
+    icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/HK.png'
 
   - name: 'HK Auto Group'
     <<: [*group_common_auto, *HK_filter]
@@ -236,7 +236,7 @@ proxy-groups:
     <<: [*group_common_select, *JP_filter]
     include-all: true
     proxies: ['JP Auto Group']
-    icon: 'https://raw.githubusercontent.com/Orz-3/mini/master/Color/JP.png'
+    icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/JP.png'
 
   - name: 'JP Auto Group'
     <<: [*group_common_auto, *JP_filter]
@@ -247,7 +247,7 @@ proxy-groups:
     <<: [*group_common_select, *US_filter]
     include-all: true
     proxies: ['US Auto Group']
-    icon: 'https://raw.githubusercontent.com/Orz-3/mini/master/Color/US.png'
+    icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/US.png'
 
   - name: 'US Auto Group'
     <<: [*group_common_auto, *US_filter]
@@ -258,7 +258,7 @@ proxy-groups:
     <<: [*group_common_select, *SG_filter]
     include-all: true
     proxies: ['SG Auto Group']
-    icon: 'https://raw.githubusercontent.com/Orz-3/mini/master/Color/SG.png'
+    icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/SG.png'
 
   - name: 'SG Auto Group'
     <<: [*group_common_auto, *SG_filter]
@@ -268,7 +268,7 @@ proxy-groups:
     <<: [*group_common_select, *TW_filter]
     include-all: true
     proxies: ['TW Auto Group']
-    icon: 'https://raw.githubusercontent.com/Orz-3/mini/master/Color/TW.png'
+    icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/TW.png'
 
   - name: 'TW Auto Group'
     <<: [*group_common_auto, *TW_filter]
@@ -278,7 +278,7 @@ proxy-groups:
     <<: [*group_common_select, *KR_filter]
     include-all: true
     proxies: ['KR Auto Group']
-    icon: 'https://raw.githubusercontent.com/Orz-3/mini/master/Color/KR.png'
+    icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/KR.png'
 
   - name: 'KR Auto Group'
     <<: [*group_common_auto, *KR_filter]
@@ -289,7 +289,7 @@ proxy-groups:
     <<: [*group_common_select, *exclude_filter]
     include-all: true
     proxies: ['Other Auto Group']
-    icon: 'https://raw.githubusercontent.com/Orz-3/mini/master/Color/Global.png'
+    icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Global.png'
 
   - name: 'Other Auto Group'
     <<: [*group_common_auto, *exclude_filter]
