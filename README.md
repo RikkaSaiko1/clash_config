@@ -33,9 +33,29 @@
 
 ---
 
+## 📥 下载地址
+
+下面每个文件都给两条链接，**内容完全一样，任选一条**：CDN 那条国内直连一般没问题，raw 那条是 GitHub 官方源。
+
+| 文件 | CDN（推荐） | raw |
+| --- | --- | --- |
+| `config.yaml` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config.yaml) |
+| `Full_control.yaml` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Full_control.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Full_control.yaml) |
+| `Full_control.js` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Full_control.js) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Full_control.js) |
+| `config_Override_Full.yaml` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config_Override_Full.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_Full.yaml) |
+| `config_Override_Full.js` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config_Override_Full.js) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_Full.js) |
+| `config_Override_lite.yaml` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config_Override_lite.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_lite.yaml) |
+| `config_Override_lite.js` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config_Override_lite.js) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_lite.js) |
+| `SubConverter_config_Full.ini` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/SubConverter_config_Full.ini) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/SubConverter_config_Full.ini) |
+| `SubConverter_config_lite.ini` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/SubConverter_config_lite.ini) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/SubConverter_config_lite.ini) |
+
+> **该用哪条**：平时用 `cdn.jsdelivr.net`——它在全国各地都有缓存节点，访问快也稳，我自己的配置里所有远程资源（`.mrs` 规则集、图标）走的都是它。`raw.githubusercontent.com` 是 GitHub 的官方地址，没有缓存、内容永远是最新的，但国内直连基本打不开，得有代理才行。两条链接指向同一份文件，今天用这条明天用那条都无所谓。
+
+---
+
 ## 📖 详细配置说明
 
-文件清单、CDN / raw 下载地址、三档规则量级对比、YAML 与 JS 两种覆写写法详解、SubConverter 订阅转换配置，全部见：
+文件清单、三档规则量级对比、YAML 与 JS 两种覆写写法详解、SubConverter 订阅转换配置，全部见：
 
 **➡️ [配置文件说明](./配置文件说明.md)**
 
