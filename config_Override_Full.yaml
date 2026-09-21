@@ -143,11 +143,10 @@ proxy-groups:
     hidden: false
     icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Roundrobin.png'
 
-  - name: 'YouTube'
+  - name: 'media'
     <<: [*group_common_select, *proxies_default]
     icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/youtube.svg'
 
-  # Google FCM
   - name: 'Google'
     <<: [*group_common_select, *proxies_default]
     icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/google.svg'
@@ -173,18 +172,9 @@ proxy-groups:
     <<: [*group_common_select, *proxies_direct]
     icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/steam.svg'
 
-  - name: 'TikTok'
-    default-selected: 'JP Group'
-    <<: [*group_common_select, *proxies_default]
-    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/tiktok.svg'
-
   - name: 'Twitter'
     <<: [*group_common_select, *proxies_default]
     icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/twitter.svg'
-
-  - name: 'Instagram'
-    <<: [*group_common_select, *proxies_default]
-    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/instagram.svg'
 
   - name: 'Netflix'
     <<: [*group_common_select, *proxies_default]
@@ -211,6 +201,19 @@ proxy-groups:
     default-selected: 'US Group'
     <<: [*group_common_select, *proxies_default]
     icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/EHentai.svg'
+
+  - name: 'Pixiv'
+    default-selected: 'JP Group'
+    <<: [*group_common_select, *proxies_default]
+    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/pixiv.svg'
+
+  - name: 'Line'
+    <<: [*group_common_select, *proxies_default]
+    icon: 'https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Line.png'
+
+  - name: 'Discord'
+    <<: [*group_common_select, *proxies_default]
+    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/discord.svg'
 
   - name: 'AdBlock'
     <<: [*group_common_select, *proxies_reject]
@@ -321,7 +324,7 @@ rules:
 
   # 代理规则
   - RULE-SET,ai,AI
-  - RULE-SET,youtube,YouTube
+  - RULE-SET,youtube,media
   - RULE-SET,googlefcm,DIRECT
   - RULE-SET,google,Google
   - RULE-SET,google_ip,Google,no-resolve
@@ -333,11 +336,11 @@ rules:
   - RULE-SET,telegram_ip,Telegram,no-resolve
   - RULE-SET,steam,Steam
   - RULE-SET,steam_ip,Steam,no-resolve
-  - RULE-SET,tiktok,TikTok
-  - RULE-SET,tiktok_ip,TikTok,no-resolve
+  - RULE-SET,tiktok,media
+  - RULE-SET,tiktok_ip,media,no-resolve
   - RULE-SET,twitter,Twitter
   - RULE-SET,twitter_ip,Twitter,no-resolve
-  - RULE-SET,instagram,Instagram
+  - RULE-SET,instagram,media
   - RULE-SET,netflix,Netflix
   - RULE-SET,netflix_ip,Netflix,no-resolve
   # emby
@@ -360,6 +363,11 @@ rules:
   - RULE-SET,cryptocurrency,Crypto
   - RULE-SET,ehentai,EHentai
 
+  - RULE-SET,twitch,media
+  - RULE-SET,pixiv,Pixiv
+  - RULE-SET,line,Line
+  - RULE-SET,discord,Discord
+
   # 兜底规则
   - RULE-SET,geolocation-!cn,PROXY
   - RULE-SET,cn_ip,DIRECT
@@ -369,6 +377,7 @@ rules:
 rule_providers_common:
   rule_providers_domain: &rule_providers_domain { type: http, format: mrs, interval: 86400, behavior: domain }
   rule_providers_ip: &rule_providers_ip { type: http, format: mrs, interval: 86400, behavior: ipcidr }
+  rule_fakeipfilter: &rule_fakeipfilter { type: http, format: text, interval: 86400, behavior: domain}
 
 # 定义 Rule Providers
 rule-providers:
@@ -590,6 +599,30 @@ rule-providers:
     path: './ruleset/ehentai.mrs'
     path-in-bundle: 'geo/geosite/ehentai.mrs'
 
+  twitch:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/twitch.mrs'
+    path: './ruleset/twitch.mrs'
+    path-in-bundle: 'geo/geosite/twitch.mrs'
+
+  pixiv:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/pixiv.mrs'
+    path: './ruleset/pixiv.mrs'
+    path-in-bundle: 'geo/geosite/pixiv.mrs'
+
+  line:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/line.mrs'
+    path: './ruleset/line.mrs'
+    path-in-bundle: 'geo/geosite/line.mrs'
+
+  discord:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/discord.mrs'
+    path: './ruleset/discord.mrs'
+    path-in-bundle: 'geo/geosite/discord.mrs'
+
   geolocation-!cn:
     <<: *rule_providers_domain
     url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-!cn.mrs'
@@ -617,17 +650,11 @@ rule-providers:
 
   # --- Fake IP 过滤 ---
   fakeipfilter_cn: 
-    type: http
-    interval: 86400
-    behavior: domain
-    format: text
-    url: 'https://raw.githubusercontent.com/qichiyuhub/rule/refs/heads/main/rules/fakeipfilter-cn.list'
+    <<: *rule_fakeipfilter
+    url: 'https://cdn.jsdelivr.net/gh/qichiyuhub/rule@main/rules/fakeipfilter-cn.list'
     path: './ruleset/fakeipfilter-cn.list'
 
   fakeipfilter_!cn:
-    type: http
-    interval: 86400
-    behavior: domain
-    format: text
-    url: 'https://raw.githubusercontent.com/qichiyuhub/rule/refs/heads/main/rules/fakeipfilter-!cn.list'
+    <<: *rule_fakeipfilter
+    url: 'https://cdn.jsdelivr.net/gh/qichiyuhub/rule@main/rules/fakeipfilter-!cn.list'
     path: './ruleset/fakeipfilter-!cn.list'
