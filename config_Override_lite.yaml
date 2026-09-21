@@ -142,26 +142,12 @@ proxy-groups:  # 定义分流策略组
     <<: [*group_common_select, *proxies_default]
     icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/youtube.svg'
 
-  # Google FCM
-  - name: 'Google'
-    <<: [*group_common_select, *proxies_default]
-    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/google.svg'
-
   - name: 'AI'
     <<: [*group_common_select, *proxies_AI]
     default-selected: 'US Group'
     icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/deepseek.svg'
 
-  - name: 'Telegram'
-    <<: [*group_common_select, *proxies_default]
-    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/telegram.svg'
-
-  - name: 'Twitter'
-    <<: [*group_common_select, *proxies_default]
-    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/twitter.svg'
-
   ### 地区策略组
-
   - name: 'HK Group'
     <<: [*group_common_select, *HK_filter]
     include-all: true
@@ -256,13 +242,7 @@ rules:
   # 代理规则
   - RULE-SET,youtube,YouTube
   - RULE-SET,googlefcm,DIRECT
-  - RULE-SET,google,Google
-  - RULE-SET,google_ip,Google,no-resolve
   - RULE-SET,ai,AI
-  - RULE-SET,telegram,Telegram
-  - RULE-SET,telegram_ip,Telegram,no-resolve
-  - RULE-SET,twitter,Twitter
-  - RULE-SET,twitter_ip,Twitter,no-resolve
 
   # 兜底规则
   - RULE-SET,geolocation-!cn,PROXY
@@ -330,6 +310,12 @@ rule-providers:
     url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/cn.mrs'
     path: './ruleset/cn_ip.mrs'
     path-in-bundle: 'geo/geoip/cn.mrs'
+    
+  cn:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/cn.mrs'
+    path: './ruleset/cn.mrs'
+    path-in-bundle: 'geo/geosite/cn.mrs'
 
   # --- 代理规则集 ---
   
@@ -345,48 +331,11 @@ rule-providers:
     path: './ruleset/googlefcm.mrs'
     path-in-bundle: 'geo/geosite/googlefcm.mrs'
 
-  google:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/google.mrs'
-    path: './ruleset/google.mrs'
-    path-in-bundle: 'geo/geosite/google.mrs'
-
-  google_ip:
-    <<: *rule_providers_ip
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/google.mrs'
-    path: './ruleset/google_ip.mrs'
-    path-in-bundle: 'geo/geoip/google.mrs'
-
   ai:
     <<: *rule_providers_domain
     url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-ai-!cn.mrs'
     path: './ruleset/ai.mrs'
     path-in-bundle: 'geo/geosite/category-ai-!cn.mrs'
-
-  telegram:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/telegram.mrs'
-    path: './ruleset/telegram.mrs'
-    path-in-bundle: 'geo/geosite/telegram.mrs'
-
-  telegram_ip:
-    <<: *rule_providers_ip
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/telegram.mrs'
-    path: './ruleset/telegram_ip.mrs'
-    path-in-bundle: 'geo/geoip/telegram.mrs'
-
-
-  twitter:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/twitter.mrs'
-    path: './ruleset/twitter.mrs'
-    path-in-bundle: 'geo/geosite/twitter.mrs'
-
-  twitter_ip:
-    <<: *rule_providers_ip
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/twitter.mrs'
-    path: './ruleset/twitter_ip.mrs'
-    path-in-bundle: 'geo/geoip/twitter.mrs'
 
   geolocation-!cn:
     <<: *rule_providers_domain
@@ -407,11 +356,7 @@ rule-providers:
     path: './ruleset/cn-additional-list.mrs'
     path-in-bundle: 'geo/geosite/cn.mrs'
 
-  cn:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/cn.mrs'
-    path: './ruleset/cn.mrs'
-    path-in-bundle: 'geo/geosite/cn.mrs'
+
   # --- Fake IP 过滤 ---
   fakeipfilter_cn: 
     type: http
