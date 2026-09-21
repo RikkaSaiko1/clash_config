@@ -1,0 +1,693 @@
+#  ============================================================================
+#  clash 覆写脚本 全规则 + 自定义 DNS (mihomo JS Override)
+#  仓库 https://github.com/RikkaSaiko1/clash_config
+# 
+#  ◆ 分流到策略组
+#      分类        规则集                                策略组
+#      ─────────────────────────────────────────────────────────────────────
+#      AI          ai                                    AI（默认 PROXY）
+#      油管        youtube                               YouTube
+#      谷歌        google / google_ip                    Google
+#      微软        microsoft                             Microsoft
+#      苹果        apple                                 Apple
+#      电报        telegram / telegram_ip                Telegram
+#      游戏平台    steam / steam_ip                      Steam
+#      短视频      tiktok / tiktok_ip                    TikTok
+#      推特        twitter / twitter_ip                  Twitter
+#      图享        instagram                             Instagram
+#      奈飞        netflix / netflix_ip                  Netflix
+#      影音        emby / emos + Emby 相关域名与 9 条进程名   Emby
+#      网盘        pikpak                                PikPak
+#      音乐        spotify / spotify_ip                  Spotify
+#      加密货币    cryptocurrency                        Crypto（默认 PROXY）
+#      图站        ehentai                               EHentai（默认 PROXY）
+#      直播        twitch                                Twitch
+#      插画        pixiv                                 Pixiv
+#      通讯        line                                  Line
+#      语音        discord                               Discord
+#      代码托管    github                                PROXY
+#  ============================================================================
+
+
+tun!:
+  enable: true
+  stack: mixed
+  dns-hijack: ["any:53", "tcp://any:53"]
+  auto-route: true
+  auto-redirect: true
+  auto-detect-interface: true
+  route-exclude-address-set:
+    - cn_ip
+
+sniffer!:
+  enable: true
+  override-destination: false
+  force-dns-mapping: false
+  parse-pure-ip: true
+  sniff:
+    HTTP:
+      ports: [80, 8080-8880]
+    TLS:
+      ports: [443, 8443]
+    QUIC:
+      ports: [443, 8443]
+  skip-domain:
+    - "Mijia Cloud"
+    - "+.push.apple.com"
+
+# ============================================================================
+# DNS
+# ============================================================================
+dns!:
+  enable: true
+  cache-algorithm: arc
+  ipv6: false
+  enhanced-mode: fake-ip
+  fake-ip-ttl: 1
+  fake-ip-range: 198.18.0.0/16
+  fake-ip-filter-mode: blacklist
+  default-nameserver:
+    - https://223.5.5.5/dns-query
+  proxy-server-nameserver:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+  direct-nameserver:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+
+  nameserver-policy:
+    "rule-set:cn,private,fakeipfilter_cn,games_cn,microsoft_cn,apple_cn":
+    - https://dns.alidns.com/dns-query#disable-qtype-65=true
+    - https://doh.pub/dns-query#disable-qtype-65=true
+    "rule-set:fakeipfilter_!cn":
+    - https://8.8.8.8/dns-query#PROXY&disable-qtype-65=true
+  nameserver:
+    - https://8.8.8.8/dns-query#PROXY&ecs=223.5.5.0/24
+  fallback:
+    - https://8.8.8.8/dns-query#PROXY
+  fallback-filter:
+    geoip: true
+    geoip-code: CN
+  fake-ip-filter:
+    - rule-set:fakeipfilter_cn
+    - rule-set:fakeipfilter_!cn
+    - rule-set:private
+    - rule-set:cn
+    - rule-set:microsoft_cn
+    - rule-set:apple_cn
+    - rule-set:games_cn
+
+
+
+# 策略组通用配置
+group_common:
+  group_common_select:
+    &group_common_select {type: select,interval: 300,timeout: 1500,max-failed-times: 5,empty-fallback: REJECT,url: 'https://www.apple.com/library/test/success.html',lazy: true}
+
+  group_common_auto:
+    &group_common_auto {type: url-test,interval: 60,timeout: 1500,max-failed-times: 5,empty-fallback: REJECT,url: 'https://www.apple.com/library/test/success.html',lazy: true,tolerance: 50,include-all: true,exclude-type: 'DIRECT'}
+
+
+# 通用代理节点组
+proxies_common:
+  proxies_default:
+    &proxies_default {proxies: ['PROXY','AUTO','HK Group','SG Group','JP Group','US Group','TW Group','KR Group','Other Group']}
+
+  proxies_direct:
+    &proxies_direct {proxies: ['PROXY','AUTO','HK Group','SG Group','JP Group','US Group','TW Group','KR Group','Other Group','DIRECT']}
+
+  proxies_AI:
+    &proxies_AI {proxies: ['PROXY','SG Group','JP Group','US Group','KR Group',]}
+  
+  proxies_proxy:
+    &proxies_proxy {proxies: ['AUTO','HK Group','JP Group','US Group','SG Group','TW Group','KR Group','Other Group']}
+
+  proxies_reject: 
+    &proxies_reject {proxies: ['REJECT', 'REJECT-DROP', 'PASS']}
+
+
+# 地区过滤器正则表达式定义
+group_filter:
+
+  HK_filter:
+    &HK_filter {filter: '(?i)(🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|hong\s*kong)'}
+
+  JP_filter:
+    &JP_filter {filter: '(?i)(🇯🇵|日本|东京|大阪|京都|(?<![A-Za-z])JPN?(?![A-Za-z])|japan)'}
+
+  US_filter:
+    &US_filter {filter: '(?i)(🇺🇸|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|拉斯维加斯|圣何塞|圣地亚哥|(?<![A-Za-z])USA?(?![A-Za-z])|america|united\s*states)'}
+
+  SG_filter:
+    &SG_filter {filter: '(?i)(🇸🇬|新加坡|狮城|(?<![A-Za-z])SGP?(?![A-Za-z])|singapore)'}
+
+  TW_filter:
+    &TW_filter {filter: '(?i)(🇹🇼|台湾|台北|高雄|(?<![A-Za-z])TWN?(?![A-Za-z])|taiwan)'}
+
+  KR_filter:
+    &KR_filter {filter: '(?i)(🇰🇷|韩国|首尔|釜山|仁川|大邱|(?<![A-Za-z])KOR?(?![A-Za-z])|korea|south\s*korea)'}
+
+  exclude_filter:
+    &exclude_filter {exclude-filter: '(?i)(🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|hong\s*kong|🇯🇵|日本|东京|大阪|京都|(?<![A-Za-z])JPN?(?![A-Za-z])|japan|🇺🇸|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|拉斯维加斯|圣何塞|圣地亚哥|(?<![A-Za-z])USA?(?![A-Za-z])|america|united\s*states|🇸🇬|新加坡|狮城|(?<![A-Za-z])SGP?(?![A-Za-z])|singapore|🇹🇼|台湾|台北|高雄|(?<![A-Za-z])TWN?(?![A-Za-z])|taiwan|🇰🇷|韩国|首尔|釜山|仁川|大邱|(?<![A-Za-z])KOR?(?![A-Za-z])|korea|south\s*korea)',exclude-type: 'DIRECT'}
+
+
+# 定义分流策略组
+proxy-groups:
+
+  - name: 'PROXY'
+    <<: [*group_common_select, *proxies_proxy]
+    include-all-proxies: true
+    icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Static.png'
+
+  - name: 'AUTO'
+    <<: *group_common_auto
+    hidden: false
+    icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Roundrobin.png'
+
+  - name: 'YouTube'
+    <<: [*group_common_select, *proxies_default]
+    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/youtube.svg'
+
+  # Google FCM
+  - name: 'Google'
+    <<: [*group_common_select, *proxies_default]
+    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/google.svg'
+
+  - name: 'AI'
+    <<: [*group_common_select, *proxies_AI]
+    default-selected: 'US Group'
+    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/deepseek.svg'
+
+  - name: 'Microsoft'
+    <<: [*group_common_select, *proxies_direct]
+    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/microsoft.svg'
+
+  - name: 'Apple'
+    <<: [*group_common_select, *proxies_direct]
+    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/apple.svg'
+
+  - name: 'Telegram'
+    <<: [*group_common_select, *proxies_default]
+    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/telegram.svg'
+
+  - name: 'Steam'
+    <<: [*group_common_select, *proxies_direct]
+    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/steam.svg'
+
+  - name: 'TikTok'
+    default-selected: 'JP Group'
+    <<: [*group_common_select, *proxies_default]
+    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/tiktok.svg'
+
+  - name: 'Twitter'
+    <<: [*group_common_select, *proxies_default]
+    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/twitter.svg'
+
+  - name: 'Instagram'
+    <<: [*group_common_select, *proxies_default]
+    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/instagram.svg'
+
+  - name: 'Netflix'
+    <<: [*group_common_select, *proxies_default]
+    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/netflix.svg'
+
+  - name: 'Emby'
+    <<: [*group_common_select, *proxies_direct]
+    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/emby.svg'
+
+  - name: 'PikPak'
+    <<: [*group_common_select, *proxies_direct]
+    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/pikpak.svg'
+
+  - name: 'Spotify'
+    <<: [*group_common_select, *proxies_direct]
+    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/spotify.svg'
+
+  - name: 'Crypto'
+    default-selected: 'JP Group'
+    <<: [*group_common_select, *proxies_default]
+    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/Crypto.svg'
+
+  - name: 'EHentai'
+    default-selected: 'US Group'
+    <<: [*group_common_select, *proxies_default]
+    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/EHentai.svg'
+
+  - name: 'Twitch'
+    <<: [*group_common_select, *proxies_default]
+    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/twitch.svg'
+
+  - name: 'Pixiv'
+    default-selected: 'JP Group'
+    <<: [*group_common_select, *proxies_default]
+    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/pixiv.svg'
+
+  - name: 'Line'
+    <<: [*group_common_select, *proxies_default]
+    icon: 'https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Line.png'
+
+  - name: 'Discord'
+    <<: [*group_common_select, *proxies_default]
+    icon: 'https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/discord.svg'
+
+  - name: 'AdBlock'
+    <<: [*group_common_select, *proxies_reject]
+    icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Adblock.png'
+
+
+  # ==============================
+  # 地区策略组
+  # ==============================
+
+  - name: 'HK Group'
+    <<: [*group_common_select, *HK_filter]
+    include-all: true
+    proxies: ['HK Auto Group']
+    icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/HK.png'
+
+  - name: 'HK Auto Group'
+    <<: [*group_common_auto, *HK_filter]
+    hidden: true
+
+
+  - name: 'JP Group'
+    <<: [*group_common_select, *JP_filter]
+    include-all: true
+    proxies: ['JP Auto Group']
+    icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/JP.png'
+
+  - name: 'JP Auto Group'
+    <<: [*group_common_auto, *JP_filter]
+    hidden: true
+
+
+  - name: 'US Group'
+    <<: [*group_common_select, *US_filter]
+    include-all: true
+    proxies: ['US Auto Group']
+    icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/US.png'
+
+  - name: 'US Auto Group'
+    <<: [*group_common_auto, *US_filter]
+    hidden: true
+
+
+  - name: 'SG Group'
+    <<: [*group_common_select, *SG_filter]
+    include-all: true
+    proxies: ['SG Auto Group']
+    icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/SG.png'
+
+  - name: 'SG Auto Group'
+    <<: [*group_common_auto, *SG_filter]
+    hidden: true
+
+  - name: 'TW Group'
+    <<: [*group_common_select, *TW_filter]
+    include-all: true
+    proxies: ['TW Auto Group']
+    icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/TW.png'
+
+  - name: 'TW Auto Group'
+    <<: [*group_common_auto, *TW_filter]
+    hidden: true
+
+  - name: 'KR Group'
+    <<: [*group_common_select, *KR_filter]
+    include-all: true
+    proxies: ['KR Auto Group']
+    icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/KR.png'
+
+  - name: 'KR Auto Group'
+    <<: [*group_common_auto, *KR_filter]
+    hidden: true
+
+  ## 其他地区
+  - name: 'Other Group'
+    <<: [*group_common_select, *exclude_filter]
+    include-all: true
+    proxies: ['Other Auto Group']
+    icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Global.png'
+
+  - name: 'Other Auto Group'
+    <<: [*group_common_auto, *exclude_filter]
+    hidden: true
+
+
+rules:
+  # 私有网络直连
+  - RULE-SET,private,DIRECT
+  - RULE-SET,private_ip,DIRECT,no-resolve
+  # 国内直连
+  - RULE-SET,geolocation-cn,DIRECT
+  - RULE-SET,games_cn,DIRECT # 已包含 steam 下载域名
+  - RULE-SET,epicgames,DIRECT
+  - RULE-SET,nvidia_cn,DIRECT
+  - RULE-SET,apple_cn,DIRECT
+  - RULE-SET,microsoft_cn,DIRECT
+  - DOMAIN,fsend.cn,DIRECT
+  - DOMAIN,international-gfe.download.nvidia.com,DIRECT
+
+  # 禁用国外 QUIC 流量
+  - AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn_additional),(RULE-SET,cn_ip,no-resolve)))))),REJECT
+
+  # 广告拦截 | 拦截 STUN/TURN 协议的 UDP流量
+  - RULE-SET,adblockmihomolite,AdBlock
+  - AND,((NETWORK,UDP),(OR,((DST-PORT,3478-3481),(DST-PORT,5349),(DST-PORT,19302-19309)))),REJECT
+
+  # emby
+  - RULE-SET,emby,Emby
+  - RULE-SET,emos,Emby
+  - DOMAIN-SUFFIX,mb3admin.com,Emby
+  - DOMAIN-SUFFIX,nubebelle.com,Emby
+  - DOMAIN-KEYWORD,emby,Emby
+  - PROCESS-NAME,com.mb.android,Emby
+  - PROCESS-NAME,tv.emby.embyatv,Emby
+  - PROCESS-NAME,com.hush.yamby,Emby
+  - PROCESS-NAME,com.jellycine.app,Emby
+  - PROCESS-NAME,com.mountains.hills,Emby
+  - PROCESS-NAME,RodelPlayer.App.exe,Emby
+  - PROCESS-NAME,com.feifeiduck.capyplayer,Emby
+
+  # 代理规则
+  - RULE-SET,ai,AI
+  - RULE-SET,youtube,YouTube
+  - RULE-SET,googlefcm,DIRECT
+  - RULE-SET,google,Google
+  - RULE-SET,google_ip,Google,no-resolve
+  - RULE-SET,github,PROXY
+  - RULE-SET,microsoft,Microsoft
+  - RULE-SET,apple,Apple
+  - RULE-SET,telegram,Telegram
+  - RULE-SET,telegram_ip,Telegram,no-resolve
+  - RULE-SET,steam,Steam
+  - RULE-SET,steam_ip,Steam,no-resolve
+  - RULE-SET,tiktok,TikTok
+  - RULE-SET,tiktok_ip,TikTok,no-resolve
+  - RULE-SET,twitter,Twitter
+  - RULE-SET,twitter_ip,Twitter,no-resolve
+  - RULE-SET,instagram,Instagram
+  - RULE-SET,netflix,Netflix
+  - RULE-SET,netflix_ip,Netflix,no-resolve
+  - RULE-SET,pikpak,PikPak
+  - RULE-SET,spotify,Spotify
+  - RULE-SET,spotify_ip,Spotify,no-resolve
+  - RULE-SET,cryptocurrency,Crypto
+  - RULE-SET,ehentai,EHentai
+  - RULE-SET,twitch,Twitch
+  - RULE-SET,pixiv,Pixiv
+  - RULE-SET,line,Line
+  - RULE-SET,discord,Discord
+
+  # 兜底规则
+  - RULE-SET,geolocation-!cn,PROXY
+  - RULE-SET,cn_ip,DIRECT
+  - MATCH,PROXY
+
+  # Rule Provider 通用配置
+rule_providers_common:
+  rule_providers_domain: &rule_providers_domain { type: http, format: mrs, interval: 86400, behavior: domain}
+  rule_providers_ip: &rule_providers_ip { type: http, format: mrs, interval: 86400, behavior: ipcidr}
+  rule_fakeipfilter: &rule_fakeipfilter { type: http, format: text, interval: 86400, behavior: domain}
+
+
+# 定义 Rule Providers
+rule-providers:
+  # --- 直连规则集 ---
+  private:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/private.mrs'
+    path: './ruleset/private.mrs'
+    path-in-bundle: 'geo/geosite/private.mrs'
+
+  private_ip:
+    <<: *rule_providers_ip
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/private.mrs'
+    path: './ruleset/private_ip.mrs'
+    path-in-bundle: 'geo/geoip/private.mrs'
+
+  games_cn:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-games@cn.mrs'
+    path: './ruleset/category-games@cn.mrs'
+    path-in-bundle: 'geo/geosite/category-games@cn.mrs'
+
+  epicgames:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/epicgames.mrs'
+    path: './ruleset/epicgames.mrs'
+    path-in-bundle: 'geo/geosite/epicgames.mrs'
+
+  nvidia_cn:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/nvidia@cn.mrs'
+    path: './ruleset/nvidia@cn.mrs'
+    path-in-bundle: 'geo/geosite/nvidia@cn.mrs'
+
+  apple_cn:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/apple@cn.mrs'
+    path: './ruleset/apple@cn.mrs'
+    path-in-bundle: 'geo/geosite/apple@cn.mrs'
+
+  microsoft_cn:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/microsoft@cn.mrs'
+    path: './ruleset/microsoft@cn.mrs'
+    path-in-bundle: 'geo/geosite/microsoft@cn.mrs'
+
+  geolocation-cn:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-cn.mrs'
+    path: './ruleset/geolocation-cn.mrs'
+    path-in-bundle: 'geo/geosite/geolocation-cn.mrs'
+
+  cn_ip:
+    <<: *rule_providers_ip
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/cn.mrs'
+    path: './ruleset/cn_ip.mrs'
+    path-in-bundle: 'geo/geoip/cn.mrs'
+
+  cn:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/cn.mrs'
+    path: './ruleset/cn.mrs'
+    path-in-bundle: 'geo/geosite/cn.mrs'
+
+  # --- 代理规则集 ---
+  youtube:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/youtube.mrs'
+    path: './ruleset/youtube.mrs'
+    path-in-bundle: 'geo/geosite/youtube.mrs'
+
+  googlefcm:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/googlefcm.mrs'
+    path: './ruleset/googlefcm.mrs'
+    path-in-bundle: 'geo/geosite/googlefcm.mrs'
+
+  google:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/google.mrs'
+    path: './ruleset/google.mrs'
+    path-in-bundle: 'geo/geosite/google.mrs'
+
+  google_ip:
+    <<: *rule_providers_ip
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/google.mrs'
+    path: './ruleset/google_ip.mrs'
+    path-in-bundle: 'geo/geoip/google.mrs'
+
+  ai:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-ai-!cn.mrs'
+    path: './ruleset/ai.mrs'
+    path-in-bundle: 'geo/geosite/category-ai-!cn.mrs'
+
+  github:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/github.mrs'
+    path: './ruleset/github.mrs'
+    path-in-bundle: 'geo/geosite/github.mrs'
+
+  microsoft:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/microsoft.mrs'
+    path: './ruleset/microsoft.mrs'
+    path-in-bundle: 'geo/geosite/microsoft.mrs'
+
+  apple:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/apple.mrs'
+    path: './ruleset/apple.mrs'
+    path-in-bundle: 'geo/geosite/apple.mrs'
+
+  telegram:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/telegram.mrs'
+    path: './ruleset/telegram.mrs'
+    path-in-bundle: 'geo/geosite/telegram.mrs'
+
+  telegram_ip:
+    <<: *rule_providers_ip
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/telegram.mrs'
+    path: './ruleset/telegram_ip.mrs'
+    path-in-bundle: 'geo/geoip/telegram.mrs'
+
+  steam:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/steam.mrs'
+    path: './ruleset/steam.mrs'
+    path-in-bundle: 'geo/geosite/steam.mrs'
+
+  steam_ip:
+    <<: *rule_providers_ip
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/steam.mrs'
+    path: './ruleset/steam_ip.mrs'
+    path-in-bundle: 'geo/geoip/steam.mrs'
+
+  tiktok:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/tiktok.mrs'
+    path: './ruleset/tiktok.mrs'
+    path-in-bundle: 'geo/geosite/tiktok.mrs'
+
+  tiktok_ip:
+    <<: *rule_providers_ip
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/tiktok.mrs'
+    path: './ruleset/tiktok_ip.mrs'
+    path-in-bundle: 'geo/geoip/tiktok.mrs'
+
+  twitter:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/twitter.mrs'
+    path: './ruleset/twitter.mrs'
+    path-in-bundle: 'geo/geosite/twitter.mrs'
+
+  twitter_ip:
+    <<: *rule_providers_ip
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/twitter.mrs'
+    path: './ruleset/twitter_ip.mrs'
+    path-in-bundle: 'geo/geoip/twitter.mrs'
+
+  instagram:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/instagram.mrs'
+    path: './ruleset/instagram.mrs'
+    path-in-bundle: 'geo/geosite/instagram.mrs'
+
+  netflix:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/netflix.mrs'
+    path: './ruleset/netflix.mrs'
+    path-in-bundle: 'geo/geosite/netflix.mrs'
+
+  netflix_ip:
+    <<: *rule_providers_ip
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/netflix.mrs'
+    path: './ruleset/netflix_ip.mrs'
+    path-in-bundle: 'geo/geoip/netflix.mrs'
+
+  emby:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/666OS/rules@release/mihomo/domain/Emby.mrs'
+    path: './ruleset/emby.mrs'
+    path-in-bundle: 'geo/geosite/category-emby.mrs'
+
+  emos:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/binaryu/emos-proxy-rule@main/rules/emos-mihomo.mrs'
+    path: './ruleset/emos.mrs'
+    path-in-bundle: 'geo/geosite/category-emby.mrs'
+
+  pikpak:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/pikpak.mrs'
+    path: './ruleset/pikpak.mrs'
+    path-in-bundle: 'geo/geosite/pikpak.mrs'
+
+  spotify:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/spotify.mrs'
+    path: './ruleset/spotify.mrs'
+    path-in-bundle: 'geo/geosite/spotify.mrs'
+
+  spotify_ip:
+    <<: *rule_providers_ip
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/spotify.mrs'
+    path: './ruleset/spotify_ip.mrs'
+    path-in-bundle: 'geo/geoip/spotify.mrs'
+
+  cryptocurrency:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-cryptocurrency.mrs'
+    path: './ruleset/cryptocurrency.mrs'
+    path-in-bundle: 'geo/geosite/category-cryptocurrency.mrs'
+
+  ehentai:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/ehentai.mrs'
+    path: './ruleset/ehentai.mrs'
+    path-in-bundle: 'geo/geosite/ehentai.mrs'
+
+  twitch:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/twitch.mrs'
+    path: './ruleset/twitch.mrs'
+    path-in-bundle: 'geo/geosite/twitch.mrs'
+
+  pixiv:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/pixiv.mrs'
+    path: './ruleset/pixiv.mrs'
+    path-in-bundle: 'geo/geosite/pixiv.mrs'
+
+  line:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/line.mrs'
+    path: './ruleset/line.mrs'
+    path-in-bundle: 'geo/geosite/line.mrs'
+
+  discord:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/discord.mrs'
+    path: './ruleset/discord.mrs'
+    path-in-bundle: 'geo/geosite/discord.mrs'
+
+  geolocation-!cn:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-!cn.mrs'
+    path: './ruleset/geolocation-!cn.mrs'
+    path-in-bundle: 'geo/geosite/geolocation-!cn.mrs'
+
+  # --- 其他规则集 ---
+  adblockmihomolite:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.mrs'
+    path: './ruleset/adblockmihomolite.mrs'
+    path-in-bundle: 'geo/geosite/category-ads-all.mrs'
+
+  fakeip_filter:
+    <<: *rule_providers_domain
+    url: 'https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/fakeip-filter.mrs'
+    path: './ruleset/fakeip-filter.mrs'
+    path-in-bundle: 'geo/geosite/fakeip-filter.mrs'
+
+  cn_additional:
+    <<: *rule_providers_domain
+    url: 'https://static-file-global.353355.xyz/rules/cn-additional-list.mrs'
+    path: './ruleset/cn-additional-list.mrs'
+    path-in-bundle: 'geo/geosite/cn.mrs'
+
+  # --- Fake IP 过滤 ---
+  fakeipfilter_cn: 
+    <<: *rule_fakeipfilter
+    url: 'https://cdn.jsdelivr.net/gh/qichiyuhub/rule@main/rules/fakeipfilter-cn.list'
+    path: './ruleset/fakeipfilter-cn.list'
+
+  fakeipfilter_!cn:
+    <<: *rule_fakeipfilter
+    url: 'https://cdn.jsdelivr.net/gh/qichiyuhub/rule@main/rules/fakeipfilter-!cn.list'
+    path: './ruleset/fakeipfilter-!cn.list'
+
