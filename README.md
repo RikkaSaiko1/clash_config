@@ -6,46 +6,47 @@
 
 ---
 
-## 📱 推荐平台
+## 📱 推荐客户端
 
-以下是我自己长期在用、确认能正常加载本配置的客户端，按平台分：
+| 客户端 | 特点 |
+| --- | --- |
+| [Bettbox](https://github.com/appshubcc/Bettbox) | 占用低、性能好，轻量省电 |
+| [Sparkle](https://github.com/xishang0128/sparkle) | UI 现代化，配置项覆盖得比较全；内置稳定版和预览版两个内核可随时切换；支持 WebDAV 备份恢复和任意覆写配置文件 |
 
-| 平台 | 客户端 | 说明 |
-| --- | --- | --- |
-| 移动端 / 桌面 | [Bettbox](https://github.com/appshubcc/Bettbox) | 自带规则覆写（`Full_control.js` / `config_Override_*.js`），配置里的 `.mrs` 规则集直接吃 |
-| iOS / macOS | [Sparkle](https://github.com/xishang0128/sparkle) | 支持 JS 覆写脚本，`config.yaml` 和覆写脚本都能直接用 |
-| Windows / macOS / Linux | [Mihomo](https://github.com/MetaCubeX/mihomo) | 内核本体，`config.yaml` 直接加载；覆写走 `Full_control.yaml` / `config_Override_*.yaml` |
-
-> 只要客户端是 Mihomo 内核且支持覆写，理论上都能跑；上表是我实际验证过的组合，没验证过的就不往上写了。
+以上客户端经测试可用,其他客户端未经测试可用性,理论mihomo内核通用
 
 ---
 
 
 ## 📥 下载地址
 
-下面每个文件都给两条链接，**内容完全一样，任选一条**：CDN 那条国内直连一般没问题，raw 那条是 GitHub 官方源。
+| 文件 | CDN（国内加速） | raw (官方推荐) | 是什么 |
+| --- | --- | --- | --- |
+| `Full_control.yaml` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Full_control.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Full_control.yaml) | 覆写：全规则，37 个策略组 |
+| `Full_control.js` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Full_control.js) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Full_control.js) | 覆写：全规则，同上，JS 写法 |
+| `config_Override_Full.yaml` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config_Override_Full.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_Full.yaml) | 覆写：全规则精简版，33 个策略组 |
+| `config_Override_Full.js` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config_Override_Full.js) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_Full.js) | 覆写：全规则精简版，同上，JS 写法 |
+| `config_Override_lite.yaml` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config_Override_lite.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_lite.yaml) | 覆写：轻量版，18 个策略组，规则最少 |
+| `config_Override_lite.js` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config_Override_lite.js) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_lite.js) | 覆写：轻量版，同上，JS 写法 |
+| `SubConverter_config_Full.ini` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/SubConverter_config_Full.ini) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/SubConverter_config_Full.ini) | SubConverter 转换配置，全规则版 |
+| `SubConverter_config_lite.ini` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/SubConverter_config_lite.ini) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/SubConverter_config_lite.ini) | SubConverter 转换配置，轻量版 |
 
-| 文件 | CDN（推荐） | raw |
-| --- | --- | --- |
-| `config.yaml` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config.yaml) |
-| `Full_control.yaml` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Full_control.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Full_control.yaml) |
-| `Full_control.js` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Full_control.js) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Full_control.js) |
-| `config_Override_Full.yaml` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config_Override_Full.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_Full.yaml) |
-| `config_Override_Full.js` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config_Override_Full.js) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_Full.js) |
-| `config_Override_lite.yaml` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config_Override_lite.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_lite.yaml) |
-| `config_Override_lite.js` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config_Override_lite.js) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_lite.js) |
-| `SubConverter_config_Full.ini` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/SubConverter_config_Full.ini) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/SubConverter_config_Full.ini) |
-| `SubConverter_config_lite.ini` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/SubConverter_config_lite.ini) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/SubConverter_config_lite.ini) |
+> **两条链接内容一样，任选一条**：CDN 国内直连快且稳，raw 是官方源、最新但需代理。
 
-> **该用哪条**：平时用 `cdn.jsdelivr.net`——它在全国各地都有缓存节点，访问快也稳，我自己的配置里所有远程资源（`.mrs` 规则集、图标）走的都是它。`raw.githubusercontent.com` 是 GitHub 的官方地址，没有缓存、内容永远是最新的，但国内直连基本打不开，得有代理才行。两条链接指向同一份文件，今天用这条明天用那条都无所谓。
+**`config.yaml` 是唯一能直接加载的完整配置**，其余 8 个都是覆写 / 转换文件，不能单独加载。各文件的区别：
+
+- `Full_control.*`：全规则，37 个策略组，最全
+- `config_Override_Full.*`：全规则精简版，33 个策略组
+- `config_Override_lite.*`：轻量版，18 个策略组，规则最少
+- `SubConverter_*.ini`：SubConverter 订阅转换用，不适用于覆写
+
+
 
 ---
 
 ## 🚀 快速上手
 
-**本仓库只有 [`config.yaml`](./config.yaml) 是可直接加载的完整配置**，其余 8 个文件**全为覆写 / 转换文件**，不能单独加载。
-
-1. 下载 `config.yaml`，把 `proxy-providers` 里的订阅地址改成你自己的：
+1. 下载 [`config.yaml`](./config.yaml)，把 `proxy-providers` 里的订阅地址改成你自己的：
 
    ```yaml
    proxy-providers:
