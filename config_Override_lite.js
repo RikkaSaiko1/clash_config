@@ -37,7 +37,7 @@ config['sniffer'] = {
   'skip-domain': ['Mijia Cloud', '+.push.apple.com'],
 };
 
-// ------------------------------------------------ DNS (防泄漏)
+// ------------------------------------------------ DNS
 config['dns'] = {
   'enable': true,
   'cache-algorithm': 'arc',
@@ -57,16 +57,22 @@ config['dns'] = {
     'https://dns.alidns.com/dns-query',
     'https://doh.pub/dns-query',
   ],
-  'nameserver': [
-    'https://8.8.8.8/dns-query#PROXY&ecs=223.5.5.0/24',
-  ],
-  'fallback': [
-    'https://8.8.8.8/dns-query#PROXY',
-  ],
+
+  // fake-ip-filter
   'fallback-filter': {
     'geoip': true,
     'geoip-code': 'CN',
   },
+
+  'fake-ip-filter': [
+    'rule-set:fakeipfilter_cn',
+    'rule-set:fakeipfilter_!cn',
+    'rule-set:private',
+    'rule-set:cn',
+    'rule-set:microsoft_cn',
+    'rule-set:apple_cn',
+    'rule-set:games_cn',
+  ],
   // nameserver-policy
   'nameserver-policy': {
     'rule-set:cn,private,fakeipfilter_cn,games_cn,microsoft_cn,apple_cn': [
@@ -77,14 +83,13 @@ config['dns'] = {
       'https://8.8.8.8/dns-query#PROXY&disable-qtype-65=true',
     ],
   },
-  'fake-ip-filter': [
-    'rule-set:fakeipfilter_cn',
-    'rule-set:fakeipfilter_!cn',
-    'rule-set:private',
-    'rule-set:cn',
-    'rule-set:microsoft_cn',
-    'rule-set:apple_cn',
-    'rule-set:games_cn',
+  // 'nameserver': [
+  //   'https://8.8.8.8/dns-query#PROXY&ecs=223.5.5.0/24',
+  'nameserver': [
+    'https://dns.alidns.com/dns-query','https://doh.pub/dns-query'
+  ],
+  'fallback': [
+    'https://8.8.8.8/dns-query#PROXY','https://1.1.1.1/dns-query#PROXY'
   ],
 };
 

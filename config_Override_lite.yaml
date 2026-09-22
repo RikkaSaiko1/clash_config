@@ -57,10 +57,6 @@ dns!:
     - https://doh.pub/dns-query#disable-qtype-65=true
     "rule-set:fakeipfilter_!cn":
     - https://8.8.8.8/dns-query#PROXY&disable-qtype-65=true
-  nameserver:
-    - https://8.8.8.8/dns-query#PROXY&ecs=223.5.5.0/24
-  fallback:
-    - https://8.8.8.8/dns-query#PROXY
   fallback-filter:
     geoip: true
     geoip-code: CN
@@ -72,9 +68,13 @@ dns!:
     - rule-set:microsoft_cn
     - rule-set:apple_cn
     - rule-set:games_cn
-
-
-
+  # 'nameserver': https://8.8.8.8/dns-query#PROXY&ecs=223.5.5.0/24
+  nameserver:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+  fallback:
+    - https://8.8.8.8/dns-query#PROXY
+    - https://1.1.1.1/dns-query#PROXY
 
 # 策略组通用配置
 group_common:

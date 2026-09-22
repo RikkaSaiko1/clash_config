@@ -55,59 +55,68 @@ const main = (config) => {
     'skip-domain': ['Mijia Cloud', '+.push.apple.com'],
   };
 
-  // ------------------------------------------------ 自定义 DNS
-  config['dns'] = {
-    'enable': true,
-    'cache-algorithm': 'arc',
-    'ipv6': false,
-    'enhanced-mode': 'fake-ip',
-    'fake-ip-ttl': 1,
-    'fake-ip-range': '198.18.0.0/16',
-    'fake-ip-filter-mode': 'blacklist',
-    'default-nameserver': ['https://223.5.5.5/dns-query'],
-    'proxy-server-nameserver': [
-      'https://dns.alidns.com/dns-query',
-      'https://doh.pub/dns-query',
+// ------------------------------------------------ DNS
+config['dns'] = {
+  'enable': true,
+  'cache-algorithm': 'arc',
+  'ipv6': false,
+  'enhanced-mode': 'fake-ip',
+  'fake-ip-ttl': 1,
+  'fake-ip-range': '198.18.0.0/16',
+  'fake-ip-filter-mode': 'blacklist',
+  'default-nameserver': [
+    'https://223.5.5.5/dns-query',
+  ],
+  'proxy-server-nameserver': [
+    'https://dns.alidns.com/dns-query',
+    'https://doh.pub/dns-query',
+  ],
+  'direct-nameserver': [
+    'https://dns.alidns.com/dns-query',
+    'https://doh.pub/dns-query',
+  ],
+  
+  // fake-ip-filter
+  'fallback-filter': {
+    'geoip': true,
+    'geoip-code': 'CN',
+  },
+
+  'fake-ip-filter': [
+    'rule-set:fakeipfilter_cn',
+    'rule-set:fakeipfilter_!cn',
+    'rule-set:private',
+    'rule-set:cn',
+    'rule-set:microsoft_cn',
+    'rule-set:apple_cn',
+    'rule-set:games_cn',
+  ],
+  // nameserver-policy
+  'nameserver-policy': {
+    'rule-set:cn,private,fakeipfilter_cn,games_cn,microsoft_cn,apple_cn': [
+      'https://dns.alidns.com/dns-query#disable-qtype-65=true',
+      'https://doh.pub/dns-query#disable-qtype-65=true',
     ],
-    'direct-nameserver': [
-      'https://dns.alidns.com/dns-query',
-      'https://doh.pub/dns-query',
+    'rule-set:fakeipfilter_!cn': [
+      'https://8.8.8.8/dns-query#PROXY&disable-qtype-65=true',
     ],
-    'nameserver-policy': {
-      'rule-set:cn,private,fakeipfilter_cn,games_cn,microsoft_cn,apple_cn': [
-        'https://dns.alidns.com/dns-query#disable-qtype-65=true',
-        'https://doh.pub/dns-query#disable-qtype-65=true',
-      ],
-      'rule-set:fakeipfilter_!cn': [
-        'https://8.8.8.8/dns-query#PROXY&disable-qtype-65=true',
-      ],
-    },
-    'nameserver': ['https://8.8.8.8/dns-query#PROXY&ecs=223.5.5.0/24'],
-    'fallback': ['https://8.8.8.8/dns-query#PROXY'],
-    'fallback-filter': {
-      'geoip': true,
-      'geoip-code': 'CN',
-    },
-    'fake-ip-filter': [
-      'rule-set:fakeipfilter_cn',
-      'rule-set:fakeipfilter_!cn',
-      'rule-set:private',
-      'rule-set:cn',
-      'rule-set:microsoft_cn',
-      'rule-set:apple_cn',
-      'rule-set:games_cn',
-    ],
-  };
+  },
+  // 'nameserver': [
+  //   'https://8.8.8.8/dns-query#PROXY&ecs=223.5.5.0/24',
+  'nameserver': [
+    'https://dns.alidns.com/dns-query','https://doh.pub/dns-query'
+  ],
+  'fallback': [
+    'https://8.8.8.8/dns-query#PROXY','https://1.1.1.1/dns-query#PROXY'
+  ],
+};
 
   // ------------------------------------------------ 规则集 (rule-providers)
-  // 对应 yaml 的 *rule_providers_domain / *rule_providers_ip / *rule_fakeipfilter
   const RULE_BASE = { 'type': 'http', 'interval': 86400 };
   const RULE_DOMAIN = { ...RULE_BASE, 'format': 'mrs', 'behavior': 'domain' };
   const RULE_IPCIDR = { ...RULE_BASE, 'format': 'mrs', 'behavior': 'ipcidr' };
   const RULE_FAKEIP = { ...RULE_BASE, 'format': 'text', 'behavior': 'domain' };
 
-  // 简写：*rule_providers_domain + appshubcc/bett-rules 的 geosite mrs
-  // 单参：bundle 名即本地文件名；双参：bundle 名与本地文件名不同（如含 ! 的规则集必须显式传 file）
   const mrs_domain = (bundle, file = bundle) => ({
     ...RULE_DOMAIN,
     'url': `https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/${bundle}.mrs`,

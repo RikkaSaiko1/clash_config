@@ -236,55 +236,61 @@ const main = (config) => {
     { 'name': 'Other Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'exclude-filter': EXCLUDE_FILTER, 'hidden': true }, // Other Auto Group
   ];
 
-  config['dns'] = {
-    'enable': true,
-    'cache-algorithm': 'arc',
-    'ipv6': false,
-    'enhanced-mode': 'fake-ip',
-    'fake-ip-ttl': 1,
-    'fake-ip-range': '198.18.0.0/16',
-    'fake-ip-filter-mode': 'blacklist',
-    'default-nameserver': [
-      'https://223.5.5.5/dns-query',
+// ------------------------------------------------ DNS
+config['dns'] = {
+  'enable': true,
+  'cache-algorithm': 'arc',
+  'ipv6': false,
+  'enhanced-mode': 'fake-ip',
+  'fake-ip-ttl': 1,
+  'fake-ip-range': '198.18.0.0/16',
+  'fake-ip-filter-mode': 'blacklist',
+  'default-nameserver': [
+    'https://223.5.5.5/dns-query',
+  ],
+  'proxy-server-nameserver': [
+    'https://dns.alidns.com/dns-query',
+    'https://doh.pub/dns-query',
+  ],
+  'direct-nameserver': [
+    'https://dns.alidns.com/dns-query',
+    'https://doh.pub/dns-query',
+  ],
+  
+  // fake-ip-filter
+  'fallback-filter': {
+    'geoip': true,
+    'geoip-code': 'CN',
+  },
+
+  'fake-ip-filter': [
+    'rule-set:fakeipfilter_cn',
+    'rule-set:fakeipfilter_!cn',
+    'rule-set:private',
+    'rule-set:cn',
+    'rule-set:microsoft_cn',
+    'rule-set:apple_cn',
+    'rule-set:games_cn',
+  ],
+  // nameserver-policy
+  'nameserver-policy': {
+    'rule-set:cn,private,fakeipfilter_cn,games_cn,microsoft_cn,apple_cn': [
+      'https://dns.alidns.com/dns-query#disable-qtype-65=true',
+      'https://doh.pub/dns-query#disable-qtype-65=true',
     ],
-    'proxy-server-nameserver': [
-      'https://dns.alidns.com/dns-query',
-      'https://doh.pub/dns-query',
+    'rule-set:fakeipfilter_!cn': [
+      'https://8.8.8.8/dns-query#PROXY&disable-qtype-65=true',
     ],
-    'direct-nameserver': [
-      'https://dns.alidns.com/dns-query',
-      'https://doh.pub/dns-query',
-    ],
-    'nameserver': [
-      'https://8.8.8.8/dns-query#PROXY&ecs=223.5.5.0/24',
-    ],
-    'fallback': [
-      'https://8.8.8.8/dns-query#PROXY',
-    ],
-    'fallback-filter': {
-      'geoip': true,
-      'geoip-code': 'CN',
-    },
-    // nameserver-policy
-    'nameserver-policy': {
-      'rule-set:cn,private,fakeipfilter_cn,games_cn,microsoft_cn,apple_cn': [
-        'https://dns.alidns.com/dns-query#disable-qtype-65=true',
-        'https://doh.pub/dns-query#disable-qtype-65=true',
-      ],
-      'rule-set:fakeipfilter_!cn': [
-        'https://8.8.8.8/dns-query#PROXY&disable-qtype-65=true',
-      ],
-    },
-    'fake-ip-filter': [
-      'rule-set:fakeipfilter_cn',
-      'rule-set:fakeipfilter_!cn',
-      'rule-set:private',
-      'rule-set:cn',
-      'rule-set:microsoft_cn',
-      'rule-set:apple_cn',
-      'rule-set:games_cn',
-    ],
-  };
+  },
+  // 'nameserver': [
+  //   'https://8.8.8.8/dns-query#PROXY&ecs=223.5.5.0/24',
+  'nameserver': [
+    'https://dns.alidns.com/dns-query','https://doh.pub/dns-query'
+  ],
+  'fallback': [
+    'https://8.8.8.8/dns-query#PROXY','https://1.1.1.1/dns-query#PROXY'
+  ],
+};
 
   // ------------------------------------------------ 分流规则 (rules)
   config['rules'] = [
