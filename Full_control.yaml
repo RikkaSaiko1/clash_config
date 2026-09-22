@@ -599,7 +599,7 @@ rule-providers:
     <<: *rule_providers_domain
     url: 'https://cdn.jsdelivr.net/gh/binaryu/emos-proxy-rule@main/rules/emos-mihomo.mrs'
     path: './ruleset/emos.mrs'
-    path-in-bundle: 'geo/geosite/category-emby.mrs'
+    path-in-bundle: 'geo/geosite/category-emos.mrs'
 
   pikpak:
     <<: *rule_providers_domain

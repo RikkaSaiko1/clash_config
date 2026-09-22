@@ -181,7 +181,7 @@ const main = (config) => {
       ...RULE_DOMAIN,
       'url': 'https://cdn.jsdelivr.net/gh/binaryu/emos-proxy-rule@main/rules/emos-mihomo.mrs',
       'path': './ruleset/emos.mrs',
-      'path-in-bundle': 'geo/geosite/category-emby.mrs',
+      'path-in-bundle': 'geo/geosite/category-emos.mrs',
     },
     'cn_additional': {
       ...RULE_DOMAIN,
