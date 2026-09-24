@@ -134,7 +134,6 @@ proxy-groups:  # 定义分流策略组
 
   - name: 'PROXY'
     <<: [*group_common_select, *proxies_proxy]
-    # include-all-proxies: true
     icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Static.png'
 
   - name: 'AUTO'
