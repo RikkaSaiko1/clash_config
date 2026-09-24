@@ -230,7 +230,7 @@ config['dns'] = {
 
   config['proxy-groups'] = [
     // ---------------------------------------- 基础策略组
-    { 'name': 'PROXY', ...RULE_GROUP, 'proxies': PROXIES_PROXY, 'include-all-proxies': true, 'icon': png('Static') },
+    { 'name': 'PROXY', ...RULE_GROUP, 'proxies': PROXIES_PROXY, 'icon': png('Static') },
     { 'name': 'AUTO', ...RULE_GROUP_TEST, 'hidden': false, 'icon': png('Urltest') },
     // ---------------------------------------- 应用策略组
     { 'name': 'YouTube', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('youtube') },
