@@ -1,1 +1,4 @@
 config.yaml
+
+# 本地测试脚本与临时产物
+_test/
