@@ -98,28 +98,35 @@ dns:
   fake-ip-ttl: 1
   fake-ip-range: 198.18.0.0/16
   fake-ip-filter-mode: blacklist
+  # 解析 "DNS 服务器域名" 的 DNS，需要填 IP 地址
   default-nameserver:
     - https://223.5.5.5/dns-query
+  # 用于节点域名解析的 DNS服务器
   proxy-server-nameserver:
     - https://dns.alidns.com/dns-query
     - https://doh.pub/dns-query
+  # 用于直连域名解析的 DNS服务器
   direct-nameserver:
     - https://dns.alidns.com/dns-query
     - https://doh.pub/dns-query
 
+  #  配置查询域名使用的 DNS 
   nameserver-policy:
     "rule-set:cn,private,fakeipfilter_cn,games_cn,microsoft_cn,apple_cn":
     - https://dns.alidns.com/dns-query#disable-qtype-65=true
     - https://doh.pub/dns-query#disable-qtype-65=true
     "rule-set:fakeipfilter_!cn":
     - https://8.8.8.8/dns-query#PROXY&disable-qtype-65=true
+  # 查询未配置 nameserver-policy 或者 nameserver-policy 中未匹配到的域名时使用的 DNS
   nameserver:
-    - https://8.8.8.8/dns-query#PROXY&ecs=223.5.5.0/24
+    - "https://8.8.8.8/dns-query#PROXY&ecs=120.76.0.0/14&ecs-override=true"
+  # 非CN IP 查询时使用的 DNS
   fallback:
     - https://8.8.8.8/dns-query#PROXY
   fallback-filter:
     geoip: true
     geoip-code: CN
+  # 绕过 fake-ip
   fake-ip-filter:
     - rule-set:fakeipfilter_cn
     - rule-set:fakeipfilter_!cn
@@ -195,7 +202,7 @@ proxy-groups:
   - name: 'AUTO'
     <<: *group_common_auto
     hidden: false
-    icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Roundrobin.png'
+    icon: 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Urltest.png'
 
   - name: 'YouTube'
     <<: [*group_common_select, *proxies_default]
