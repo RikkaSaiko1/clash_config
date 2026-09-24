@@ -53,20 +53,8 @@ const main = (config) => {
   const RULE_DOMAIN = { ...RULE_BASE, 'behavior': 'domain' };
   const RULE_IPCIDR = { ...RULE_BASE, 'behavior': 'ipcidr' };
 
-  const mrs_domain = (bundle, file = bundle) => ({
-    ...RULE_DOMAIN,
-    'url': `https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/${bundle}.mrs`,
-    'path': `./ruleset/${file}.mrs`,
-    'path-in-bundle': `geo/geosite/${bundle}.mrs`,
-  });
-
-  const mrs_ipcidr = (bundle, file) => ({
-    ...RULE_IPCIDR,
-    'url': `https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/${bundle}.mrs`,
-    'path': `./ruleset/${file}.mrs`,
-    'path-in-bundle': `geo/geoip/${bundle}.mrs`,
-  });
-
+  const mrs_domain = (bundle, file = bundle) => ({...RULE_DOMAIN,'url': `https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/${bundle}.mrs`,'path': `./ruleset/${file}.mrs`,'path-in-bundle': `geo/geosite/${bundle}.mrs`,});
+  const mrs_ipcidr = (bundle, file) => ({...RULE_IPCIDR,'url': `https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/${bundle}.mrs`,'path': `./ruleset/${file}.mrs`,'path-in-bundle': `geo/geoip/${bundle}.mrs`,});
 
   config['rule-providers'] = {
     'private': mrs_domain('private'),
@@ -98,6 +86,13 @@ const main = (config) => {
     'instagram': mrs_domain('instagram'),
     'netflix': mrs_domain('netflix'),
     'netflix_ip': mrs_ipcidr('netflix', 'netflix_ip'),
+    'pikpak': mrs_domain('pikpak'),
+    'spotify': mrs_domain('spotify'),
+    'spotify_ip': mrs_ipcidr('spotify', 'spotify_ip'),
+    'cryptocurrency': mrs_domain('category-cryptocurrency', 'cryptocurrency'),
+    'ehentai': mrs_domain('ehentai'),
+    'geolocation-!cn': mrs_domain('geolocation-!cn', 'geolocation-!cn'),
+    'fakeip_filter': mrs_domain('fakeip-filter'),
     'emby': {
       ...RULE_DOMAIN,
       'url': 'https://cdn.jsdelivr.net/gh/666OS/rules@release/mihomo/domain/Emby.mrs',
@@ -110,19 +105,13 @@ const main = (config) => {
       'path': './ruleset/emos.mrs',
       'path-in-bundle': 'geo/geosite/category-emos.mrs',
     },
-    'pikpak': mrs_domain('pikpak'),
-    'spotify': mrs_domain('spotify'),
-    'spotify_ip': mrs_ipcidr('spotify', 'spotify_ip'),
-    'cryptocurrency': mrs_domain('category-cryptocurrency', 'cryptocurrency'),
-    'ehentai': mrs_domain('ehentai'),
-    'geolocation-!cn': mrs_domain('geolocation-!cn', 'geolocation-!cn'),
+
     'adblockmihomolite': {
       ...RULE_DOMAIN,
       'url': 'https://cdn.jsdelivr.net/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.mrs',
       'path': './ruleset/adblockmihomolite.mrs',
       'path-in-bundle': 'geo/geosite/category-ads-all.mrs',
     },
-    'fakeip_filter': mrs_domain('fakeip-filter'),
     'cn_additional': {
       ...RULE_DOMAIN,
       'url': 'https://static-file-global.353355.xyz/rules/cn-additional-list.mrs',
@@ -148,61 +137,33 @@ const main = (config) => {
   };
 
   // ------------------------------------------------ 策略组 (proxy-groups)
-  const GROUP_COMMON = {
-    'timeout': 1500,
-    'max-failed-times': 5,
-    'empty-fallback': 'REJECT',
-    'url': 'https://www.apple.com/library/test/success.html',
-    'lazy': true,
-  };
+  const GROUP_COMMON = {'timeout': 1500,'max-failed-times': 5,'empty-fallback': 'REJECT','url': 'https://www.apple.com/library/test/success.html','lazy': true,};
   const RULE_GROUP = { 'type': 'select', 'interval': 300, ...GROUP_COMMON };
   const RULE_GROUP_TEST = { 'type': 'url-test', 'interval': 60, ...GROUP_COMMON, 'tolerance': 50 };
-
-  const PROXIES_ALL = [
-    'PROXY',
-    'AUTO',
-    'HK Group',
-    'SG Group',
-    'JP Group',
-    'US Group',
-    'TW Group',
-    'KR Group',
-    'Other Group',
-  ];
+  const PROXIES_ALL = ['PROXY','AUTO','HK Group','SG Group','JP Group','US Group','TW Group','KR Group', 'Other Group',];
   const list = (arr) => [...arr];
   const PROXIES_ALL_DIRECT = [...PROXIES_ALL, 'DIRECT'];
 
   const svg = (name) => `https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/${name}.svg`;
   const png = (name) => `https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/${name}.png`;
 
-  const PROXIES_PROXY = [
-    'AUTO',
-    'HK Group',
-    'JP Group',
-    'US Group',
-    'SG Group',
-    'TW Group',
-    'KR Group',
-    'Other Group',
-  ];
+  const PROXIES_PROXY = ['AUTO','HK Group','JP Group','US Group','SG Group','TW Group','KR Group','Other Group',];
   const PROXIES_AI = ['PROXY', 'SG Group', 'JP Group', 'US Group', 'KR Group'];
   const PROXIES_REJECT = ['REJECT', 'REJECT-DROP', 'PASS'];
-
   const FILTER_HK = '(?i)(🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|hong\\s*kong)';
   const FILTER_JP = '(?i)(🇯🇵|日本|东京|大阪|京都|(?<![A-Za-z])JPN?(?![A-Za-z])|japan)';
   const FILTER_US = '(?i)(🇺🇸|美国|纽约|洛杉矶|旧金山|芝加哥|休斯顿|迈阿密|西雅图|波士顿|华盛顿|拉斯维加斯|圣何塞|圣地亚哥|(?<![A-Za-z])USA?(?![A-Za-z])|america|united\\s*states)';
   const FILTER_SG = '(?i)(🇸🇬|新加坡|狮城|(?<![A-Za-z])SGP?(?![A-Za-z])|singapore)';
   const FILTER_TW = '(?i)(🇹🇼|台湾|台北|高雄|(?<![A-Za-z])TWN?(?![A-Za-z])|taiwan)';
   const FILTER_KR = '(?i)(🇰🇷|韩国|首尔|釜山|仁川|大邱|(?<![A-Za-z])KOR?(?![A-Za-z])|korea|south\\s*korea)';
-
   const EXCLUDE_FILTER = `(?i)(${[FILTER_HK, FILTER_JP, FILTER_US, FILTER_SG, FILTER_TW, FILTER_KR]
     .map((pattern) => pattern.slice('(?i)('.length, -1))
     .join('|')})`;
 
 
   config['proxy-groups'] = [
-    { 'name': 'PROXY', ...RULE_GROUP, 'proxies': list(PROXIES_PROXY), 'include-all-proxies': true, 'icon': png('Static') }, // PROXY
-    { 'name': 'AUTO', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'hidden': false, 'icon': png('Roundrobin') }, // AUTO
+    { 'name': 'PROXY', ...RULE_GROUP, 'proxies': list(PROXIES_PROXY), 'icon': png('Static') }, // PROXY
+    { 'name': 'AUTO', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'hidden': false, 'icon': png('Urltest') }, // AUTO
     { 'name': 'YouTube', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'icon': svg('youtube') }, // YouTube
     { 'name': 'Google', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'icon': svg('google') }, // Google FCM
     { 'name': 'AI', ...RULE_GROUP, 'proxies': list(PROXIES_AI), 'default-selected': 'US Group', 'icon': svg('deepseek') }, // AI
@@ -245,24 +206,26 @@ config['dns'] = {
   'fake-ip-ttl': 1,
   'fake-ip-range': '198.18.0.0/16',
   'fake-ip-filter-mode': 'blacklist',
+  // 解析 "DNS 服务器域名" 的 DNS，需要填 IP 地址
   'default-nameserver': [
     'https://223.5.5.5/dns-query',
   ],
+  // 用于节点域名解析的 DNS服务器
   'proxy-server-nameserver': [
     'https://dns.alidns.com/dns-query',
     'https://doh.pub/dns-query',
   ],
+  // 用于直连域名解析的 DNS服务器
   'direct-nameserver': [
     'https://dns.alidns.com/dns-query',
     'https://doh.pub/dns-query',
   ],
   
-  // fake-ip-filter
   'fallback-filter': {
     'geoip': true,
     'geoip-code': 'CN',
   },
-
+  // 绕过 fake-ip
   'fake-ip-filter': [
     'rule-set:fakeipfilter_cn',
     'rule-set:fakeipfilter_!cn',
@@ -272,7 +235,7 @@ config['dns'] = {
     'rule-set:apple_cn',
     'rule-set:games_cn',
   ],
-  // nameserver-policy
+  //  配置查询域名使用的 DNS 
   'nameserver-policy': {
     'rule-set:cn,private,fakeipfilter_cn,games_cn,microsoft_cn,apple_cn': [
       'https://dns.alidns.com/dns-query#disable-qtype-65=true',
@@ -282,13 +245,13 @@ config['dns'] = {
       'https://8.8.8.8/dns-query#PROXY&disable-qtype-65=true',
     ],
   },
-  // 'nameserver': [
-  //   'https://8.8.8.8/dns-query#PROXY&ecs=223.5.5.0/24',
+  // 查询未配置 nameserver-policy 或者 nameserver-policy 中未匹配到的域名时使用的 DNS
   'nameserver': [
-    'https://dns.alidns.com/dns-query','https://doh.pub/dns-query'
+    "https://8.8.8.8/dns-query#PROXY&ecs=120.76.0.0/14&ecs-override=true",
   ],
+  // 非CN IP 查询时使用的 DNS
   'fallback': [
-    'https://8.8.8.8/dns-query#PROXY','https://1.1.1.1/dns-query#PROXY'
+    'https://8.8.8.8/dns-query#PROXY',
   ],
 };
 
