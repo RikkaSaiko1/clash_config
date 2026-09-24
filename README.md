@@ -20,9 +20,9 @@
 ## 📥 下载地址
 
 > ⚠️ **下载前先读这几条**：
-> - 覆写脚本/配置**只针对机场订阅**，别拿它去覆写你自己手写的配置
-> - 脚本已处理机场私有 DNS 和节点域名 `hosts` 的解析问题，**请把代理软件的 DNS 覆写关掉**
-> - Windows 遇到 DNS 泄露，**关掉系统「智能多宿主名称解析」**，或在代理软件里开启 [严格路由](https://wiki.metacubex.one/config/inbound/tun/#strict-route)
+> - 覆写脚本/配置**只针对机场订阅**
+> - 代理软件的 DNS 覆写关掉
+> - 开启 [严格路由](https://wiki.metacubex.one/config/inbound/tun/#strict-route)
 
 | 文件 | CDN（国内加速） | raw (官方推荐) |
 | --- | --- | --- |
