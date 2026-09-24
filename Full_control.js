@@ -64,24 +64,26 @@ config['dns'] = {
   'fake-ip-ttl': 1,
   'fake-ip-range': '198.18.0.0/16',
   'fake-ip-filter-mode': 'blacklist',
+  // 解析 "DNS 服务器域名" 的 DNS，需要填 IP 地址
   'default-nameserver': [
     'https://223.5.5.5/dns-query',
   ],
+  // 用于节点域名解析的 DNS服务器
   'proxy-server-nameserver': [
     'https://dns.alidns.com/dns-query',
     'https://doh.pub/dns-query',
   ],
+  // 用于直连域名解析的 DNS服务器
   'direct-nameserver': [
     'https://dns.alidns.com/dns-query',
     'https://doh.pub/dns-query',
   ],
   
-  // fake-ip-filter
   'fallback-filter': {
     'geoip': true,
     'geoip-code': 'CN',
   },
-
+  // 绕过 fake-ip
   'fake-ip-filter': [
     'rule-set:fakeipfilter_cn',
     'rule-set:fakeipfilter_!cn',
@@ -91,7 +93,7 @@ config['dns'] = {
     'rule-set:apple_cn',
     'rule-set:games_cn',
   ],
-  // nameserver-policy
+  //  配置查询域名使用的 DNS 
   'nameserver-policy': {
     'rule-set:cn,private,fakeipfilter_cn,games_cn,microsoft_cn,apple_cn': [
       'https://dns.alidns.com/dns-query#disable-qtype-65=true',
@@ -101,13 +103,13 @@ config['dns'] = {
       'https://8.8.8.8/dns-query#PROXY&disable-qtype-65=true',
     ],
   },
-  // 'nameserver': [
-  //   'https://8.8.8.8/dns-query#PROXY&ecs=223.5.5.0/24',
+  // 查询未配置 nameserver-policy 或者 nameserver-policy 中未匹配到的域名时使用的 DNS
   'nameserver': [
-    'https://dns.alidns.com/dns-query','https://doh.pub/dns-query'
+    "https://8.8.8.8/dns-query#PROXY&ecs=120.76.0.0/14&ecs-override=true",
   ],
+  // 非CN IP 查询时使用的 DNS
   'fallback': [
-    'https://8.8.8.8/dns-query#PROXY','https://1.1.1.1/dns-query#PROXY'
+    'https://8.8.8.8/dns-query#PROXY',
   ],
 };
 
@@ -117,20 +119,9 @@ config['dns'] = {
   const RULE_IPCIDR = { ...RULE_BASE, 'format': 'mrs', 'behavior': 'ipcidr' };
   const RULE_FAKEIP = { ...RULE_BASE, 'format': 'text', 'behavior': 'domain' };
 
-  const mrs_domain = (bundle, file = bundle) => ({
-    ...RULE_DOMAIN,
-    'url': `https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/${bundle}.mrs`,
-    'path': `./ruleset/${file}.mrs`,
-    'path-in-bundle': `geo/geosite/${bundle}.mrs`,
-  });
+  const mrs_domain = (bundle, file = bundle) => ({...RULE_DOMAIN,'url': `https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/${bundle}.mrs`,'path': `./ruleset/${file}.mrs`,'path-in-bundle': `geo/geosite/${bundle}.mrs`,});
 
-  // 简写：*rule_providers_ip + appshubcc/bett-rules 的 geoip mrs
-  const mrs_ipcidr = (bundle, file) => ({
-    ...RULE_IPCIDR,
-    'url': `https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/${bundle}.mrs`,
-    'path': `./ruleset/${file}.mrs`,
-    'path-in-bundle': `geo/geoip/${bundle}.mrs`,
-  });
+  const mrs_ipcidr = (bundle, file) => ({...RULE_IPCIDR,'url': `https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/${bundle}.mrs`,'path': `./ruleset/${file}.mrs`,'path-in-bundle': `geo/geoip/${bundle}.mrs`,});
 
   config['rule-providers'] = {
     'private': mrs_domain('private'),
@@ -212,50 +203,19 @@ config['dns'] = {
 
 
   // ------------------------------------------------ 策略组 (proxy-groups)
-  const GROUP_COMMON = {
-    'timeout': 1500,
-    'max-failed-times': 5,
-    'empty-fallback': 'REJECT',
-    'url': 'https://www.apple.com/library/test/success.html',
-    'lazy': true,
-  };
+  const GROUP_COMMON = {'timeout': 1500,'max-failed-times': 5,'empty-fallback': 'REJECT','url': 'https://www.apple.com/library/test/success.html','lazy': true,};
   const RULE_GROUP = { 'type': 'select', 'interval': 300, ...GROUP_COMMON };
-  const RULE_GROUP_TEST = {
-    'type': 'url-test',
-    'interval': 60,
-    ...GROUP_COMMON,
-    'tolerance': 50,
-    'include-all': true,
-    'exclude-type': 'DIRECT',
-  };
-
-  const PROXIES_DEFAULT = [
-    'PROXY',
-    'AUTO',
-    'HK Group',
-    'SG Group',
-    'JP Group',
-    'US Group',
-    'TW Group',
-    'KR Group',
-    'Other Group',
-  ];
+  const RULE_GROUP_TEST = {'type': 'url-test','interval': 60,...GROUP_COMMON,'tolerance': 50,'include-all': true,'exclude-type': 'DIRECT',};
+  const PROXIES_DEFAULT = ['PROXY','AUTO','HK Group','SG Group','JP Group','US Group','TW Group','KR Group','Other Group',];
   const PROXIES_DIRECT = [...PROXIES_DEFAULT, 'DIRECT'];
-  const PROXIES_PROXY = [
-    'AUTO',
-    'HK Group',
-    'JP Group',
-    'US Group',
-    'SG Group',
-    'TW Group',
-    'KR Group',
-    'Other Group',
-  ];
+  const PROXIES_PROXY = ['AUTO','HK Group','JP Group','US Group','SG Group','TW Group','KR Group','Other Group',];
   const PROXIES_AI = ['PROXY', 'SG Group', 'JP Group', 'US Group', 'KR Group'];
   const PROXIES_REJECT = ['REJECT', 'REJECT-DROP', 'PASS'];
 
   const svg = (name) =>
     `https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/${name}.svg`;
+  const png = (name) =>
+    `https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/${name}.png`;
 
 
   const FILTER_HK = '(?i)(🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|hong\\s*kong)';
@@ -270,8 +230,8 @@ config['dns'] = {
 
   config['proxy-groups'] = [
     // ---------------------------------------- 基础策略组
-    { 'name': 'PROXY', ...RULE_GROUP, 'proxies': PROXIES_PROXY, 'include-all-proxies': true, 'icon': 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Static.png' },
-    { 'name': 'AUTO', ...RULE_GROUP_TEST, 'hidden': false, 'icon': 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Roundrobin.png' },
+    { 'name': 'PROXY', ...RULE_GROUP, 'proxies': PROXIES_PROXY, 'include-all-proxies': true, 'icon': png('Static') },
+    { 'name': 'AUTO', ...RULE_GROUP_TEST, 'hidden': false, 'icon': png('Urltest') },
     // ---------------------------------------- 应用策略组
     { 'name': 'YouTube', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('youtube') },
     { 'name': 'Google', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('google') },
@@ -291,24 +251,24 @@ config['dns'] = {
     { 'name': 'EHentai', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'default-selected': 'US Group', 'icon': svg('EHentai') },
     { 'name': 'Twitch', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('twitch') },
     { 'name': 'Pixiv', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'default-selected': 'JP Group', 'icon': svg('pixiv') },
-    { 'name': 'Line', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': 'https://cdn.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Line.png' },
+    { 'name': 'Line', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('line') },
     { 'name': 'Discord', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('discord') },
-    { 'name': 'AdBlock', ...RULE_GROUP, 'proxies': PROXIES_REJECT, 'icon': 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Adblock.png' },
+    { 'name': 'AdBlock', ...RULE_GROUP, 'proxies': PROXIES_REJECT, 'icon': png('Adblock') },
     // ---------------------------------------- 地区策略组
-    { 'name': 'HK Group', ...RULE_GROUP, 'filter': FILTER_HK, 'include-all': true, 'proxies': ['HK Auto Group'], 'icon': 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/HK.png' },
+    { 'name': 'HK Group', ...RULE_GROUP, 'filter': FILTER_HK, 'include-all': true, 'proxies': ['HK Auto Group'], 'icon': png('HK') },
     { 'name': 'HK Auto Group', ...RULE_GROUP_TEST, 'filter': FILTER_HK, 'hidden': true },
-    { 'name': 'JP Group', ...RULE_GROUP, 'filter': FILTER_JP, 'include-all': true, 'proxies': ['JP Auto Group'], 'icon': 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/JP.png' },
+    { 'name': 'JP Group', ...RULE_GROUP, 'filter': FILTER_JP, 'include-all': true, 'proxies': ['JP Auto Group'], 'icon': png('JP') },
     { 'name': 'JP Auto Group', ...RULE_GROUP_TEST, 'filter': FILTER_JP, 'hidden': true },
-    { 'name': 'US Group', ...RULE_GROUP, 'filter': FILTER_US, 'include-all': true, 'proxies': ['US Auto Group'], 'icon': 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/US.png' },
+    { 'name': 'US Group', ...RULE_GROUP, 'filter': FILTER_US, 'include-all': true, 'proxies': ['US Auto Group'], 'icon': png('US') },
     { 'name': 'US Auto Group', ...RULE_GROUP_TEST, 'filter': FILTER_US, 'hidden': true },
-    { 'name': 'SG Group', ...RULE_GROUP, 'filter': FILTER_SG, 'include-all': true, 'proxies': ['SG Auto Group'], 'icon': 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/SG.png' },
+    { 'name': 'SG Group', ...RULE_GROUP, 'filter': FILTER_SG, 'include-all': true, 'proxies': ['SG Auto Group'], 'icon': png('SG') },
     { 'name': 'SG Auto Group', ...RULE_GROUP_TEST, 'filter': FILTER_SG, 'hidden': true },
-    { 'name': 'TW Group', ...RULE_GROUP, 'filter': FILTER_TW, 'include-all': true, 'proxies': ['TW Auto Group'], 'icon': 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/TW.png' },
+    { 'name': 'TW Group', ...RULE_GROUP, 'filter': FILTER_TW, 'include-all': true, 'proxies': ['TW Auto Group'], 'icon': png('TW') },
     { 'name': 'TW Auto Group', ...RULE_GROUP_TEST, 'filter': FILTER_TW, 'hidden': true },
-    { 'name': 'KR Group', ...RULE_GROUP, 'filter': FILTER_KR, 'include-all': true, 'proxies': ['KR Auto Group'], 'icon': 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/KR.png' },
+    { 'name': 'KR Group', ...RULE_GROUP, 'filter': FILTER_KR, 'include-all': true, 'proxies': ['KR Auto Group'], 'icon': png('KR') },
     { 'name': 'KR Auto Group', ...RULE_GROUP_TEST, 'filter': FILTER_KR, 'hidden': true },
     // ---------------------------------------- 其他地区
-    { 'name': 'Other Group', ...RULE_GROUP, 'exclude-filter': EXCLUDE_FILTER, 'exclude-type': 'DIRECT', 'include-all': true, 'proxies': ['Other Auto Group'], 'icon': 'https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/Global.png' },
+    { 'name': 'Other Group', ...RULE_GROUP, 'exclude-filter': EXCLUDE_FILTER, 'exclude-type': 'DIRECT', 'include-all': true, 'proxies': ['Other Auto Group'], 'icon': png('Global') },
     { 'name': 'Other Auto Group', ...RULE_GROUP_TEST, 'exclude-filter': EXCLUDE_FILTER, 'hidden': true },
   ];
 
