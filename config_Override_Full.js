@@ -1,40 +1,96 @@
 // ============================================================================
-// clash 覆写脚本 全规则 + 自定义 DNS (mihomo JS Override)
+// clash 覆写脚本 · 全规则 (mihomo JS Override)
 // 仓库 https://github.com/RikkaSaiko1/clash_config
-//
-// ◆ 分流到策略组
-//     分类        规则集                                策略组
-//     ─────────────────────────────────────────────────────────────────────
-//     AI          ai                                    AI（默认 PROXY）
-//     油管        youtube                               YouTube
-//     谷歌        google / google_ip                    Google
-//     微软        microsoft                             Microsoft
-//     苹果        apple                                 Apple
-//     电报        telegram / telegram_ip                Telegram
-//     游戏平台    steam / steam_ip                      Steam
-//     短视频      tiktok / tiktok_ip                    TikTok
-//     推特        twitter / twitter_ip                  Twitter
-//     图享        instagram                             Instagram
-//     奈飞        netflix / netflix_ip                  Netflix
-//     影音        emby / emos + Emby 相关域名与 9 条进程名   Emby
-//     网盘        pikpak                                PikPak
-//     音乐        spotify / spotify_ip                  Spotify
-//     加密货币    cryptocurrency                        Crypto（默认 PROXY）
-//     图站        ehentai                               EHentai（默认 PROXY）
-//     代码托管    github                                PROXY
+// ============================================================================
 
-const main = (config) => {
+// 配置开关：true 启用 / false 禁用（关闭后对应分组与规则不写入产物）
+const OPTIONS = {
+  // 分流组
+  FCM: true,        // Google FCM
+  YouTube: true,    // YouTube
+  Google: true,     // Google
+  AI: true,         // 国外 AI
+  Microsoft: true,  // Microsoft
+  Apple: true,      // Apple
+  Telegram: true,   // Telegram
+  Steam: true,      // Steam
+  TikTok: true,     // TikTok
+  Twitter: true,    // Twitter
+  Instagram: true,  // Instagram
+  Netflix: true,    // Netflix
+  Emby: true,       // Emby
+  PikPak: true,     // PikPak
+  Spotify: true,    // Spotify
+  Crypto: true,     // 加密货币
+  EHentai: true,    // E-Hentai
+  GitHub: true,     // GitHub
+  AdBlock: true,    // 广告拦截
+  // 功能开关
+  BlockQUIC: true,  // 屏蔽国外 QUIC
+};
 
+// 去重并过滤空值；传 getter 时按字段去重
+const dedupe = (arr, getter) => {
+  const seen = new Set();
+  const out = [];
+  for (const item of arr) {
+    const value = getter ? getter(item) : item;
+    if (!value) continue;
+    if (!seen.has(value)) {
+      seen.add(value);
+      out.push(value);
+    }
+  }
+  return out;
+};
+
+// 收集节点来源（顶层 proxies + provider），提取节点域名；
+// 顶层无节点但存在 provider 时，fallbackUse 兜底 use 全部 provider
+const collectNodeSources = (config) => {
+  config['proxies'] = Array.isArray(config['proxies']) ? config['proxies'] : [];
+
+  // 顶层节点名
+  const topProxyNames = dedupe(
+    config['proxies'],
+    (p) => (typeof p === 'string' ? p : p && p.name),
+  );
+
+  // provider 名
+  const providers = config['proxy-providers'];
+  const providerNames = dedupe(
+    providers && typeof providers === 'object' ? Object.keys(providers) : [],
+  );
+
+  // 节点 server 里的域名（非纯 IP）
+  const isIp = (s) => /^\d{1,3}(\.\d{1,3}){3}$/.test(s) || s.includes(':');
+  const nodeDomains = dedupe(
+    config['proxies']
+      .filter((p) => p && typeof p === 'object')
+      .map((p) => p.server)
+      .filter((s) => typeof s === 'string' && s && !isIp(s)),
+  );
+
+  // 顶层无节点但有 provider 时兜底 use 所有 provider
+  const fallbackUse = (topProxyNames.length === 0 && providerNames.length > 0) ? providerNames : null;
+
+  return { topProxyNames, providerNames, fallbackUse, nodeDomains };
+};
+
+// TUN
+const overwriteTun = (config) => {
   config['tun'] = {
     'enable': true,
-    'stack': 'mixed',
+    'stack': 'mips',
     'dns-hijack': ['any:53', 'tcp://any:53'],
     'auto-route': true,
     'auto-redirect': true,
     'auto-detect-interface': true,
     'route-exclude-address-set': ['cn_ip'],
   };
+};
 
+// Sniffer
+const overwriteSniffer = (config) => {
   config['sniffer'] = {
     'enable': true,
     'override-destination': false,
@@ -47,9 +103,11 @@ const main = (config) => {
     },
     'skip-domain': ['Mijia Cloud', '+.push.apple.com'],
   };
+};
 
-  // ------------------------------------------------ 规则集 (rule-providers)
-  const RULE_BASE = { 'type': 'http', 'format': 'mrs', 'interval': 86400 };
+// 规则集 (rule-providers)
+const overwriteRuleProviders = (config) => {
+  const RULE_BASE = { 'type': 'http', 'format': 'mrs', 'interval': 86400, 'dialer-proxy': 'DIRECT' };
   const RULE_DOMAIN = { ...RULE_BASE, 'behavior': 'domain' };
   const RULE_IPCIDR = { ...RULE_BASE, 'behavior': 'ipcidr' };
 
@@ -123,6 +181,7 @@ const main = (config) => {
       'interval': 86400,
       'behavior': 'domain',
       'format': 'text',
+      'dialer-proxy': 'DIRECT',
       'url': 'https://cdn.jsdelivr.net/gh/qichiyuhub/rule@main/rules/fakeipfilter-cn.list',
       'path': './ruleset/fakeipfilter-cn.list',
     },
@@ -131,12 +190,40 @@ const main = (config) => {
       'interval': 86400,
       'behavior': 'domain',
       'format': 'text',
+      'dialer-proxy': 'DIRECT',
       'url': 'https://cdn.jsdelivr.net/gh/qichiyuhub/rule@main/rules/fakeipfilter-!cn.list',
       'path': './ruleset/fakeipfilter-!cn.list',
     },
   };
+};
 
-  // ------------------------------------------------ 策略组 (proxy-groups)
+// 策略组 (proxy-groups)
+const overwriteProxyGroups = (config, ctx) => {
+  const { topProxyNames, fallbackUse: FALLBACK_USE } = ctx;
+
+  // 判断地区是否有节点：可读到节点名就按 filter 匹配（空地区组隐藏），
+  // 读不到（远程 provider）则保持显示；(?i) 前缀转成 JS 的 i 标志
+  const makeRegionHasNodes = (topProxyNames) => {
+    const canInspectNodes = topProxyNames.length > 0;
+    const regexCache = new Map();
+
+    const compile = (filter) => {
+      let re = regexCache.get(filter);
+      if (!re) {
+        re = new RegExp(filter.replace(/^\(\?i\)/, ''), 'i');
+        regexCache.set(filter, re);
+      }
+      return re;
+    };
+
+    return (filter) => {
+      if (!canInspectNodes) return true;
+      const re = compile(filter);
+      return topProxyNames.some((n) => re.test(n));
+    };
+  };
+  const regionHasNodes = makeRegionHasNodes(topProxyNames);
+
   const GROUP_COMMON = {'timeout': 1500,'max-failed-times': 5,'empty-fallback': 'REJECT','url': 'https://www.apple.com/library/test/success.html','lazy': true,};
   const RULE_GROUP = { 'type': 'select', 'interval': 300, ...GROUP_COMMON };
   const RULE_GROUP_TEST = { 'type': 'url-test', 'interval': 60, ...GROUP_COMMON, 'tolerance': 50 };
@@ -162,43 +249,116 @@ const main = (config) => {
 
 
   config['proxy-groups'] = [
-    { 'name': 'PROXY', ...RULE_GROUP, 'proxies': list(PROXIES_PROXY), 'icon': png('Static') }, // PROXY
-    { 'name': 'AUTO', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'hidden': false, 'icon': png('Urltest') }, // AUTO
-    { 'name': 'YouTube', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'icon': svg('youtube') }, // YouTube
-    { 'name': 'Google', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'icon': svg('google') }, // Google FCM
-    { 'name': 'AI', ...RULE_GROUP, 'proxies': list(PROXIES_AI), 'default-selected': 'US Group', 'icon': svg('deepseek') }, // AI
-    { 'name': 'Microsoft', ...RULE_GROUP, 'proxies': list(PROXIES_ALL_DIRECT), 'icon': svg('microsoft') }, // Microsoft
-    { 'name': 'Apple', ...RULE_GROUP, 'proxies': list(PROXIES_ALL_DIRECT), 'icon': svg('apple') }, // Apple
-    { 'name': 'Telegram', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'icon': svg('telegram') }, // Telegram
-    { 'name': 'Steam', ...RULE_GROUP, 'proxies': list(PROXIES_ALL_DIRECT), 'icon': svg('steam') }, // Steam
-    { 'name': 'TikTok', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'default-selected': 'JP Group', 'icon': svg('tiktok') }, // TikTok
-    { 'name': 'Twitter', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'icon': svg('twitter') }, // Twitter
-    { 'name': 'Instagram', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'icon': svg('instagram') }, // Instagram
-    { 'name': 'Netflix', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'icon': svg('netflix') }, // Netflix
-    { 'name': 'Emby', ...RULE_GROUP, 'proxies': list(PROXIES_ALL_DIRECT), 'icon': svg('emby') }, // Emby
-    { 'name': 'PikPak', ...RULE_GROUP, 'proxies': list(PROXIES_ALL_DIRECT), 'icon': svg('pikpak') }, // PikPak
-    { 'name': 'Spotify', ...RULE_GROUP, 'proxies': list(PROXIES_ALL_DIRECT), 'icon': svg('spotify') }, // Spotify
-    { 'name': 'Crypto', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'default-selected': 'JP Group', 'icon': svg('Crypto') }, // Crypto
-    { 'name': 'EHentai', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'default-selected': 'US Group', 'icon': svg('EHentai') }, // EHentai
-    { 'name': 'AdBlock', ...RULE_GROUP, 'proxies': list(PROXIES_REJECT), 'icon': png('Adblock') }, // AdBlock
-    { 'name': 'HK Group', ...RULE_GROUP, 'filter': FILTER_HK, 'include-all': true, 'proxies': ['HK Auto Group'], 'icon': png('HK') }, // HK Group
-    { 'name': 'HK Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'filter': FILTER_HK, 'hidden': true }, // HK Auto Group
-    { 'name': 'JP Group', ...RULE_GROUP, 'filter': FILTER_JP, 'include-all': true, 'proxies': ['JP Auto Group'], 'icon': png('JP') }, // JP Group
-    { 'name': 'JP Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'filter': FILTER_JP, 'hidden': true }, // JP Auto Group
-    { 'name': 'US Group', ...RULE_GROUP, 'filter': FILTER_US, 'include-all': true, 'proxies': ['US Auto Group'], 'icon': png('US') }, // US Group
-    { 'name': 'US Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'filter': FILTER_US, 'hidden': true }, // US Auto Group
-    { 'name': 'SG Group', ...RULE_GROUP, 'filter': FILTER_SG, 'include-all': true, 'proxies': ['SG Auto Group'], 'icon': png('SG') }, // SG Group
-    { 'name': 'SG Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'filter': FILTER_SG, 'hidden': true }, // SG Auto Group
-    { 'name': 'TW Group', ...RULE_GROUP, 'filter': FILTER_TW, 'include-all': true, 'proxies': ['TW Auto Group'], 'icon': png('TW') }, // TW Group
-    { 'name': 'TW Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'filter': FILTER_TW, 'hidden': true }, // TW Auto Group
-    { 'name': 'KR Group', ...RULE_GROUP, 'filter': FILTER_KR, 'include-all': true, 'proxies': ['KR Auto Group'], 'icon': png('KR') }, // KR Group
-    { 'name': 'KR Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'filter': FILTER_KR, 'hidden': true }, // KR Auto Group
-    { 'name': 'Other Group', ...RULE_GROUP, 'exclude-filter': EXCLUDE_FILTER, 'exclude-type': 'DIRECT', 'include-all': true, 'proxies': ['Other Auto Group'], 'icon': png('Global') }, // Other Group
-    { 'name': 'Other Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'exclude-filter': EXCLUDE_FILTER, 'hidden': true }, // Other Auto Group
+    { 'name': 'PROXY', ...RULE_GROUP, 'proxies': list(PROXIES_PROXY), ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': png('Static') },
+    { 'name': 'AUTO', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'hidden': false, 'icon': png('Urltest') },
+    ...(OPTIONS.YouTube ? [{ 'name': 'YouTube', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'icon': svg('youtube') }] : []),
+    ...(OPTIONS.Google ? [{ 'name': 'Google', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'icon': svg('google') }] : []),
+    ...(OPTIONS.AI ? [{ 'name': 'AI', ...RULE_GROUP, 'proxies': list(PROXIES_AI), 'default-selected': 'US Group', 'icon': svg('deepseek') }] : []),
+    ...(OPTIONS.Microsoft ? [{ 'name': 'Microsoft', ...RULE_GROUP, 'proxies': list(PROXIES_ALL_DIRECT), 'icon': svg('microsoft') }] : []),
+    ...(OPTIONS.Apple ? [{ 'name': 'Apple', ...RULE_GROUP, 'proxies': list(PROXIES_ALL_DIRECT), 'icon': svg('apple') }] : []),
+    ...(OPTIONS.Telegram ? [{ 'name': 'Telegram', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'icon': svg('telegram') }] : []),
+    ...(OPTIONS.Steam ? [{ 'name': 'Steam', ...RULE_GROUP, 'proxies': list(PROXIES_ALL_DIRECT), 'icon': svg('steam') }] : []),
+    ...(OPTIONS.TikTok ? [{ 'name': 'TikTok', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'default-selected': 'JP Group', 'icon': svg('tiktok') }] : []),
+    ...(OPTIONS.Twitter ? [{ 'name': 'Twitter', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'icon': svg('twitter') }] : []),
+    ...(OPTIONS.Instagram ? [{ 'name': 'Instagram', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'icon': svg('instagram') }] : []),
+    ...(OPTIONS.Netflix ? [{ 'name': 'Netflix', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'icon': svg('netflix') }] : []),
+    ...(OPTIONS.Emby ? [{ 'name': 'Emby', ...RULE_GROUP, 'proxies': list(PROXIES_ALL_DIRECT), 'icon': svg('emby') }] : []),
+    ...(OPTIONS.PikPak ? [{ 'name': 'PikPak', ...RULE_GROUP, 'proxies': list(PROXIES_ALL_DIRECT), 'icon': svg('pikpak') }] : []),
+    ...(OPTIONS.Spotify ? [{ 'name': 'Spotify', ...RULE_GROUP, 'proxies': list(PROXIES_ALL_DIRECT), 'icon': svg('spotify') }] : []),
+    ...(OPTIONS.Crypto ? [{ 'name': 'Crypto', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'default-selected': 'JP Group', 'icon': svg('Crypto') }] : []),
+    ...(OPTIONS.EHentai ? [{ 'name': 'EHentai', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'default-selected': 'US Group', 'icon': svg('EHentai') }] : []),
+    ...(OPTIONS.AdBlock ? [{ 'name': 'AdBlock', ...RULE_GROUP, 'proxies': list(PROXIES_REJECT), 'icon': png('Adblock') }] : []),
+    { 'name': 'HK Group', ...RULE_GROUP, 'filter': FILTER_HK, 'include-all': true, 'proxies': ['HK Auto Group'], 'hidden': !regionHasNodes(FILTER_HK), ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': png('HK') },
+    { 'name': 'HK Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'filter': FILTER_HK, 'hidden': true },
+    { 'name': 'JP Group', ...RULE_GROUP, 'filter': FILTER_JP, 'include-all': true, 'proxies': ['JP Auto Group'], 'hidden': !regionHasNodes(FILTER_JP), ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': png('JP') },
+    { 'name': 'JP Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'filter': FILTER_JP, 'hidden': true },
+    { 'name': 'US Group', ...RULE_GROUP, 'filter': FILTER_US, 'include-all': true, 'proxies': ['US Auto Group'], 'hidden': !regionHasNodes(FILTER_US), ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': png('US') },
+    { 'name': 'US Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'filter': FILTER_US, 'hidden': true },
+    { 'name': 'SG Group', ...RULE_GROUP, 'filter': FILTER_SG, 'include-all': true, 'proxies': ['SG Auto Group'], 'hidden': !regionHasNodes(FILTER_SG), ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': png('SG') },
+    { 'name': 'SG Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'filter': FILTER_SG, 'hidden': true },
+    { 'name': 'TW Group', ...RULE_GROUP, 'filter': FILTER_TW, 'include-all': true, 'proxies': ['TW Auto Group'], 'hidden': !regionHasNodes(FILTER_TW), ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': png('TW') },
+    { 'name': 'TW Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'filter': FILTER_TW, 'hidden': true },
+    { 'name': 'KR Group', ...RULE_GROUP, 'filter': FILTER_KR, 'include-all': true, 'proxies': ['KR Auto Group'], 'hidden': !regionHasNodes(FILTER_KR), ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': png('KR') },
+    { 'name': 'KR Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'filter': FILTER_KR, 'hidden': true },
+    { 'name': 'Other Group', ...RULE_GROUP, 'exclude-filter': EXCLUDE_FILTER, 'exclude-type': 'DIRECT', 'include-all': true, 'proxies': ['Other Auto Group'], ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': png('Global') },
+    { 'name': 'Other Auto Group', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'exclude-filter': EXCLUDE_FILTER, 'hidden': true },
   ];
+};
 
-// ------------------------------------------------ DNS
-config['dns'] = {
+// DNS
+const overwriteDns = (config, ctx) => {
+  const { nodeDomains } = ctx;
+
+  // 公共 DNS 黑名单：订阅 nameserver 命中这些即视为公共 DNS 过滤
+  const COMMON_DNS = ['8.8.8.8', '8.8.4.4', '1.1.1.1', '1.0.0.1', '9.9.9.9',
+    '223.5.5.5', '223.6.6.6', '119.29.29.29', '114.114.114.114', '1.12.12.12',
+    '180.76.76.76', 'dns.google', 'dns.cloudflare', 'cloudflare-dns', 'doh.pub',
+    'alidns', 'dnspod', 'system'];
+
+  const isCommonDns = (dns) => {
+    const v = String(dns).trim().toLowerCase();
+    return COMMON_DNS.some((k) => v.includes(k.toLowerCase()));
+  };
+
+  // 剥掉 DNS 的 # 后缀；含 direct/直连 时改为 #DIRECT
+  const stripDnsSuffix = (dns) => {
+    const str = String(dns);
+    const i = str.indexOf('#');
+    if (i === -1) return str;
+
+    const prefix = str.slice(0, i).trim();
+    const suffix = str.slice(i + 1).toLowerCase().trim();
+    if (suffix.includes('direct') || suffix.includes('直连')) return prefix + '#DIRECT';
+    return prefix;
+  };
+
+  // 为节点域名生成 DNS：走代理解析 + 跳过 fake-ip；
+  // 解析回退顺序：hosts → 私有 nameserver → 8.8.8.8#PROXY
+  const buildNodeDomainDns = (config, nodeDomains) => {
+    if (nodeDomains.length === 0) return { proxyPolicy: {}, fakeIpFilter: [] };
+
+    // ① hosts 已覆盖的域名，无需走 DNS
+    const hosts = config['hosts'];
+    const hostsMap = hosts && typeof hosts === 'object' ? hosts : {};
+    const resolvable = new Set();
+    for (const d of nodeDomains) {
+      const v = hostsMap[d];
+      if (typeof v === 'string' && v) resolvable.add(d);
+      else if (Array.isArray(v) && v.length) resolvable.add(d);
+    }
+
+    // ② 私有 nameserver：剥 # 后缀 + 过滤公共 DNS，剩下的才算私有
+    const dnsCfg = config['dns'] || {};
+    const rawNameserver = dnsCfg['nameserver'];
+    const privateNameserver = dedupe(
+      Array.isArray(rawNameserver) ? rawNameserver : [],
+      (d) => {
+        const stripped = stripDnsSuffix(d);
+        return stripped && !isCommonDns(stripped) ? stripped : null;
+      },
+    );
+    const hasPrivateNameserver = privateNameserver.length > 0;
+
+    // ③ 回退公共 DNS
+    const FALLBACK_DNS = ['https://8.8.8.8/dns-query#PROXY'];
+
+    const needPolicyDomains = nodeDomains.filter((d) => !resolvable.has(d));
+    const policyDns = hasPrivateNameserver ? privateNameserver : FALLBACK_DNS;
+
+    const proxyPolicy = {};
+    for (const d of needPolicyDomains) {
+      proxyPolicy[d] = policyDns;
+    }
+
+    // 节点域名全部跳过 fake-ip
+    const fakeIpFilter = [...nodeDomains];
+
+    return { proxyPolicy, fakeIpFilter };
+  };
+
+  const { proxyPolicy, fakeIpFilter } = buildNodeDomainDns(config, nodeDomains);
+
+  config['dns'] = {
   'enable': true,
   'cache-algorithm': 'arc',
   'ipv6': false,
@@ -206,16 +366,16 @@ config['dns'] = {
   'fake-ip-ttl': 1,
   'fake-ip-range': '198.18.0.0/16',
   'fake-ip-filter-mode': 'blacklist',
-  // 解析 "DNS 服务器域名" 的 DNS，需要填 IP 地址
+  // 解析 DNS 服务器域名（需填 IP）
   'default-nameserver': [
     'https://223.5.5.5/dns-query',
   ],
-  // 用于节点域名解析的 DNS服务器
+  // 节点域名解析
   'proxy-server-nameserver': [
     'https://dns.alidns.com/dns-query',
     'https://doh.pub/dns-query',
   ],
-  // 用于直连域名解析的 DNS服务器
+  // 直连域名解析
   'direct-nameserver': [
     'https://dns.alidns.com/dns-query',
     'https://doh.pub/dns-query',
@@ -227,6 +387,7 @@ config['dns'] = {
   },
   // 绕过 fake-ip
   'fake-ip-filter': [
+    ...fakeIpFilter, // 动态：节点域名跳过 fake-ip
     'rule-set:fakeipfilter_cn',
     'rule-set:fakeipfilter_!cn',
     'rule-set:private',
@@ -235,8 +396,9 @@ config['dns'] = {
     'rule-set:apple_cn',
     'rule-set:games_cn',
   ],
-  //  配置查询域名使用的 DNS 
+  // 域名查询使用的 DNS
   'nameserver-policy': {
+    ...proxyPolicy, // 动态：节点域名走代理 DNS
     'rule-set:cn,private,fakeipfilter_cn,games_cn,microsoft_cn,apple_cn': [
       'https://dns.alidns.com/dns-query#disable-qtype-65=true',
       'https://doh.pub/dns-query#disable-qtype-65=true',
@@ -245,17 +407,19 @@ config['dns'] = {
       'https://8.8.8.8/dns-query#PROXY&disable-qtype-65=true',
     ],
   },
-  // 查询未配置 nameserver-policy 或者 nameserver-policy 中未匹配到的域名时使用的 DNS
+  // 未匹配 nameserver-policy 的域名使用的 DNS
   'nameserver': [
     "https://8.8.8.8/dns-query#PROXY&ecs=120.76.0.0/14&ecs-override=true",
   ],
-  // 非CN IP 查询时使用的 DNS
+  // 非 CN IP 查询使用的 DNS
   'fallback': [
     'https://8.8.8.8/dns-query#PROXY',
   ],
+  };
 };
 
-  // ------------------------------------------------ 分流规则 (rules)
+// 分流规则 (rules)
+const overwriteRules = (config) => {
   config['rules'] = [
     // 私有网络直连
     'RULE-SET,private,DIRECT',
@@ -270,53 +434,59 @@ config['dns'] = {
     'DOMAIN,fsend.cn,DIRECT',
     'DOMAIN,international-gfe.download.nvidia.com,DIRECT',
     // 禁用国外 QUIC 流量
-    'AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn_additional),(RULE-SET,cn_ip,no-resolve)))))),REJECT',
-    // 广告拦截 | 拦截 STUN/TURN 探测
-    'RULE-SET,adblockmihomolite,AdBlock',
+    ...(OPTIONS.BlockQUIC ? ['AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn_additional),(RULE-SET,cn_ip,no-resolve)))))),REJECT'] : []),
+    // 广告拦截
+    ...(OPTIONS.AdBlock ? ['RULE-SET,adblockmihomolite,AdBlock'] : []),
     'AND,((NETWORK,UDP),(OR,((DST-PORT,3478-3481),(DST-PORT,5349),(DST-PORT,19302-19309)))),REJECT',
     // emby
-    'RULE-SET,emby,Emby',
-    'RULE-SET,emos,Emby',
-    'DOMAIN-SUFFIX,mb3admin.com,Emby',
-    'DOMAIN-SUFFIX,nubebelle.com,Emby',
-    'DOMAIN-KEYWORD,emby,Emby',
-    'PROCESS-NAME,com.mb.android,Emby',
-    'PROCESS-NAME,tv.emby.embyatv,Emby',
-    'PROCESS-NAME,com.hush.yamby,Emby',
-    'PROCESS-NAME,com.jellycine.app,Emby',
-    'PROCESS-NAME,com.mountains.hills,Emby',
-    'PROCESS-NAME,RodelPlayer.App.exe,Emby',
-    'PROCESS-NAME,com.feifeiduck.capyplayer,Emby',
+    ...(OPTIONS.Emby ? [
+      'RULE-SET,emby,Emby',
+      'RULE-SET,emos,Emby',
+      'DOMAIN-SUFFIX,mb3admin.com,Emby',
+      'DOMAIN-SUFFIX,nubebelle.com,Emby',
+      'DOMAIN-KEYWORD,emby,Emby',
+      'PROCESS-NAME,com.mb.android,Emby',
+      'PROCESS-NAME,tv.emby.embyatv,Emby',
+      'PROCESS-NAME,com.hush.yamby,Emby',
+      'PROCESS-NAME,com.jellycine.app,Emby',
+      'PROCESS-NAME,com.mountains.hills,Emby',
+      'PROCESS-NAME,RodelPlayer.App.exe,Emby',
+      'PROCESS-NAME,com.feifeiduck.capyplayer,Emby',
+    ] : []),
     // 代理规则
-    'RULE-SET,ai,AI',
-    'RULE-SET,youtube,YouTube',
-    'RULE-SET,googlefcm,DIRECT',
-    'RULE-SET,google,Google',
-    'RULE-SET,google_ip,Google,no-resolve',
-    'RULE-SET,github,PROXY',
-    'RULE-SET,microsoft,Microsoft',
-    'RULE-SET,apple,Apple',
-    'RULE-SET,telegram,Telegram',
-    'RULE-SET,telegram_ip,Telegram,no-resolve',
-    'RULE-SET,steam,Steam',
-    'RULE-SET,steam_ip,Steam,no-resolve',
-    'RULE-SET,tiktok,TikTok',
-    'RULE-SET,tiktok_ip,TikTok,no-resolve',
-    'RULE-SET,twitter,Twitter',
-    'RULE-SET,twitter_ip,Twitter,no-resolve',
-    'RULE-SET,instagram,Instagram',
-    'RULE-SET,netflix,Netflix',
-    'RULE-SET,netflix_ip,Netflix,no-resolve',
-    'RULE-SET,pikpak,PikPak',
-    'RULE-SET,spotify,Spotify',
-    'RULE-SET,spotify_ip,Spotify,no-resolve',
-    'RULE-SET,cryptocurrency,Crypto',
-    'RULE-SET,ehentai,EHentai',
+    ...(OPTIONS.AI ? ['RULE-SET,ai,AI'] : []),
+    ...(OPTIONS.YouTube ? ['RULE-SET,youtube,YouTube'] : []),
+    ...(OPTIONS.FCM ? ['RULE-SET,googlefcm,DIRECT'] : []),
+    ...(OPTIONS.Google ? ['RULE-SET,google,Google', 'RULE-SET,google_ip,Google,no-resolve'] : []),
+    ...(OPTIONS.GitHub ? ['RULE-SET,github,PROXY'] : []),
+    ...(OPTIONS.Microsoft ? ['RULE-SET,microsoft,Microsoft'] : []),
+    ...(OPTIONS.Apple ? ['RULE-SET,apple,Apple'] : []),
+    ...(OPTIONS.Telegram ? ['RULE-SET,telegram,Telegram', 'RULE-SET,telegram_ip,Telegram,no-resolve'] : []),
+    ...(OPTIONS.Steam ? ['RULE-SET,steam,Steam', 'RULE-SET,steam_ip,Steam,no-resolve'] : []),
+    ...(OPTIONS.TikTok ? ['RULE-SET,tiktok,TikTok', 'RULE-SET,tiktok_ip,TikTok,no-resolve'] : []),
+    ...(OPTIONS.Twitter ? ['RULE-SET,twitter,Twitter', 'RULE-SET,twitter_ip,Twitter,no-resolve'] : []),
+    ...(OPTIONS.Instagram ? ['RULE-SET,instagram,Instagram'] : []),
+    ...(OPTIONS.Netflix ? ['RULE-SET,netflix,Netflix', 'RULE-SET,netflix_ip,Netflix,no-resolve'] : []),
+    ...(OPTIONS.PikPak ? ['RULE-SET,pikpak,PikPak'] : []),
+    ...(OPTIONS.Spotify ? ['RULE-SET,spotify,Spotify', 'RULE-SET,spotify_ip,Spotify,no-resolve'] : []),
+    ...(OPTIONS.Crypto ? ['RULE-SET,cryptocurrency,Crypto'] : []),
+    ...(OPTIONS.EHentai ? ['RULE-SET,ehentai,EHentai'] : []),
     // 兜底规则
     'RULE-SET,geolocation-!cn,PROXY',
     'RULE-SET,cn_ip,DIRECT',
     'MATCH,PROXY',
   ];
+};
 
+// 入口：收集节点上下文后按区块依次覆写
+const main = (config) => {
+  config = config || {};
+  const ctx = collectNodeSources(config);
+  overwriteTun(config);
+  overwriteSniffer(config);
+  overwriteDns(config, ctx);
+  overwriteRuleProviders(config);
+  overwriteProxyGroups(config, ctx);
+  overwriteRules(config);
   return config;
-}
+};

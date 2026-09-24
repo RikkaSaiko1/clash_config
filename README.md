@@ -8,17 +8,21 @@
 
 ## 📱 推荐客户端
 
-| 客户端 | 特点 |
-| --- | --- |
-| [Bettbox](https://github.com/appshubcc/Bettbox) | 占用低、性能好，轻量省电 |
-| [Sparkle](https://github.com/xishang0128/sparkle) | UI 现代化，配置项覆盖得比较全；内置稳定版和预览版两个内核可随时切换；支持 WebDAV 备份恢复和任意覆写配置文件 |
+| 客户端 | Stars | 特点 |
+| --- | :---: | --- |
+| [Bettbox](https://github.com/appshubcc/Bettbox) | [![Stars](https://img.shields.io/github/stars/appshubcc/Bettbox?style=flat&label=%E2%98%85&color=yellow)](https://github.com/appshubcc/Bettbox/stargazers) | 占用低、性能好，轻量省电 |
+| [Sparkle](https://github.com/xishang0128/sparkle) | [![Stars](https://img.shields.io/github/stars/xishang0128/sparkle?style=flat&label=%E2%98%85&color=yellow)](https://github.com/xishang0128/sparkle/stargazers) | UI 现代化，配置项覆盖得比较全；内置稳定版和预览版两个内核可随时切换；支持 WebDAV 备份恢复和任意覆写配置文件 |
 
 以上客户端经测试可用,其他客户端未经测试可用性,理论mihomo内核通用
 
 ---
 
-
 ## 📥 下载地址
+
+> ⚠️ **下载前先读这几条**：
+> - 覆写脚本/配置**只针对机场订阅**，别拿它去覆写你自己手写的配置
+> - 脚本已处理机场私有 DNS 和节点域名 `hosts` 的解析问题，**请把代理软件的 DNS 覆写关掉**
+> - Windows 遇到 DNS 泄露，**关掉系统「智能多宿主名称解析」**，或在代理软件里开启 [严格路由](https://wiki.metacubex.one/config/inbound/tun/#strict-route)
 
 | 文件 | CDN（国内加速） | raw (官方推荐) |
 | --- | --- | --- |
