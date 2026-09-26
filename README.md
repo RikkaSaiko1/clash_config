@@ -22,22 +22,22 @@
 > ⚠️ **下载前先读这几条**：
 > - 覆写脚本/配置**只针对机场订阅**
 > - 代理软件的 DNS 覆写关掉
-> - 开启 [严格路由](https://wiki.metacubex.one/config/inbound/tun/#strict-route)
+> - 开启软件内严格路由或者 [严格路由](https://wiki.metacubex.one/config/inbound/tun/#strict-route)
 
 | 文件 | CDN（国内加速） | raw (官方推荐) |
 | --- | --- | --- |
-| `Full_control.yaml` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Full_control.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Full_control.yaml) |
-| `Full_control.js` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Full_control.js) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Full_control.js) |
-| `config_Override_Full.yaml` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config_Override_Full.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_Full.yaml) |
-| `config_Override_Full.js` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config_Override_Full.js) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_Full.js) |
-| `config_Override_lite.yaml` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config_Override_lite.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_lite.yaml) |
-| `config_Override_lite.js` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/config_Override_lite.js) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/config_Override_lite.js) |
-| `SubConverter_config_Full.ini` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/SubConverter_config_Full.ini) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/SubConverter_config_Full.ini) |
-| `SubConverter_config_lite.ini` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/SubConverter_config_lite.ini) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/SubConverter_config_lite.ini) |
+| `Full_control.yaml` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Yaml/Full_control.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Yaml/Full_control.yaml) |
+| `Full_control.js` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Script/Full_control.js) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Script/Full_control.js) |
+| `config_Override_Full.yaml` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Yaml/config_Override_Full.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Yaml/config_Override_Full.yaml) |
+| `config_Override_Full.js` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Script/config_Override_Full.js) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Script/config_Override_Full.js) |
+| `config_Override_lite.yaml` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Yaml/config_Override_lite.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Yaml/config_Override_lite.yaml) |
+| `config_Override_lite.js` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Script/config_Override_lite.js) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Script/config_Override_lite.js) |
+| `SubConverter_config_Full.ini` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Sub/SubConverter_config_Full.ini) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Sub/SubConverter_config_Full.ini) |
+| `SubConverter_config_lite.ini` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Sub/SubConverter_config_lite.ini) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Sub/SubConverter_config_lite.ini) |
 
 > **两条链接内容一样，任选一条**：CDN 国内直连快且稳，raw 是官方源、最新但需代理。
 
-**`config.yaml` 是唯一能直接加载的完整配置**，其余 8 个都是覆写 / 转换文件，不能单独加载。各文件的区别：
+**`config.yaml` 是唯一能直接加载的完整配置**，其余 8 个都是覆写 / 转换文件，不能单独加载。`config.yaml` 单独放在 [`mihomo_config_yaml/`](./mihomo_config_yaml)，其余文件按类型放在 [`Yaml/`](./Yaml)、[`Script/`](./Script)、[`Sub/`](./Sub) 三个目录下，各文件的区别：
 
 - `Full_control.*`：全规则，37 个策略组，最全
 - `config_Override_Full.*`：全规则精简版，33 个策略组
@@ -50,7 +50,7 @@
 
 ## 🚀 快速上手
 
-1. 下载 [`config.yaml`](./config.yaml)，把 `proxy-providers` 里的订阅地址改成你自己的：
+1. 下载 [`config.yaml`](./mihomo_config_yaml/config.yaml)，把 `proxy-providers` 里的订阅地址改成你自己的：
 
    ```yaml
    proxy-providers:

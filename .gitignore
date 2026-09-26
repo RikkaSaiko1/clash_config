@@ -1,4 +1,7 @@
-config.yaml
+# 本地私人配置（仓库里发布的配置在 Yaml/、Script/、Sub/、mihomo_config_yaml/，不要忽略）
+/config.yaml
+local_config.yaml
+*mihomo_local*
 
 # 本地测试脚本与临时产物
 _test/
