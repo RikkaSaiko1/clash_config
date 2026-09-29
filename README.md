@@ -68,6 +68,8 @@
 
 **➡️ [配置文件说明](./配置文件说明.md)**
 
+## Loon插件/规则
+
 loon的京东模块来自"https://github.com/luoxmc/loon/blob/main/surge/Plugins/JD.sgmoudle"
 
 
