@@ -90,6 +90,25 @@ const overwriteSniffer = (config) => {
   };
 };
 
+// 静态域名映射
+const overwriteHosts = (config) => {
+  config['hosts'] = {
+    // DNS 服务器域名固定解析为国内公共 DNS，避免解析自身失败
+    'doh.pub': ['1.12.12.12', '120.53.53.53'],
+    'cloudflare-dns.com': ['1.1.1.1', '1.0.0.1'],
+    'dns.google': ['8.8.8.8', '8.8.4.4'],
+
+    // 解决谷歌商店无法下载的问题
+    'services.googleapis.cn': 'services.googleapis.com',
+
+    // 屏蔽哔哩哔哩 PCDN，解决访问视频/直播卡顿问题
+    '+.mcdn.bilivideo.com': ['0.0.0.0'],
+    '+.mcdn.bilivideo.cn': ['0.0.0.0'],
+    '+.edge.mountaintoys.cn': ['0.0.0.0'],
+    '+.h2.smtcdns.net': ['0.0.0.0'],
+  };
+};
+
 // DNS
 const overwriteDns = (config, ctx) => {
   const { nodeDomains } = ctx;
@@ -195,17 +214,16 @@ const overwriteDns = (config, ctx) => {
       'rule-set:fakeipfilter_cn',
       'rule-set:fakeipfilter_!cn',
       'rule-set:private',
-      'rule-set:cn',
-      'rule-set:microsoft_cn',
-      'rule-set:apple_cn',
-      'rule-set:games_cn',
+
     ],
     'nameserver-policy': {
       ...proxyPolicy, // 动态：节点域名走代理 DNS
-      'rule-set:cn,private,fakeipfilter_cn,games_cn,microsoft_cn,apple_cn': [
+      'rule-set:cn,games_cn,microsoft_cn,apple_cn,private,fakeipfilter_cn': [
         'https://dns.alidns.com/dns-query#disable-qtype-65=true',
         'https://doh.pub/dns-query#disable-qtype-65=true',
       ],
+      'rule-set:douyin,bytedance,kuaishou,bilibili': ['system'],
+
       'rule-set:fakeipfilter_!cn': [
         'https://8.8.8.8/dns-query#PROXY&disable-qtype-65=true',
       ],
@@ -230,7 +248,7 @@ const overwriteRuleProviders = (config) => {
 
   const mrs_domain = (bundle, file = bundle) => ({
     ...RULE_DOMAIN,
-    'url': `https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/${bundle}.mrs`,
+    'url': `https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/${bundle}.mrs`,
     'path': `./ruleset/${file}.mrs`,
     'path-in-bundle': `geo/geosite/${bundle}.mrs`,
   });
@@ -238,7 +256,7 @@ const overwriteRuleProviders = (config) => {
   // geoip mrs
   const mrs_ipcidr = (bundle, file) => ({
     ...RULE_IPCIDR,
-    'url': `https://cdn.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/${bundle}.mrs`,
+    'url': `https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/${bundle}.mrs`,
     'path': `./ruleset/${file}.mrs`,
     'path-in-bundle': `geo/geoip/${bundle}.mrs`,
   });
@@ -255,6 +273,10 @@ const overwriteRuleProviders = (config) => {
     'geolocation-cn': mrs_domain('geolocation-cn'),
     'cn': mrs_domain('cn'),
     'cn_ip': mrs_ipcidr('cn', 'cn_ip'),
+    'douyin': mrs_domain('douyin'),
+    'bytedance': mrs_domain('bytedance'),
+    'kuaishou': mrs_domain('kuaishou'),
+    'bilibili': mrs_domain('bilibili'),
 
     // --- 应用规则集 ---
     'youtube': mrs_domain('youtube'),
@@ -265,7 +287,7 @@ const overwriteRuleProviders = (config) => {
     'geolocation-!cn': mrs_domain('geolocation-!cn'),
     'adblockmihomolite': {
       ...RULE_DOMAIN,
-      'url': 'https://cdn.jsdelivr.net/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.mrs',
+      'url': 'https://fastly.jsdelivr.net/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.mrs',
       'path': './ruleset/adblockmihomolite.mrs',
       'path-in-bundle': 'geo/geosite/category-ads-all.mrs',
     },
@@ -279,12 +301,12 @@ const overwriteRuleProviders = (config) => {
     // --- Fake IP 过滤 ---
     'fakeipfilter_cn': {
       ...RULE_FAKEIPFILTER,
-      'url': 'https://cdn.jsdelivr.net/gh/qichiyuhub/rule@main/rules/fakeipfilter-cn.list',
+      'url': 'https://fastly.jsdelivr.net/gh/qichiyuhub/rule@main/rules/fakeipfilter-cn.list',
       'path': './ruleset/fakeipfilter-cn.list',
     },
     'fakeipfilter_!cn': {
       ...RULE_FAKEIPFILTER,
-      'url': 'https://cdn.jsdelivr.net/gh/qichiyuhub/rule@main/rules/fakeipfilter-!cn.list',
+      'url': 'https://fastly.jsdelivr.net/gh/qichiyuhub/rule@main/rules/fakeipfilter-!cn.list',
       'path': './ruleset/fakeipfilter-!cn.list',
     },
   };
@@ -349,10 +371,10 @@ const overwriteProxyGroups = (config, ctx) => {
     .join('|')})`;
 
   const svg = (name) =>
-    `https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/${name}.svg`;
+    `https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/${name}.svg`;
 
   const group = (name) =>
-    `https://cdn.jsdelivr.net/gh/Orz-3/mini@master/Color/${name}.png`;
+    `https://fastly.jsdelivr.net/gh/Orz-3/mini@master/Color/${name}.png`;
 
   config['proxy-groups'] = [
     // 基础策略组（PROXY 在纯 provider 订阅时追加 use 兜底）
@@ -385,7 +407,6 @@ const overwriteRules = (config) => {
   config['rules'] = [
     // 私有网络直连
     'RULE-SET,private,DIRECT',
-    'RULE-SET,private_ip,DIRECT,no-resolve',
     // 国内直连
     'RULE-SET,geolocation-cn,DIRECT',
     'RULE-SET,games_cn,DIRECT', // 已包含 steam 下载域名
@@ -407,6 +428,7 @@ const overwriteRules = (config) => {
     ...(OPTIONS.AI ? ['RULE-SET,ai,AI'] : []),
     'RULE-SET,geolocation-!cn,PROXY',
     'RULE-SET,cn_ip,DIRECT',
+    'RULE-SET,private_ip,DIRECT,no-resolve',
     'MATCH,PROXY',
   ];
 };
@@ -417,6 +439,7 @@ const main = (config) => {
   const ctx = collectNodeSources(config);
   overwriteTun(config);
   overwriteSniffer(config);
+  overwriteHosts(config);
   overwriteDns(config, ctx);
   overwriteRuleProviders(config);
   overwriteProxyGroups(config, ctx);

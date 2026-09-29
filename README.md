@@ -26,14 +26,14 @@
 
 | 文件 | CDN（国内加速） | raw (官方推荐) |
 | --- | --- | --- |
-| `Full_control.yaml` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Yaml/Full_control.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Yaml/Full_control.yaml) |
-| `Full_control.js` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Script/Full_control.js) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Script/Full_control.js) |
-| `config_Override_Full.yaml` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Yaml/config_Override_Full.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Yaml/config_Override_Full.yaml) |
-| `config_Override_Full.js` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Script/config_Override_Full.js) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Script/config_Override_Full.js) |
-| `config_Override_lite.yaml` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Yaml/config_Override_lite.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Yaml/config_Override_lite.yaml) |
-| `config_Override_lite.js` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Script/config_Override_lite.js) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Script/config_Override_lite.js) |
-| `SubConverter_config_Full.ini` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Sub/SubConverter_config_Full.ini) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Sub/SubConverter_config_Full.ini) |
-| `SubConverter_config_lite.ini` | [`jsdelivr`](https://cdn.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Sub/SubConverter_config_lite.ini) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Sub/SubConverter_config_lite.ini) |
+| `Full_control.yaml` | [`jsdelivr`](https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Yaml/Full_control.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Yaml/Full_control.yaml) |
+| `Full_control.js` | [`jsdelivr`](https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Script/Full_control.js) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Script/Full_control.js) |
+| `config_Override_Full.yaml` | [`jsdelivr`](https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Yaml/config_Override_Full.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Yaml/config_Override_Full.yaml) |
+| `config_Override_Full.js` | [`jsdelivr`](https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Script/config_Override_Full.js) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Script/config_Override_Full.js) |
+| `config_Override_lite.yaml` | [`jsdelivr`](https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Yaml/config_Override_lite.yaml) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Yaml/config_Override_lite.yaml) |
+| `config_Override_lite.js` | [`jsdelivr`](https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Script/config_Override_lite.js) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Script/config_Override_lite.js) |
+| `SubConverter_config_Full.ini` | [`jsdelivr`](https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Sub/SubConverter_config_Full.ini) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Sub/SubConverter_config_Full.ini) |
+| `SubConverter_config_lite.ini` | [`jsdelivr`](https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/Sub/SubConverter_config_lite.ini) | [`raw`](https://raw.githubusercontent.com/RikkaSaiko1/clash_config/main/Sub/SubConverter_config_lite.ini) |
 
 > **两条链接内容一样，任选一条**：CDN 国内直连快且稳，raw 是官方源、最新但需代理。
 
