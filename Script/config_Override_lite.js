@@ -355,10 +355,10 @@ const overwriteProxyGroups = (config, ctx) => {
     'include-all': true,
     'exclude-type': 'DIRECT',
   };
-  const PROXIES_DEFAULT = ['PROXY', 'AUTO', 'HK Group', 'SG Group', 'JP Group', 'US Group', 'TW Group', 'KR Group', 'Other Group'];
+  const PROXIES_DEFAULT = ['PROXY', 'AUTO', 'HK', 'SG', 'JP', 'US', 'TW', 'KR', 'Other'];
   const PROXIES_DIRECT = [...PROXIES_DEFAULT, 'DIRECT'];
-  const PROXIES_AI = ['PROXY', 'SG Group', 'JP Group', 'US Group', 'KR Group'];
-  const PROXIES_PROXY = ['AUTO', 'HK Group', 'JP Group', 'US Group', 'SG Group', 'TW Group', 'KR Group', 'Other Group'];
+  const PROXIES_AI = ['PROXY', 'SG', 'JP', 'US', 'KR'];
+  const PROXIES_PROXY = ['AUTO', 'HK', 'JP', 'US', 'SG', 'TW', 'KR', 'Other'];
 
   const FILTER_HK = '(?i)(🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|hong\\s*kong)';
   const FILTER_JP = '(?i)(🇯🇵|日本|东京|大阪|京都|(?<![A-Za-z])JPN?(?![A-Za-z])|japan)';
@@ -382,23 +382,23 @@ const overwriteProxyGroups = (config, ctx) => {
     { 'name': 'AUTO', ...RULE_GROUP_TEST, 'hidden': false, 'icon': group('Urltest') },
     // 应用策略组
     ...(OPTIONS.YouTube ? [{ 'name': 'YouTube', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('youtube') }] : []),
-    ...(OPTIONS.AI ? [{ 'name': 'AI', ...RULE_GROUP, 'proxies': PROXIES_AI, 'default-selected': 'US Group', 'icon': svg('deepseek') }] : []),
+    ...(OPTIONS.AI ? [{ 'name': 'AI', ...RULE_GROUP, 'proxies': PROXIES_AI, 'default-selected': 'US', 'icon': svg('deepseek') }] : []),
     // 地区策略组（按关键字匹配节点，空组自动隐藏）
-    { 'name': 'HK Group', ...RULE_GROUP, 'filter': FILTER_HK, 'include-all': true, 'proxies': ['HK Auto Group'], 'hidden': !regionHasNodes(FILTER_HK), ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': group('HK') },
-    { 'name': 'HK Auto Group', ...RULE_GROUP_TEST, 'filter': FILTER_HK, 'hidden': true },
-    { 'name': 'JP Group', ...RULE_GROUP, 'filter': FILTER_JP, 'include-all': true, 'proxies': ['JP Auto Group'], 'hidden': !regionHasNodes(FILTER_JP), ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': group('JP') },
-    { 'name': 'JP Auto Group', ...RULE_GROUP_TEST, 'filter': FILTER_JP, 'hidden': true },
-    { 'name': 'US Group', ...RULE_GROUP, 'filter': FILTER_US, 'include-all': true, 'proxies': ['US Auto Group'], 'hidden': !regionHasNodes(FILTER_US), ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': group('US') },
-    { 'name': 'US Auto Group', ...RULE_GROUP_TEST, 'filter': FILTER_US, 'hidden': true },
-    { 'name': 'SG Group', ...RULE_GROUP, 'filter': FILTER_SG, 'include-all': true, 'proxies': ['SG Auto Group'], 'hidden': !regionHasNodes(FILTER_SG), ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': group('SG') },
-    { 'name': 'SG Auto Group', ...RULE_GROUP_TEST, 'filter': FILTER_SG, 'hidden': true },
-    { 'name': 'TW Group', ...RULE_GROUP, 'filter': FILTER_TW, 'include-all': true, 'proxies': ['TW Auto Group'], 'hidden': !regionHasNodes(FILTER_TW), ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': group('TW') },
-    { 'name': 'TW Auto Group', ...RULE_GROUP_TEST, 'filter': FILTER_TW, 'hidden': true },
-    { 'name': 'KR Group', ...RULE_GROUP, 'filter': FILTER_KR, 'include-all': true, 'proxies': ['KR Auto Group'], 'hidden': !regionHasNodes(FILTER_KR), ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': group('KR') },
-    { 'name': 'KR Auto Group', ...RULE_GROUP_TEST, 'filter': FILTER_KR, 'hidden': true },
+    { 'name': 'HK', ...RULE_GROUP, 'filter': FILTER_HK, 'include-all': true, 'proxies': ['HK Auto'], 'hidden': !regionHasNodes(FILTER_HK), ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': group('HK') },
+    { 'name': 'HK Auto', ...RULE_GROUP_TEST, 'filter': FILTER_HK, 'hidden': true },
+    { 'name': 'JP', ...RULE_GROUP, 'filter': FILTER_JP, 'include-all': true, 'proxies': ['JP Auto'], 'hidden': !regionHasNodes(FILTER_JP), ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': group('JP') },
+    { 'name': 'JP Auto', ...RULE_GROUP_TEST, 'filter': FILTER_JP, 'hidden': true },
+    { 'name': 'US', ...RULE_GROUP, 'filter': FILTER_US, 'include-all': true, 'proxies': ['US Auto'], 'hidden': !regionHasNodes(FILTER_US), ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': group('US') },
+    { 'name': 'US Auto', ...RULE_GROUP_TEST, 'filter': FILTER_US, 'hidden': true },
+    { 'name': 'SG', ...RULE_GROUP, 'filter': FILTER_SG, 'include-all': true, 'proxies': ['SG Auto'], 'hidden': !regionHasNodes(FILTER_SG), ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': group('SG') },
+    { 'name': 'SG Auto', ...RULE_GROUP_TEST, 'filter': FILTER_SG, 'hidden': true },
+    { 'name': 'TW', ...RULE_GROUP, 'filter': FILTER_TW, 'include-all': true, 'proxies': ['TW Auto'], 'hidden': !regionHasNodes(FILTER_TW), ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': group('TW') },
+    { 'name': 'TW Auto', ...RULE_GROUP_TEST, 'filter': FILTER_TW, 'hidden': true },
+    { 'name': 'KR', ...RULE_GROUP, 'filter': FILTER_KR, 'include-all': true, 'proxies': ['KR Auto'], 'hidden': !regionHasNodes(FILTER_KR), ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': group('KR') },
+    { 'name': 'KR Auto', ...RULE_GROUP_TEST, 'filter': FILTER_KR, 'hidden': true },
     // 其他地区
-    { 'name': 'Other Group', ...RULE_GROUP, 'exclude-filter': EXCLUDE_FILTER, 'exclude-type': 'DIRECT', 'include-all': true, 'proxies': ['Other Auto Group'], ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': group('Global') },
-    { 'name': 'Other Auto Group', ...RULE_GROUP_TEST, 'exclude-filter': EXCLUDE_FILTER, 'hidden': true },
+    { 'name': 'Other', ...RULE_GROUP, 'exclude-filter': EXCLUDE_FILTER, 'exclude-type': 'DIRECT', 'include-all': true, 'proxies': ['Other Auto'], ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': group('Global') },
+    { 'name': 'Other Auto', ...RULE_GROUP_TEST, 'exclude-filter': EXCLUDE_FILTER, 'hidden': true },
   ];
 };
 

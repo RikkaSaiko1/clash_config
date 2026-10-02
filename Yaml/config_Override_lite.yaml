@@ -108,16 +108,16 @@ group_common:
 # 通用代理节点组
 proxies_common:  # 通用代理节点组
   proxies_default:
-    &proxies_default {proxies: ['PROXY','AUTO','HK Group','SG Group','JP Group','US Group','TW Group','KR Group','Other Group']}
+    &proxies_default {proxies: ['PROXY','AUTO','HK','SG','JP','US','TW','KR','Other']}
 
   proxies_direct:
-    &proxies_direct {proxies: ['PROXY','AUTO','HK Group','SG Group','JP Group','US Group','TW Group','KR Group','Other Group','DIRECT']}
+    &proxies_direct {proxies: ['PROXY','AUTO','HK','SG','JP','US','TW','KR','Other','DIRECT']}
 
   proxies_AI:
-    &proxies_AI {proxies: ['PROXY','SG Group','JP Group','US Group','KR Group',]}
+    &proxies_AI {proxies: ['PROXY','SG','JP','US','KR',]}
   
   proxies_proxy:
-    &proxies_proxy {proxies: ['AUTO','HK Group','JP Group','US Group','SG Group','TW Group','KR Group','Other Group']}
+    &proxies_proxy {proxies: ['AUTO','HK','JP','US','SG','TW','KR','Other']}
 
 
 # 地区过滤器正则表达式定义
@@ -163,78 +163,78 @@ proxy-groups:  # 定义分流策略组
 
   - name: 'AI'
     <<: [*group_common_select, *proxies_AI]
-    default-selected: 'US Group'
+    default-selected: 'US'
     icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/deepseek.svg'
 
   ### 地区策略组
-  - name: 'HK Group'
+  - name: 'HK'
     <<: [*group_common_select, *HK_filter]
     include-all: true
-    proxies: ['HK Auto Group']
+    proxies: ['HK Auto']
     icon: 'https://fastly.jsdelivr.net/gh/Orz-3/mini@master/Color/HK.png'
 
-  - name: 'HK Auto Group'
+  - name: 'HK Auto'
     <<: [*group_common_auto, *HK_filter]
     hidden: true
 
-  - name: 'JP Group'
+  - name: 'JP'
     <<: [*group_common_select, *JP_filter]
     include-all: true
-    proxies: ['JP Auto Group']
+    proxies: ['JP Auto']
     icon: 'https://fastly.jsdelivr.net/gh/Orz-3/mini@master/Color/JP.png'
 
-  - name: 'JP Auto Group'
+  - name: 'JP Auto'
     <<: [*group_common_auto, *JP_filter]
     hidden: true
 
-  - name: 'US Group'
+  - name: 'US'
     <<: [*group_common_select, *US_filter]
     include-all: true
-    proxies: ['US Auto Group']
+    proxies: ['US Auto']
     icon: 'https://fastly.jsdelivr.net/gh/Orz-3/mini@master/Color/US.png'
 
-  - name: 'US Auto Group'
+  - name: 'US Auto'
     <<: [*group_common_auto, *US_filter]
     hidden: true
 
-  - name: 'SG Group'
+  - name: 'SG'
     <<: [*group_common_select, *SG_filter]
     include-all: true
-    proxies: ['SG Auto Group']
+    proxies: ['SG Auto']
     icon: 'https://fastly.jsdelivr.net/gh/Orz-3/mini@master/Color/SG.png'
 
-  - name: 'SG Auto Group'
+  - name: 'SG Auto'
     <<: [*group_common_auto, *SG_filter]
     hidden: true
 
-  - name: 'TW Group'
+  - name: 'TW'
     <<: [*group_common_select, *TW_filter]
     include-all: true
-    proxies: ['TW Auto Group']
+    proxies: ['TW Auto']
     icon: 'https://fastly.jsdelivr.net/gh/Orz-3/mini@master/Color/TW.png'
 
-  - name: 'TW Auto Group'
+  - name: 'TW Auto'
     <<: [*group_common_auto, *TW_filter]
     hidden: true
 
-  - name: 'KR Group'
+  - name: 'KR'
     <<: [*group_common_select, *KR_filter]
     include-all: true
-    proxies: ['KR Auto Group']
+    proxies: ['KR Auto']
     icon: 'https://fastly.jsdelivr.net/gh/Orz-3/mini@master/Color/KR.png'
 
-  - name: 'KR Auto Group'
+  - name: 'KR Auto'
     <<: [*group_common_auto, *KR_filter]
     hidden: true
 
   ## 其他地区
-  - name: 'Other Group'
+  - name: 'Other'
     <<: [*group_common_select, *exclude_filter]
     include-all: true
-    proxies: ['Other Auto Group']
+    proxies: ['Other Auto']
     icon: 'https://fastly.jsdelivr.net/gh/Orz-3/mini@master/Color/Global.png'
 
-  - name: 'Other Auto Group'
+  - name: 'Other Auto'
     <<: [*group_common_auto, *exclude_filter]
     hidden: true
 
