@@ -3,16 +3,36 @@
 // 仓库 https://github.com/RikkaSaiko1/clash_config
 // ============================================================================
 
-// 配置开关：true 启用 / false 禁用（关闭后对应分组与规则不写入产物）
-const OPTIONS = {
-  // 分流组
-  YouTube: true,   // YouTube
-  AI: true,        // 国外 AI
-  // 功能开关
-  AdBlock: true,   // 广告拦截
-  BlockQUIC: true, // 屏蔽国外 QUIC
-  BlockSTUN: true, // 拦截 STUN/TURN
+// ============================================================================
+// Bettbox 适配（Bettbox v1.18.8+）
+//   ruleOptionsEnable  : 开关对象，Bettbox 读它生成可视化开关
+//   policyGroupOptions : 声明哪些开关属于「策略组」，其余归入「其他设置」
+//   serviceConfigs     : 开关在 UI 上显示的图标
+// ============================================================================
+const Compatible_With_Bettbox = { ruleOptionsEnable: true };
+
+/**
+ * 自定义配置选项
+ * true = 启用 / false = 禁用（关闭后对应分组与规则不写入产物）
+ */
+const ruleOptionsEnable = {
+  // 分流策略组开关
+  YouTube: true,        // YouTube
+  AI: true,             // 国外 AI
+  // 其他功能开关
+  AdBlock: true,        // 广告拦截
+  BlockQUIC: true,      // 屏蔽国外 QUIC
+  BlockSTUN: true,      // 拦截 STUN/TURN
 };
+
+// 声明属于策略组的开关，需与 ruleOptionsEnable 的键完全一致
+Compatible_With_Bettbox.policyGroupOptions = ['YouTube', 'AI'];
+
+// 开关在 Bettbox 开关列表里显示的图标
+const serviceConfigs = [
+  { name: 'YouTube', icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/youtube.svg' },
+  { name: 'AI', icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/deepseek.svg' },
+];
 
 // 去重并过滤空值；传 getter 时按字段去重
 const dedupe = (arr, getter) => {
@@ -381,8 +401,8 @@ const overwriteProxyGroups = (config, ctx) => {
     { 'name': 'PROXY', ...RULE_GROUP, 'proxies': PROXIES_PROXY, ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': group('Static') },
     { 'name': 'AUTO', ...RULE_GROUP_TEST, 'hidden': false, 'icon': group('Urltest') },
     // 应用策略组
-    ...(OPTIONS.YouTube ? [{ 'name': 'YouTube', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('youtube') }] : []),
-    ...(OPTIONS.AI ? [{ 'name': 'AI', ...RULE_GROUP, 'proxies': PROXIES_AI, 'default-selected': 'US', 'icon': svg('deepseek') }] : []),
+    ...(ruleOptionsEnable.YouTube ? [{ 'name': 'YouTube', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('youtube') }] : []),
+    ...(ruleOptionsEnable.AI ? [{ 'name': 'AI', ...RULE_GROUP, 'proxies': PROXIES_AI, 'default-selected': 'US', 'icon': svg('deepseek') }] : []),
     // 地区策略组（按关键字匹配节点，空组自动隐藏）
     { 'name': 'HK', ...RULE_GROUP, 'filter': FILTER_HK, 'include-all': true, 'proxies': ['HK Auto'], 'hidden': !regionHasNodes(FILTER_HK), ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': group('HK') },
     { 'name': 'HK Auto', ...RULE_GROUP_TEST, 'filter': FILTER_HK, 'hidden': true },
@@ -417,15 +437,15 @@ const overwriteRules = (config) => {
     'DOMAIN,fsend.cn,DIRECT',
     'DOMAIN,international-gfe.download.nvidia.com,DIRECT',
     // 拦截 STUN/TURN 探测
-    ...(OPTIONS.BlockSTUN ? ['AND,((NETWORK,UDP),(OR,((DST-PORT,3478-3481),(DST-PORT,5349),(DST-PORT,19302-19309)))),REJECT'] : []),
+    ...(ruleOptionsEnable.BlockSTUN ? ['AND,((NETWORK,UDP),(OR,((DST-PORT,3478-3481),(DST-PORT,5349),(DST-PORT,19302-19309)))),REJECT'] : []),
     // 屏蔽国外 QUIC
-    ...(OPTIONS.BlockQUIC ? ['AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn_additional),(RULE-SET,cn_ip,no-resolve)))))),REJECT'] : []),
+    ...(ruleOptionsEnable.BlockQUIC ? ['AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn_additional),(RULE-SET,cn_ip,no-resolve)))))),REJECT'] : []),
     // 广告拦截
-    ...(OPTIONS.AdBlock ? ['RULE-SET,adblockmihomolite,REJECT'] : []),
+    ...(ruleOptionsEnable.AdBlock ? ['RULE-SET,adblockmihomolite,REJECT'] : []),
     // 代理规则
-    ...(OPTIONS.YouTube ? ['RULE-SET,youtube,YouTube'] : []),
+    ...(ruleOptionsEnable.YouTube ? ['RULE-SET,youtube,YouTube'] : []),
     'RULE-SET,googlefcm,DIRECT',
-    ...(OPTIONS.AI ? ['RULE-SET,ai,AI'] : []),
+    ...(ruleOptionsEnable.AI ? ['RULE-SET,ai,AI'] : []),
     'RULE-SET,geolocation-!cn,PROXY',
     'RULE-SET,cn_ip,DIRECT',
     'RULE-SET,private_ip,DIRECT,no-resolve',

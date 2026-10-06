@@ -3,35 +3,74 @@
 // 仓库 https://github.com/RikkaSaiko1/clash_config
 // ============================================================================
 
-// 配置开关：true 启用 / false 禁用（关闭后对应分组与规则不写入产物）
-const OPTIONS = {
-  // 分流组
-  FCM: true,        // Google FCM
-  YouTube: true,    // YouTube
-  Google: true,     // Google
-  AI: true,         // 国外 AI
-  Microsoft: true,  // Microsoft
-  Apple: true,      // Apple
-  Telegram: true,   // Telegram
-  Steam: true,      // Steam
-  TikTok: true,     // TikTok
-  Twitter: true,    // Twitter
-  Instagram: true,  // Instagram
-  Netflix: true,    // Netflix
-  Emby: true,       // Emby
-  PikPak: true,     // PikPak
-  Spotify: true,    // Spotify
-  Crypto: true,     // 加密货币
-  EHentai: true,    // E-Hentai
-  Twitch: true,     // Twitch
-  Pixiv: true,      // Pixiv
-  Line: true,       // Line
-  Discord: true,    // Discord
-  GitHub: true,     // GitHub
-  AdBlock: true,    // 广告拦截
-  // 功能开关
-  BlockQUIC: true,  // 屏蔽国外 QUIC
+// ============================================================================
+// Bettbox 适配（Bettbox v1.18.8+）
+//   ruleOptionsEnable  : 开关对象，Bettbox 读它生成可视化开关
+//   policyGroupOptions : 声明哪些开关属于「策略组」，其余归入「其他设置」
+//   serviceConfigs     : 开关在 UI 上显示的图标
+// ============================================================================
+const Compatible_With_Bettbox = { ruleOptionsEnable: true };
+
+/**
+ * 自定义配置选项
+ * true = 启用 / false = 禁用（关闭后对应分组与规则不写入产物）
+ */
+const ruleOptionsEnable = {
+  // 分流策略组开关
+  YouTube: true,        // YouTube
+  Google: true,         // Google
+  AI: true,             // 国外 AI
+  Microsoft: true,      // Microsoft
+  Apple: true,          // Apple
+  Telegram: true,       // Telegram
+  Steam: true,          // Steam
+  TikTok: true,         // TikTok
+  Twitter: true,        // Twitter
+  Instagram: true,      // Instagram
+  Netflix: true,        // Netflix
+  Emby: true,           // Emby
+  PikPak: true,         // PikPak
+  Spotify: true,        // Spotify
+  Crypto: true,         // 加密货币
+  EHentai: true,        // E-Hentai
+  Twitch: true,         // Twitch
+  Pixiv: true,          // Pixiv
+  Line: true,           // Line
+  Discord: true,        // Discord
+  AdBlock: true,        // 广告拦截
+  // 其他功能开关
+  FCM: true,            // Google FCM
+  GitHub: true,         // GitHub
+  BlockQUIC: true,      // 屏蔽国外 QUIC
 };
+
+// 声明属于策略组的开关，需与 ruleOptionsEnable 的键完全一致
+Compatible_With_Bettbox.policyGroupOptions = ['YouTube', 'Google', 'AI', 'Microsoft', 'Apple', 'Telegram', 'Steam', 'TikTok', 'Twitter', 'Instagram', 'Netflix', 'Emby', 'PikPak', 'Spotify', 'Crypto', 'EHentai', 'Twitch', 'Pixiv', 'Line', 'Discord', 'AdBlock'];
+
+// 开关在 Bettbox 开关列表里显示的图标
+const serviceConfigs = [
+  { name: 'YouTube', icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/youtube.svg' },
+  { name: 'Google', icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/google.svg' },
+  { name: 'AI', icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/deepseek.svg' },
+  { name: 'Microsoft', icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/microsoft.svg' },
+  { name: 'Apple', icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/apple.svg' },
+  { name: 'Telegram', icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/telegram.svg' },
+  { name: 'Steam', icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/steam.svg' },
+  { name: 'TikTok', icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/tiktok.svg' },
+  { name: 'Twitter', icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/twitter.svg' },
+  { name: 'Instagram', icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/instagram.svg' },
+  { name: 'Netflix', icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/netflix.svg' },
+  { name: 'Emby', icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/emby.svg' },
+  { name: 'PikPak', icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/pikpak.svg' },
+  { name: 'Spotify', icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/spotify.svg' },
+  { name: 'Crypto', icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/Crypto.svg' },
+  { name: 'EHentai', icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/EHentai.svg' },
+  { name: 'Twitch', icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/twitch.svg' },
+  { name: 'Pixiv', icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/pixiv.svg' },
+  { name: 'Line', icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/line.svg' },
+  { name: 'Discord', icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/discord.svg' },
+  { name: 'AdBlock', icon: 'https://fastly.jsdelivr.net/gh/Orz-3/mini@master/Color/Adblock.png' },
+];
 
 // 去重并过滤空值；传 getter 时按字段去重
 const dedupe = (arr, getter) => {
@@ -411,27 +450,27 @@ const overwriteProxyGroups = (config, ctx) => {
     { 'name': 'PROXY', ...RULE_GROUP, 'proxies': PROXIES_PROXY, ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': png('Static') },
     { 'name': 'AUTO', ...RULE_GROUP_TEST, 'hidden': false, 'icon': png('Urltest') },
     // 应用策略组
-    ...(OPTIONS.YouTube ? [{ 'name': 'YouTube', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('youtube') }] : []),
-    ...(OPTIONS.Google ? [{ 'name': 'Google', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('google') }] : []),
-    ...(OPTIONS.AI ? [{ 'name': 'AI', ...RULE_GROUP, 'proxies': PROXIES_AI, 'default-selected': 'US', 'icon': svg('deepseek') }] : []),
-    ...(OPTIONS.Microsoft ? [{ 'name': 'Microsoft', ...RULE_GROUP, 'proxies': PROXIES_DIRECT, 'icon': svg('microsoft') }] : []),
-    ...(OPTIONS.Apple ? [{ 'name': 'Apple', ...RULE_GROUP, 'proxies': PROXIES_DIRECT, 'icon': svg('apple') }] : []),
-    ...(OPTIONS.Telegram ? [{ 'name': 'Telegram', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('telegram') }] : []),
-    ...(OPTIONS.Steam ? [{ 'name': 'Steam', ...RULE_GROUP, 'proxies': PROXIES_DIRECT, 'icon': svg('steam') }] : []),
-    ...(OPTIONS.TikTok ? [{ 'name': 'TikTok', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'default-selected': 'JP', 'icon': svg('tiktok') }] : []),
-    ...(OPTIONS.Twitter ? [{ 'name': 'Twitter', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('twitter') }] : []),
-    ...(OPTIONS.Instagram ? [{ 'name': 'Instagram', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('instagram') }] : []),
-    ...(OPTIONS.Netflix ? [{ 'name': 'Netflix', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('netflix') }] : []),
-    ...(OPTIONS.Emby ? [{ 'name': 'Emby', ...RULE_GROUP, 'proxies': PROXIES_DIRECT, 'icon': svg('emby') }] : []),
-    ...(OPTIONS.PikPak ? [{ 'name': 'PikPak', ...RULE_GROUP, 'proxies': PROXIES_DIRECT, 'icon': svg('pikpak') }] : []),
-    ...(OPTIONS.Spotify ? [{ 'name': 'Spotify', ...RULE_GROUP, 'proxies': PROXIES_DIRECT, 'icon': svg('spotify') }] : []),
-    ...(OPTIONS.Crypto ? [{ 'name': 'Crypto', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'default-selected': 'JP', 'icon': svg('Crypto') }] : []),
-    ...(OPTIONS.EHentai ? [{ 'name': 'EHentai', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'default-selected': 'US', 'icon': svg('EHentai') }] : []),
-    ...(OPTIONS.Twitch ? [{ 'name': 'Twitch', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('twitch') }] : []),
-    ...(OPTIONS.Pixiv ? [{ 'name': 'Pixiv', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'default-selected': 'JP', 'icon': svg('pixiv') }] : []),
-    ...(OPTIONS.Line ? [{ 'name': 'Line', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('line') }] : []),
-    ...(OPTIONS.Discord ? [{ 'name': 'Discord', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('discord') }] : []),
-    ...(OPTIONS.AdBlock ? [{ 'name': 'AdBlock', ...RULE_GROUP, 'proxies': PROXIES_REJECT, 'icon': png('Adblock') }] : []),
+    ...(ruleOptionsEnable.YouTube ? [{ 'name': 'YouTube', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('youtube') }] : []),
+    ...(ruleOptionsEnable.Google ? [{ 'name': 'Google', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('google') }] : []),
+    ...(ruleOptionsEnable.AI ? [{ 'name': 'AI', ...RULE_GROUP, 'proxies': PROXIES_AI, 'default-selected': 'US', 'icon': svg('deepseek') }] : []),
+    ...(ruleOptionsEnable.Microsoft ? [{ 'name': 'Microsoft', ...RULE_GROUP, 'proxies': PROXIES_DIRECT, 'icon': svg('microsoft') }] : []),
+    ...(ruleOptionsEnable.Apple ? [{ 'name': 'Apple', ...RULE_GROUP, 'proxies': PROXIES_DIRECT, 'icon': svg('apple') }] : []),
+    ...(ruleOptionsEnable.Telegram ? [{ 'name': 'Telegram', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('telegram') }] : []),
+    ...(ruleOptionsEnable.Steam ? [{ 'name': 'Steam', ...RULE_GROUP, 'proxies': PROXIES_DIRECT, 'icon': svg('steam') }] : []),
+    ...(ruleOptionsEnable.TikTok ? [{ 'name': 'TikTok', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'default-selected': 'JP', 'icon': svg('tiktok') }] : []),
+    ...(ruleOptionsEnable.Twitter ? [{ 'name': 'Twitter', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('twitter') }] : []),
+    ...(ruleOptionsEnable.Instagram ? [{ 'name': 'Instagram', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('instagram') }] : []),
+    ...(ruleOptionsEnable.Netflix ? [{ 'name': 'Netflix', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('netflix') }] : []),
+    ...(ruleOptionsEnable.Emby ? [{ 'name': 'Emby', ...RULE_GROUP, 'proxies': PROXIES_DIRECT, 'icon': svg('emby') }] : []),
+    ...(ruleOptionsEnable.PikPak ? [{ 'name': 'PikPak', ...RULE_GROUP, 'proxies': PROXIES_DIRECT, 'icon': svg('pikpak') }] : []),
+    ...(ruleOptionsEnable.Spotify ? [{ 'name': 'Spotify', ...RULE_GROUP, 'proxies': PROXIES_DIRECT, 'icon': svg('spotify') }] : []),
+    ...(ruleOptionsEnable.Crypto ? [{ 'name': 'Crypto', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'default-selected': 'JP', 'icon': svg('Crypto') }] : []),
+    ...(ruleOptionsEnable.EHentai ? [{ 'name': 'EHentai', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'default-selected': 'US', 'icon': svg('EHentai') }] : []),
+    ...(ruleOptionsEnable.Twitch ? [{ 'name': 'Twitch', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('twitch') }] : []),
+    ...(ruleOptionsEnable.Pixiv ? [{ 'name': 'Pixiv', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'default-selected': 'JP', 'icon': svg('pixiv') }] : []),
+    ...(ruleOptionsEnable.Line ? [{ 'name': 'Line', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('line') }] : []),
+    ...(ruleOptionsEnable.Discord ? [{ 'name': 'Discord', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('discord') }] : []),
+    ...(ruleOptionsEnable.AdBlock ? [{ 'name': 'AdBlock', ...RULE_GROUP, 'proxies': PROXIES_REJECT, 'icon': png('Adblock') }] : []),
     // 地区策略组（按关键字匹配节点，空组自动隐藏）
     { 'name': 'HK', ...RULE_GROUP, 'filter': FILTER_HK, 'include-all': true, 'proxies': ['HK Auto'], 'hidden': !regionHasNodes(FILTER_HK), ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': png('HK') },
     { 'name': 'HK Auto', ...RULE_GROUP_TEST, 'filter': FILTER_HK, 'hidden': true },
@@ -467,14 +506,14 @@ const overwriteRules = (config) => {
     'DOMAIN,international-gfe.download.nvidia.com,DIRECT',
 
     // 屏蔽国外 QUIC
-    ...(OPTIONS.BlockQUIC ? ['AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn_additional),(RULE-SET,cn_ip,no-resolve)))))),REJECT'] : []),
+    ...(ruleOptionsEnable.BlockQUIC ? ['AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn_additional),(RULE-SET,cn_ip,no-resolve)))))),REJECT'] : []),
 
     // 广告拦截 + 拦截 STUN/TURN 探测
-    ...(OPTIONS.AdBlock ? ['RULE-SET,adblockmihomolite,AdBlock'] : []),
+    ...(ruleOptionsEnable.AdBlock ? ['RULE-SET,adblockmihomolite,AdBlock'] : []),
     'AND,((NETWORK,UDP),(OR,((DST-PORT,3478-3481),(DST-PORT,5349),(DST-PORT,19302-19309)))),REJECT',
 
     // emby
-    ...(OPTIONS.Emby ? [
+    ...(ruleOptionsEnable.Emby ? [
       'RULE-SET,emby,Emby',
       'RULE-SET,emos,Emby',
       'DOMAIN-SUFFIX,mb3admin.com,Emby',
@@ -490,27 +529,27 @@ const overwriteRules = (config) => {
     ] : []),
 
     // 代理规则
-    ...(OPTIONS.AI ? ['RULE-SET,ai,AI'] : []),
-    ...(OPTIONS.YouTube ? ['RULE-SET,youtube,YouTube'] : []),
-    ...(OPTIONS.FCM ? ['RULE-SET,googlefcm,DIRECT'] : []),
-    ...(OPTIONS.Google ? ['RULE-SET,google,Google', 'RULE-SET,google_ip,Google,no-resolve'] : []),
-    ...(OPTIONS.GitHub ? ['RULE-SET,github,PROXY'] : []),
-    ...(OPTIONS.Microsoft ? ['RULE-SET,microsoft,Microsoft'] : []),
-    ...(OPTIONS.Apple ? ['RULE-SET,apple,Apple'] : []),
-    ...(OPTIONS.Telegram ? ['RULE-SET,telegram,Telegram', 'RULE-SET,telegram_ip,Telegram,no-resolve'] : []),
-    ...(OPTIONS.Steam ? ['RULE-SET,steam,Steam', 'RULE-SET,steam_ip,Steam,no-resolve'] : []),
-    ...(OPTIONS.TikTok ? ['RULE-SET,tiktok,TikTok', 'RULE-SET,tiktok_ip,TikTok,no-resolve'] : []),
-    ...(OPTIONS.Twitter ? ['RULE-SET,twitter,Twitter', 'RULE-SET,twitter_ip,Twitter,no-resolve'] : []),
-    ...(OPTIONS.Instagram ? ['RULE-SET,instagram,Instagram'] : []),
-    ...(OPTIONS.Netflix ? ['RULE-SET,netflix,Netflix', 'RULE-SET,netflix_ip,Netflix,no-resolve'] : []),
-    ...(OPTIONS.PikPak ? ['RULE-SET,pikpak,PikPak'] : []),
-    ...(OPTIONS.Spotify ? ['RULE-SET,spotify,Spotify', 'RULE-SET,spotify_ip,Spotify,no-resolve'] : []),
-    ...(OPTIONS.Crypto ? ['RULE-SET,cryptocurrency,Crypto'] : []),
-    ...(OPTIONS.EHentai ? ['RULE-SET,ehentai,EHentai'] : []),
-    ...(OPTIONS.Twitch ? ['RULE-SET,twitch,Twitch'] : []),
-    ...(OPTIONS.Pixiv ? ['RULE-SET,pixiv,Pixiv'] : []),
-    ...(OPTIONS.Line ? ['RULE-SET,line,Line'] : []),
-    ...(OPTIONS.Discord ? ['RULE-SET,discord,Discord'] : []),
+    ...(ruleOptionsEnable.AI ? ['RULE-SET,ai,AI'] : []),
+    ...(ruleOptionsEnable.YouTube ? ['RULE-SET,youtube,YouTube'] : []),
+    ...(ruleOptionsEnable.FCM ? ['RULE-SET,googlefcm,DIRECT'] : []),
+    ...(ruleOptionsEnable.Google ? ['RULE-SET,google,Google', 'RULE-SET,google_ip,Google,no-resolve'] : []),
+    ...(ruleOptionsEnable.GitHub ? ['RULE-SET,github,PROXY'] : []),
+    ...(ruleOptionsEnable.Microsoft ? ['RULE-SET,microsoft,Microsoft'] : []),
+    ...(ruleOptionsEnable.Apple ? ['RULE-SET,apple,Apple'] : []),
+    ...(ruleOptionsEnable.Telegram ? ['RULE-SET,telegram,Telegram', 'RULE-SET,telegram_ip,Telegram,no-resolve'] : []),
+    ...(ruleOptionsEnable.Steam ? ['RULE-SET,steam,Steam', 'RULE-SET,steam_ip,Steam,no-resolve'] : []),
+    ...(ruleOptionsEnable.TikTok ? ['RULE-SET,tiktok,TikTok', 'RULE-SET,tiktok_ip,TikTok,no-resolve'] : []),
+    ...(ruleOptionsEnable.Twitter ? ['RULE-SET,twitter,Twitter', 'RULE-SET,twitter_ip,Twitter,no-resolve'] : []),
+    ...(ruleOptionsEnable.Instagram ? ['RULE-SET,instagram,Instagram'] : []),
+    ...(ruleOptionsEnable.Netflix ? ['RULE-SET,netflix,Netflix', 'RULE-SET,netflix_ip,Netflix,no-resolve'] : []),
+    ...(ruleOptionsEnable.PikPak ? ['RULE-SET,pikpak,PikPak'] : []),
+    ...(ruleOptionsEnable.Spotify ? ['RULE-SET,spotify,Spotify', 'RULE-SET,spotify_ip,Spotify,no-resolve'] : []),
+    ...(ruleOptionsEnable.Crypto ? ['RULE-SET,cryptocurrency,Crypto'] : []),
+    ...(ruleOptionsEnable.EHentai ? ['RULE-SET,ehentai,EHentai'] : []),
+    ...(ruleOptionsEnable.Twitch ? ['RULE-SET,twitch,Twitch'] : []),
+    ...(ruleOptionsEnable.Pixiv ? ['RULE-SET,pixiv,Pixiv'] : []),
+    ...(ruleOptionsEnable.Line ? ['RULE-SET,line,Line'] : []),
+    ...(ruleOptionsEnable.Discord ? ['RULE-SET,discord,Discord'] : []),
 
     // 兜底规则
     'RULE-SET,geolocation-!cn,PROXY',
