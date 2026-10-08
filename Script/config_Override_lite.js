@@ -305,10 +305,10 @@ const overwriteRuleProviders = (config) => {
 
     // --- 其他规则集 ---
     'geolocation-!cn': mrs_domain('geolocation-!cn'),
-    'adblockmihomolite': {
+    'ads': {
       ...RULE_DOMAIN,
-      'url': 'https://fastly.jsdelivr.net/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.mrs',
-      'path': './ruleset/adblockmihomolite.mrs',
+      'url': 'https://fastly.jsdelivr.net/gh/TG-Twilight/AWAvenue-Ads-Rule@main/Filters/AWAvenue-Ads-Rule-Clash.mrs',
+      'path': './ruleset/ads.mrs',
       'path-in-bundle': 'geo/geosite/category-ads-all.mrs',
     },
     'cn_additional': {
@@ -441,7 +441,7 @@ const overwriteRules = (config) => {
     // 屏蔽国外 QUIC
     ...(ruleOptionsEnable.BlockQUIC ? ['AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn_additional),(RULE-SET,cn_ip,no-resolve)))))),REJECT'] : []),
     // 广告拦截
-    ...(ruleOptionsEnable.AdBlock ? ['RULE-SET,adblockmihomolite,REJECT'] : []),
+    ...(ruleOptionsEnable.AdBlock ? ['RULE-SET,ads,REJECT'] : []),
     // 代理规则
     ...(ruleOptionsEnable.YouTube ? ['RULE-SET,youtube,YouTube'] : []),
     'RULE-SET,googlefcm,DIRECT',

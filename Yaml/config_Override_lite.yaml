@@ -255,7 +255,7 @@ rules:
   # 禁用国外 QUIC 流量
   - AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn_additional),(RULE-SET,cn_ip,no-resolve)))))),REJECT
   # 广告拦截
-  - RULE-SET,adblockmihomolite,REJECT
+  - RULE-SET,ads,REJECT
 
   # 代理规则
   - RULE-SET,youtube,YouTube
@@ -387,10 +387,10 @@ rule-providers:
     path-in-bundle: 'geo/geosite/geolocation-!cn.mrs'
 
   # --- 其他规则集 ---
-  adblockmihomolite:
+  ads:
     <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.mrs'
-    path: './ruleset/adblockmihomolite.mrs'
+    url: 'https://fastly.jsdelivr.net/gh/TG-Twilight/AWAvenue-Ads-Rule@main/Filters/AWAvenue-Ads-Rule-Clash.mrs'
+    path: './ruleset/ads.mrs'
     path-in-bundle: 'geo/geosite/category-ads-all.mrs'
 
   cn_additional:
