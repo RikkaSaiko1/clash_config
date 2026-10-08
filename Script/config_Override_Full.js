@@ -222,10 +222,10 @@ const overwriteRuleProviders = (config) => {
       'path-in-bundle': 'geo/geosite/category-emos.mrs',
     },
 
-    'adblockmihomolite': {
+    'ads': {
       ...RULE_DOMAIN,
-      'url': 'https://fastly.jsdelivr.net/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.mrs',
-      'path': './ruleset/adblockmihomolite.mrs',
+      'url': 'https://fastly.jsdelivr.net/gh/TG-Twilight/AWAvenue-Ads-Rule@main/Filters/AWAvenue-Ads-Rule-Clash.mrs',
+      'path': './ruleset/ads.mrs',
       'path-in-bundle': 'geo/geosite/category-ads-all.mrs',
     },
     'cn_additional': {
@@ -493,7 +493,7 @@ const overwriteRules = (config) => {
     // 禁用国外 QUIC 流量
     ...(ruleOptionsEnable.BlockQUIC ? ['AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn_additional),(RULE-SET,cn_ip,no-resolve)))))),REJECT'] : []),
     // 广告拦截
-    ...(ruleOptionsEnable.AdBlock ? ['RULE-SET,adblockmihomolite,AdBlock'] : []),
+    ...(ruleOptionsEnable.AdBlock ? ['RULE-SET,ads,AdBlock'] : []),
     'AND,((NETWORK,UDP),(OR,((DST-PORT,3478-3481),(DST-PORT,5349),(DST-PORT,19302-19309)))),REJECT',
     // emby
     ...(ruleOptionsEnable.Emby ? [
