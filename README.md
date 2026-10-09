@@ -70,7 +70,7 @@
 
 ## Loon插件/规则
 
-loon的京东模块来自'''https://github.com/luoxmc/loon/blob/main/surge/Plugins/JD.sgmoudle'''
+loon的京东模块来自[JD.sgmoudle](https://github.com/luoxmc/loon/blob/main/surge/Plugins/JD.sgmoudle)
 
 
 ## 🙏 致谢
