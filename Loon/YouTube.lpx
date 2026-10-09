@@ -1,0 +1,66 @@
+#!name = YouTube
+#!desc = 去除 YouTube 应用内广告，开启后台播放，并将已有字幕轨道翻译为目标语言（目标语言 zh-CN 或 en-US，无字幕视频无法翻译）。默认仅记录媒体响应头，完整采样可能产生延迟。需要配合 MITM 及受信任证书使用。
+#!openUrl = https://loon-plugins.vercel.app
+#!author = devchristian1337
+#!tag = YouTube, AdBlock
+#!loon_version = 3.5.1(983)
+#!homepage = https://github.com/devchristian1337/loon-plugins/blob/main/README.md
+#!icon = https://raw.githubusercontent.com/RikkaSaiko1/clash_config/refs/heads/main/svg/youtube.svg
+#!date = 2026-10-07
+
+[Argument]
+background_playback = switch,false,tag=后台播放,desc=切换应用或锁屏后仍保持普通视频的音频播放。直播及受限内容仍由 YouTube 决定
+playback_region = select,"original","CN","HK","TW","US","JP","KR","SG","GB","DE","RU",tag=播放请求区域,desc=original 保持当前区域。仅修改客户端 gl 参数，出口 IP 不变。去广告效果仍有待验证
+translation_enabled = switch,false,tag=字幕翻译,desc=将已有字幕翻译为所选目标语言。关闭时保留原始字幕请求
+translation_target = select,"zh-CN","en-US",tag=字幕目标语言,desc=仅转换已有字幕轨道（简体中文 zh-CN 或美式英语 en-US）。无字幕视频无法翻译。音轨、标题与简介均不变
+hide_home_shorts = switch,false,tag=隐藏首页 Shorts,desc=移除首页信息流中的 Shorts 板块。底部 Shorts 标签及其他页面保留
+blocked_channels = input,"",tag=屏蔽频道,desc=频道 ID、@handle 或完整频道名，以空格分隔。优先使用频道 ID；名称含空格时用 handle 或 ID。留空则关闭。仅隐藏可识别作者的视频
+blocked_channels_url = input,"",tag=远程屏蔽频道链接,desc=公开的 HTTPS 纯文本直链（如 GitHub Raw）。本地缓存每小时刷新，或运行更新脚本。与手动列表合并。留空则关闭
+log_enabled = switch,false,tag=日志工具,desc=首次匹配请求时自动启动，并通知日志入口。关闭后，下一次 API 命中会清空日志并停止采样，如需保留请先下载。完整采样可能产生延迟
+quality_research = switch,false,tag=画质研究采样,desc=仅在日志工具开启时生效。记录可识别的画质与格式参数，并读取较小的媒体 POST 请求用于对比。不会自动切换画质
+media_capture_mode = select,"headers","full",tag=媒体采样模式,desc=仅在日志工具开启时生效，日志关闭时自动禁用。headers 仅记录响应头。full 读取完整响应用于调试，可能产生延迟
+log_level = select,"info","debug","warn","error",tag=日志级别,desc=info 保留完整脱敏日志。error 仅保留错误。debug 保留调试级别。warn 保留警告与错误
+capture_budget = select,"32","16","64",tag=日志容量(MB),desc=达到上限后停止记录，已采样内容保留。导出后请清理
+
+[Rule]
+# Force API and playback negotiation to fall back from QUIC to TCP so MITM/scripts can inspect it. Media bodies are not rejected.
+AND,((DOMAIN,youtubei.googleapis.com),(PROTOCOL,UDP),(DEST-PORT,443)),REJECT
+AND,((DOMAIN,youtubei-att.googleapis.com),(PROTOCOL,UDP),(DEST-PORT,443)),REJECT
+# Match googlevideo domains and subdomains by QUIC protocol. UDP/443 is kept as fallback.
+AND,((DOMAIN-SUFFIX,googlevideo.com),(PROTOCOL,QUIC)),REJECT
+AND,((DOMAIN-SUFFIX,googlevideo.com),(PROTOCOL,UDP),(DEST-PORT,443)),REJECT
+
+[Rewrite]
+# Only the YouTube app init POST returns Loon's built-in blank video. The body is not read and regular media is unaffected.
+# Updated 2026-10-05. Replaces the failed HTTP 204 experiment. Playback fallback recovery still needs device verification.
+request if ${url} ~= /^https:\/\/[a-z0-9-]+\.googlevideo\.com\/initplayback(?:\?[^#]*)?$/i && ${request.method} == "POST" && ${request.header['User-Agent']} ~= /(?:^|\s)com\.google\.ios\.youtube\//i then reject_video(200)
+# Clear the alternative connection hint from media sources to reduce QUIC retries after rejection. Response headers only.
+# Updated 2026-10-05. Actual startup delay still needs device verification, the client may use other HTTP/3 discovery methods.
+^https://(?:[\w-]+\.)*googlevideo\.com(?::443)?/ response-header-replace Alt-Svc clear
+
+[Script]
+# Refreshes the channel list cache independently. The feed script only reads the cache and never waits for a remote download.
+# Updated 2026-10-07
+cron "0 * * * *" script-path=https://raw.githubusercontent.com/devchristian1337/loon-plugins/refs/heads/main/Scripts/YouTube/request.min.js,timeout=10,argument=[{blocked_channels_url}],tag=YouTube 定时更新屏蔽频道
+generic script-path=https://raw.githubusercontent.com/devchristian1337/loon-plugins/refs/heads/main/Scripts/YouTube/request.min.js,timeout=10,argument=[{blocked_channels_url}],tag=YouTube 更新屏蔽频道,img-url=person.crop.circle.badge.xmark.system
+http-request ^https:\/\/(?:www\.|m\.)?youtube\.com\/api\/timedtext\?[^#]+$ script-path=https://raw.githubusercontent.com/devchristian1337/loon-plugins/refs/heads/main/Scripts/YouTube/request.min.js,requires-body=false,timeout=10,enable={translation_enabled},argument=[{translation_enabled},{translation_target}],tag=YouTube 字幕目标语言
+# Reads videoplayback POST only when logging and quality research are explicitly enabled. Does not hit the blank init video.
+# Updated 2026-10-07. Must match before the regular log entry, no body buffering by default.
+request if ${url} ~= /^https:\/\/[\w-]+\.googlevideo\.com\/videoplayback(?:\?[^#]*)?$/i && ${request.method} == "POST" && ${log_enabled} == true && ${quality_research} == true then script("https://raw.githubusercontent.com/devchristian1337/loon-plugins/refs/heads/main/Scripts/YouTube/request.min.js", {${log_enabled}, ${log_level}, ${capture_budget}, ${quality_research}}) with requires_body=true, binary_body_mode=true, timeout=10, tag="YouTube 画质研究请求采样"
+http-request ^https:\/\/(?:youtubei(?:-att)?\.googleapis\.com|(?:www\.|m\.|music\.)?youtube\.com)\/youtubei\/v1\/(?:browse|next|search|reel\/reel_watch_sequence)(?:\?[^#]*)?$|^https:\/\/[\w-]+\.googlevideo\.com\/videoplayback\?[^#]*$|^http:\/\/youtube-logs\.invalid(?::80)?(?:\/[^#]*)?$|^https:\/\/[\w-]+\.googlevideo\.com\/initplayback(?:\?[^#]*)?$ script-path=https://raw.githubusercontent.com/devchristian1337/loon-plugins/refs/heads/main/Scripts/YouTube/request.min.js,requires-body=false,timeout=10,enable={log_enabled},argument=[{log_enabled},{log_level},{capture_budget},{background_playback},{media_capture_mode},{quality_research}],tag=YouTube 日志与导出
+http-request ^https:\/\/(?:youtubei(?:-att)?\.googleapis\.com|(?:www\.|m\.)?youtube\.com)\/youtubei\/v1\/log_event(?:\?[^#]*)?$ script-path=https://raw.githubusercontent.com/devchristian1337/loon-plugins/refs/heads/main/Scripts/YouTube/request.min.js,requires-body=true,binary-body-mode=true,timeout=10,argument=[{log_enabled},{log_level},{capture_budget},{playback_region}],tag=YouTube 配置请求处理
+# Media sampling is controlled by the logging master switch. When off, neither headers nor full runs. The saved mode option does not mean sampling is active.
+# Full sampling must be selected before the body is received. Only the first matching script runs for a given response. The default header entry does not pass full to avoid reading the body by mistake.
+response if ${url} ~= /^https:\/\/[\w-]+\.googlevideo\.com\/(?:videoplayback|initplayback)(?:\?[^#]*)?$/i && ${log_enabled} == true && ${media_capture_mode} == "full" then script("https://raw.githubusercontent.com/devchristian1337/loon-plugins/refs/heads/main/Scripts/YouTube/response.min.js", {${log_enabled}, ${log_level}, ${capture_budget}, ${media_capture_mode}}) with requires_body=true, binary_body_mode=true, timeout=30, tag="YouTube 完整媒体开发采样"
+http-response ^https:\/\/[\w-]+\.googlevideo\.com\/(?:videoplayback|initplayback)(?:\?[^#]*)?$ script-path=https://raw.githubusercontent.com/devchristian1337/loon-plugins/refs/heads/main/Scripts/YouTube/response.min.js,requires-body=false,timeout=10,enable={log_enabled},argument=[{log_enabled},{log_level},{capture_budget}],tag=YouTube 媒体响应日志
+http-response ^https:\/\/(?:youtubei(?:-att)?\.googleapis\.com|(?:www\.|m\.)?youtube\.com)\/youtubei\/v1\/(?:config|log_event)(?:\?[^#]*)?$ script-path=https://raw.githubusercontent.com/devchristian1337/loon-plugins/refs/heads/main/Scripts/YouTube/response.min.js,requires-body=true,binary-body-mode=true,timeout=10,argument=[{log_enabled},{log_level},{capture_budget}],tag=YouTube Onesie 配置缓存
+
+http-request ^https:\/\/(?:youtubei(?:-att)?\.googleapis\.com|(?:www\.|m\.|music\.)?youtube\.com)\/youtubei\/v1\/(?:player|get_watch)(?:\?[^#]*)?$|^https:\/\/(?:youtubei(?:-att)?\.googleapis\.com|(?:www\.|m\.|music\.)?youtube\.com)\/youtubei\/v1\/player\/ad_break(?:\?[^#]*)?$ script-path=https://raw.githubusercontent.com/devchristian1337/loon-plugins/refs/heads/main/Scripts/YouTube/request.min.js,requires-body=true,binary-body-mode=true,timeout=10,argument=[{log_enabled},{log_level},{capture_budget},{playback_region}],tag=YouTube 播放请求与广告配置处理
+
+http-response ^https:\/\/(?:youtubei(?:-att)?\.googleapis\.com|(?:www\.|m\.|music\.)?youtube\.com)\/youtubei\/v1\/(browse|next|search)(\?[^#]*)?$ script-path=https://raw.githubusercontent.com/devchristian1337/loon-plugins/refs/heads/main/Scripts/YouTube/response.min.js,requires-body=true,binary-body-mode=true,timeout=10,argument=[{log_enabled},{log_level},{capture_budget},{hide_home_shorts},{blocked_channels},{blocked_channels_url}],tag=YouTube 信息流广告与首页 Shorts 处理
+http-response ^https:\/\/(?:youtubei(?:-att)?\.googleapis\.com|(?:www\.|m\.|music\.)?youtube\.com)\/youtubei\/v1\/(player|get_watch)(\?[^#]*)?$|^https:\/\/(?:youtubei(?:-att)?\.googleapis\.com|(?:www\.|m\.|music\.)?youtube\.com)\/youtubei\/v1\/reel\/reel_watch_sequence(?:\?[^#]*)?$ script-path=https://raw.githubusercontent.com/devchristian1337/loon-plugins/refs/heads/main/Scripts/YouTube/response.min.js,requires-body=true,binary-body-mode=true,timeout=10,argument=[{log_enabled},{log_level},{capture_budget},{background_playback},{quality_research}],tag=YouTube 播放响应与后台播放
+
+[Mitm]
+hostname = youtubei.googleapis.com, youtubei-att.googleapis.com, youtube.com, www.youtube.com, m.youtube.com, music.youtube.com, *.googlevideo.com
+# With logging off, neither init nor regular media responses run body-sampling scripts. The init POST is handled by the native blank video rewrite, regular playback requests still get ad negotiation cleanup.
+# googlevideo UDP only falls back to TCP, regular videoplayback media requests are still allowed.
