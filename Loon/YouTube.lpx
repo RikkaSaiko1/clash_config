@@ -5,7 +5,7 @@
 #!tag = YouTube, AdBlock
 #!loon_version = 3.5.1(983)
 #!homepage = https://github.com/devchristian1337/loon-plugins/blob/main/README.md
-#!icon = https://raw.githubusercontent.com/RikkaSaiko1/clash_config/refs/heads/main/svg/youtube.svg
+#!icon = https://cdn.jsdelivr.net/gh/selfhst/icons/png/youtube.png
 #!date = 2026-10-07
 
 [Argument]
