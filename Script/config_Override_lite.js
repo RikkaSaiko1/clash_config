@@ -34,6 +34,11 @@ const serviceConfigs = [
   { name: 'AI', icon: 'https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/deepseek.svg' },
 ];
 
+// 按需在此添加静态节点；名称需唯一
+const CUSTOM_PROXIES = [
+  // { name: 'JP 手动节点', type: 'socks5', server: '1.2.3.4', port: 1080, username: '用户名', password: '密码' },
+];
+
 // 去重并过滤空值；传 getter 时按字段去重
 const dedupe = (arr, getter) => {
   const seen = new Set();
@@ -380,7 +385,7 @@ const overwriteProxyGroups = (config, ctx) => {
   const PROXIES_DEFAULT = ['PROXY', 'AUTO', 'HK', 'SG', 'JP', 'US', 'TW', 'KR', 'Other'];
   const PROXIES_DIRECT = [...PROXIES_DEFAULT, 'DIRECT'];
   const PROXIES_AI = ['PROXY', 'SG', 'JP', 'US', 'KR'];
-  const PROXIES_PROXY = ['AUTO', 'HK', 'JP', 'US', 'SG', 'TW', 'KR', 'Other'];
+  const PROXIES_PROXY = ['AUTO', 'HK', 'JP', 'US', 'SG', 'TW', 'KR', 'Other', ...(CUSTOM_PROXIES.length > 0 ? ['手动节点'] : [])];
 
   const FILTER_HK = '(?i)(🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|hong\\s*kong)';
   const FILTER_JP = '(?i)(🇯🇵|日本|东京|大阪|京都|(?<![A-Za-z])JPN?(?![A-Za-z])|japan)';
@@ -402,6 +407,7 @@ const overwriteProxyGroups = (config, ctx) => {
     // 基础策略组（PROXY 在纯 provider 订阅时追加 use 兜底）
     { 'name': 'PROXY', ...RULE_GROUP, 'proxies': PROXIES_PROXY, ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': group('Static') },
     { 'name': 'AUTO', ...RULE_GROUP_TEST, 'hidden': false, 'icon': group('Urltest') },
+    ...(CUSTOM_PROXIES.length > 0 ? [{ 'name': '手动节点', ...RULE_GROUP, 'proxies': CUSTOM_PROXIES.map((proxy) => proxy.name) }] : []),
     // 应用策略组
     ...(ruleOptionsEnable.YouTube ? [{ 'name': 'YouTube', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('youtube') }] : []),
     ...(ruleOptionsEnable.AI ? [{ 'name': 'AI', ...RULE_GROUP, 'proxies': PROXIES_AI, 'default-selected': 'US', 'icon': svg('deepseek') }] : []),
@@ -458,6 +464,12 @@ const overwriteRules = (config) => {
 // 入口：收集节点上下文后按区块依次覆写
 const main = (config) => {
   config = config || {};
+  if (CUSTOM_PROXIES.length > 0) {
+    config['proxies'] = [
+      ...(Array.isArray(config['proxies']) ? config['proxies'] : []),
+      ...CUSTOM_PROXIES,
+    ];
+  }
   const ctx = collectNodeSources(config);
   overwriteTun(config);
   overwriteSniffer(config);

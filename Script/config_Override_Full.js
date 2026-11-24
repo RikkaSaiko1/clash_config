@@ -64,6 +64,11 @@ const serviceConfigs = [
   { name: 'AdBlock', icon: 'https://fastly.jsdelivr.net/gh/Orz-3/mini@master/Color/Adblock.png' },
 ];
 
+// 按需在此添加静态节点；名称需唯一
+const CUSTOM_PROXIES = [
+  // { name: 'JP 手动节点', type: 'socks5', server: '1.2.3.4', port: 1080, username: '用户名', password: '密码' },
+];
+
 // 去重并过滤空值；传 getter 时按字段去重
 const dedupe = (arr, getter) => {
   const seen = new Set();
@@ -292,7 +297,7 @@ const overwriteProxyGroups = (config, ctx) => {
   const svg = (name) => `https://fastly.jsdelivr.net/gh/RikkaSaiko1/clash_config@main/svg/${name}.svg`;
   const png = (name) => `https://fastly.jsdelivr.net/gh/Orz-3/mini@master/Color/${name}.png`;
 
-  const PROXIES_PROXY = ['AUTO','HK','JP','US','SG','TW','KR','Other',];
+  const PROXIES_PROXY = ['AUTO','HK','JP','US','SG','TW','KR','Other', ...(CUSTOM_PROXIES.length > 0 ? ['手动节点'] : [])];
   const PROXIES_AI = ['PROXY', 'SG', 'JP', 'US', 'KR'];
   const PROXIES_REJECT = ['REJECT', 'REJECT-DROP', 'PASS'];
   const FILTER_HK = '(?i)(🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|hong\\s*kong)';
@@ -309,6 +314,7 @@ const overwriteProxyGroups = (config, ctx) => {
   config['proxy-groups'] = [
     { 'name': 'PROXY', ...RULE_GROUP, 'proxies': list(PROXIES_PROXY), ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': png('Static') },
     { 'name': 'AUTO', ...RULE_GROUP_TEST, 'include-all': true, 'exclude-type': 'DIRECT', 'hidden': false, 'icon': png('Urltest') },
+    ...(CUSTOM_PROXIES.length > 0 ? [{ 'name': '手动节点', ...RULE_GROUP, 'proxies': CUSTOM_PROXIES.map((proxy) => proxy.name) }] : []),
     ...(ruleOptionsEnable.YouTube ? [{ 'name': 'YouTube', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'icon': svg('youtube') }] : []),
     ...(ruleOptionsEnable.Google ? [{ 'name': 'Google', ...RULE_GROUP, 'proxies': list(PROXIES_ALL), 'icon': svg('google') }] : []),
     ...(ruleOptionsEnable.AI ? [{ 'name': 'AI', ...RULE_GROUP, 'proxies': list(PROXIES_AI), 'default-selected': 'US', 'icon': svg('deepseek') }] : []),
@@ -541,6 +547,12 @@ const overwriteRules = (config) => {
 // 入口：收集节点上下文后按区块依次覆写
 const main = (config) => {
   config = config || {};
+  if (CUSTOM_PROXIES.length > 0) {
+    config['proxies'] = [
+      ...(Array.isArray(config['proxies']) ? config['proxies'] : []),
+      ...CUSTOM_PROXIES,
+    ];
+  }
   const ctx = collectNodeSources(config);
   overwriteTun(config);
   overwriteSniffer(config);

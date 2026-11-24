@@ -5,6 +5,15 @@
 # - DNS 防泄漏: fake-ip + 全 DoH, nameserver-policy 分组, 出口分离
 # - 轻量规则集: 精简策略组 + 精简规则链 + 裁剪 rule-providers
 
+# 按需取消注释并填写节点参数；将节点名称同时加入“手动节点”组的 proxies 列表
+# proxies+:
+#   - name: "手动-JP节点"
+#     type: socks5
+#     server: 1.2.3.4
+#     port: 1080
+#     username: "用户名"
+#     password: "密码"
+
 tun!:
   enable: true
   stack: mips
@@ -119,7 +128,7 @@ proxies_common:  # 通用代理节点组
     &proxies_AI {proxies: ['PROXY','SG','JP','US','KR',]}
   
   proxies_proxy:
-    &proxies_proxy {proxies: ['AUTO','HK','JP','US','SG','TW','KR','Other']}
+    &proxies_proxy {proxies: ['AUTO','HK','JP','US','SG','TW','KR','Other','手动节点']}
 
 
 # 地区过滤器正则表达式定义
@@ -158,6 +167,10 @@ proxy-groups:  # 定义分流策略组
     <<: *group_common_auto
     hidden: false
     icon: 'https://fastly.jsdelivr.net/gh/Orz-3/mini@master/Color/Urltest.png'
+
+  - name: '手动节点'
+    <<: *group_common_select
+    proxies: []
 
   - name: 'YouTube'
     <<: [*group_common_select, *proxies_default]
@@ -420,4 +433,3 @@ rule-providers:
     dialer-proxy: DIRECT
     url: 'https://fastly.jsdelivr.net/gh/qichiyuhub/rule@main/rules/fakeipfilter-!cn.list'
     path: './ruleset/fakeipfilter-!cn.list'
-

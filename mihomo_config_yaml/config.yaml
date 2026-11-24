@@ -27,10 +27,17 @@ proxy-providers:
   #   health-check: {enable: true,url: "https://www.gstatic.com/generate_204",interval: 100}
   #   override:
   #    additional-prefix: "[]"
-proxies: 
+# 手动节点可直接追加在此；将节点名称同时加入“手动节点”组的 proxies 列表
+proxies:
   - name: "直连"
     type: direct
     udp: true
+  # - name: "手动-JP节点"
+  #   type: socks5
+  #   server: 1.2.3.4
+  #   port: 1080
+  #   username: "用户名"
+  #   password: "密码"
 
 mixed-port: 7890
 authentication:
@@ -174,7 +181,7 @@ proxies_common:
     &proxies_AI {proxies: ['PROXY','SG','JP','US','KR',]}
   
   proxies_proxy:
-    &proxies_proxy {proxies: ['AUTO','HK','JP','US','SG','TW','KR','Other']}
+    &proxies_proxy {proxies: ['AUTO','HK','JP','US','SG','TW','KR','Other','手动节点']}
 
   proxies_reject: 
     &proxies_reject {proxies: ['REJECT', 'REJECT-DROP', 'PASS']}
@@ -210,13 +217,16 @@ proxy-groups:
 
   - name: 'PROXY'
     <<: [*group_common_select, *proxies_proxy]
-    include-all-proxies: true
     icon: 'https://fastly.jsdelivr.net/gh/Orz-3/mini@master/Color/Static.png'
 
   - name: 'AUTO'
     <<: *group_common_auto
     hidden: false
     icon: 'https://fastly.jsdelivr.net/gh/Orz-3/mini@master/Color/Urltest.png'
+
+  - name: '手动节点'
+    <<: *group_common_select
+    proxies: []
 
   - name: 'YouTube'
     <<: [*group_common_select, *proxies_default]
