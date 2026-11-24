@@ -1,0 +1,11 @@
+# Cue AI (cue.im / Manus) 域名规则
+# 更新: 2026-11-25
+
+DOMAIN-SUFFIX,cue.im
+DOMAIN-SUFFIX,manus.im
+DOMAIN-SUFFIX,manus.ai
+DOMAIN-SUFFIX,manuscdn.com
+DOMAIN-SUFFIX,manus.space
+DOMAIN-SUFFIX,manus-preview.space
+DOMAIN-SUFFIX,manus.computer
+DOMAIN-SUFFIX,cname.manus.space
