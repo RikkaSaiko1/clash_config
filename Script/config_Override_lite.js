@@ -38,6 +38,480 @@ const serviceConfigs = [
 const CUSTOM_PROXIES = [
   // { name: 'JP 手动节点', type: 'socks5', server: '1.2.3.4', port: 1080, username: '用户名', password: '密码' },
 ];
+// 可粘贴 Mihomo 分享链接或 WireGuard .conf；完整节点对象可放入上方数组
+const CUSTOM_PROXY_URLS = [
+  // 'vless://uuid@example.com:443?security=tls&type=xhttp&host=example.com&path=%2Fpath&mode=auto#节点名称',
+];
+const CUSTOM_ECH_DNS_SERVERS = new Map();
+
+const getCustomProxies = () => {
+  const proxies = [...CUSTOM_PROXIES, ...CUSTOM_PROXY_URLS.map(parseProxyUri)];
+  const names = new Set();
+  for (const proxy of proxies) {
+    if (!proxy || typeof proxy.name !== 'string' || !proxy.name.trim()) {
+      throw new Error('每个手动节点都必须设置非空名称。');
+    }
+    if (names.has(proxy.name)) throw new Error(`手动节点名称重复：${proxy.name}`);
+    names.add(proxy.name);
+  }
+  return proxies;
+};
+
+const decodeUriValue = (value, formEncoded) => {
+  try {
+    return decodeURIComponent(formEncoded ? value.replace(/\+/g, ' ') : value);
+  } catch {
+    throw new Error('分享链接包含无效的 URL 编码。');
+  }
+};
+
+const decodeBase64 = (value) => {
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  const input = value.replace(/-/g, '+').replace(/_/g, '/').replace(/\s|=/g, '');
+  if (!input || input.length % 4 === 1 || /[^A-Za-z0-9+/]/.test(input)) {
+    throw new Error('分享链接包含无效的 Base64 数据。');
+  }
+  const bytes = [];
+  let buffer = 0;
+  let bits = 0;
+  for (const char of input) {
+    buffer = (buffer << 6) | alphabet.indexOf(char);
+    bits += 6;
+    if (bits >= 8) {
+      bits -= 8;
+      bytes.push((buffer >> bits) & 255);
+    }
+  }
+  try {
+    return decodeURIComponent(bytes.map((byte) => `%${byte.toString(16).padStart(2, '0')}`).join(''));
+  } catch {
+    throw new Error('分享链接包含无法解码的 Base64 文本。');
+  }
+};
+
+const parseProxyUriParts = (uri) => {
+  const match = /^([a-z][a-z0-9+.-]*):\/\/([^/?#]+)\/?(?:\?([^#]*))?(?:#(.*))?$/i.exec(uri.trim());
+  if (!match) throw new Error('手动节点链接格式无效。');
+  const params = new Map();
+  for (const pair of (match[3] || '').split('&')) {
+    if (!pair) continue;
+    const separator = pair.indexOf('=');
+    const key = decodeUriValue(separator < 0 ? pair : pair.slice(0, separator), true);
+    if (!params.has(key)) {
+      params.set(key, decodeUriValue(separator < 0 ? '' : pair.slice(separator + 1), true));
+    }
+  }
+  const atIndex = match[2].lastIndexOf('@');
+  const userInfo = atIndex >= 0 ? decodeUriValue(match[2].slice(0, atIndex)) : '';
+  const address = match[2].slice(atIndex + 1);
+  let server;
+  let portText;
+  if (address.startsWith('[')) {
+    const closingBracket = address.indexOf(']');
+    if (closingBracket < 0 || address[closingBracket + 1] !== ':') {
+      throw new Error('分享链接中的 IPv6 地址或端口无效。');
+    }
+    server = address.slice(1, closingBracket);
+    portText = address.slice(closingBracket + 2);
+  } else {
+    const separator = address.lastIndexOf(':');
+    if (separator < 1) throw new Error('分享链接缺少服务器端口。');
+    server = address.slice(0, separator);
+    portText = address.slice(separator + 1);
+  }
+  const port = Number(portText);
+  if (!server || !Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new Error('分享链接必须包含有效的服务器地址和端口。');
+  }
+  const name = match[4] ? decodeUriValue(match[4]) : `${server}:${port}`;
+  const credentials = userInfo.indexOf(':');
+  return {
+    scheme: match[1].toLowerCase(),
+    server,
+    port,
+    name,
+    user: credentials < 0 ? userInfo : userInfo.slice(0, credentials),
+    password: credentials < 0 ? '' : userInfo.slice(credentials + 1),
+    params,
+  };
+};
+
+const uriBoolean = (value) => /^(1|true|yes)$/i.test(String(value || ''));
+
+const applyTlsUriOptions = (proxy, params, defaultTls) => {
+  if (defaultTls || params.has('security') && ['tls', 'reality'].includes(params.get('security').toLowerCase())) {
+    proxy.tls = true;
+  }
+  const sni = params.get('sni') || params.get('servername') || params.get('peer');
+  if (sni) {
+    if (proxy.type === 'hysteria' || proxy.type === 'hysteria2' || proxy.type === 'tuic' || proxy.type === 'anytls') proxy.sni = sni;
+    else proxy.servername = sni;
+  }
+  const fingerprint = params.get('fp') || params.get('client-fingerprint');
+  if (fingerprint) proxy['client-fingerprint'] = fingerprint;
+  const alpn = params.get('alpn');
+  if (alpn) proxy.alpn = alpn.split(',').filter(Boolean);
+  const insecure = params.get('insecure') || params.get('allowInsecure') || params.get('allow_insecure');
+  if (insecure !== null) proxy['skip-cert-verify'] = uriBoolean(insecure);
+  if (params.get('security') === 'reality' || params.has('pbk')) {
+    proxy.tls = true;
+    const realityOptions = {};
+    if (params.has('pbk')) realityOptions['public-key'] = params.get('pbk');
+    if (params.has('sid')) realityOptions['short-id'] = params.get('sid');
+    if (Object.keys(realityOptions).length > 0) proxy['reality-opts'] = realityOptions;
+  }
+};
+
+const applyV2rayTransport = (proxy, network, params) => {
+  if (!network || network === 'tcp') return;
+  if (network === 'ws' || network === 'httpupgrade') {
+    proxy.network = 'ws';
+    const options = { path: params.get('path') || '/', headers: {} };
+    if (params.has('host')) options.headers.Host = params.get('host');
+    if (network === 'httpupgrade') options['v2ray-http-upgrade'] = true;
+    proxy['ws-opts'] = options;
+  } else if (network === 'grpc') {
+    proxy.network = 'grpc';
+    proxy['grpc-opts'] = { 'grpc-service-name': params.get('serviceName') || '' };
+  } else if (network === 'h2' || network === 'http') {
+    proxy.network = 'h2';
+    proxy['h2-opts'] = {
+      path: params.get('path') || '/',
+      ...(params.has('host') ? { host: params.get('host').split(',') } : {}),
+    };
+  } else if (network === 'xhttp') {
+    proxy.network = 'xhttp';
+    proxy['xhttp-opts'] = {
+      ...(params.has('host') ? { host: params.get('host') } : {}),
+      ...(params.has('path') ? { path: params.get('path') } : {}),
+      ...(params.has('mode') ? { mode: params.get('mode') } : {}),
+    };
+  } else {
+    throw new Error(`暂不支持 VLESS/VMess 传输类型：${network}`);
+  }
+};
+
+const parseWireGuardConfig = (text) => {
+  const interfaceOptions = {};
+  const peerOptions = {};
+  let section = '';
+  let peerCount = 0;
+  for (const line of text.split(/\r?\n/)) {
+    const value = line.trim();
+    if (!value || value.startsWith('#') || value.startsWith(';')) continue;
+    const sectionMatch = /^\[([^\]]+)\]$/.exec(value);
+    if (sectionMatch) {
+      section = sectionMatch[1].toLowerCase();
+      if (section === 'peer') peerCount += 1;
+      continue;
+    }
+    const separator = value.indexOf('=');
+    if (separator < 1) continue;
+    const key = value.slice(0, separator).trim().toLowerCase();
+    const fieldValue = value.slice(separator + 1).trim();
+    const options = section === 'interface' ? interfaceOptions : section === 'peer' ? peerOptions : null;
+    if (options && fieldValue) {
+      options[key] = options[key] ? `${options[key]},${fieldValue}` : fieldValue;
+    }
+  }
+  if (peerCount !== 1) throw new Error('WireGuard 配置必须且只能包含一个 [Peer]。');
+  if (!interfaceOptions.privatekey || !interfaceOptions.address || !peerOptions.publickey || !peerOptions.endpoint) {
+    throw new Error('WireGuard 配置缺少 PrivateKey、Address、PublicKey 或 Endpoint。');
+  }
+  if (!peerOptions.allowedips) throw new Error('WireGuard 配置缺少 Peer 的 AllowedIPs。');
+
+  const endpoint = parseProxyUriParts(`wireguard://${peerOptions.endpoint}`);
+  const addresses = interfaceOptions.address.split(',').map((address) => address.trim()).filter(Boolean);
+  const ipv4 = addresses.find((address) => !address.includes(':'));
+  const ipv6 = addresses.find((address) => address.includes(':'));
+  if (!ipv4 && !ipv6) throw new Error('WireGuard 配置中的 Address 无效。');
+  const proxy = {
+    name: endpoint.name,
+    type: 'wireguard',
+    server: endpoint.server,
+    port: endpoint.port,
+    'private-key': interfaceOptions.privatekey,
+    'public-key': peerOptions.publickey,
+    'allowed-ips': peerOptions.allowedips.split(',').map((address) => address.trim()).filter(Boolean),
+    udp: true,
+  };
+  if (ipv4) proxy.ip = ipv4.split('/')[0];
+  if (ipv6) proxy.ipv6 = ipv6.split('/')[0];
+  if (peerOptions.presharedkey) proxy['pre-shared-key'] = peerOptions.presharedkey;
+  if (interfaceOptions.dns) {
+    proxy.dns = interfaceOptions.dns.split(',').map((address) => address.trim()).filter(Boolean);
+    proxy['remote-dns-resolve'] = true;
+  }
+  if (peerOptions.persistentkeepalive) {
+    const keepalive = Number(peerOptions.persistentkeepalive);
+    if (!Number.isInteger(keepalive) || keepalive < 0) throw new Error('WireGuard PersistentKeepalive 必须是非负整数。');
+    proxy['persistent-keepalive'] = keepalive;
+  }
+  if (interfaceOptions.mtu) {
+    const mtu = Number(interfaceOptions.mtu);
+    if (!Number.isInteger(mtu) || mtu < 1) throw new Error('WireGuard MTU 必须是正整数。');
+    proxy.mtu = mtu;
+  }
+  return proxy;
+};
+
+const parseProxyUri = (uri) => {
+  const value = uri.trim();
+  if (/^\[Interface\]\s*$/im.test(value)) return parseWireGuardConfig(value);
+  const schemeMatch = /^([a-z][a-z0-9+.-]*):\/\//i.exec(value);
+  if (!schemeMatch) throw new Error('手动节点链接必须包含协议 scheme。');
+  const scheme = schemeMatch[1].toLowerCase();
+  if (scheme === 'vless') return parseVlessUri(uri);
+  if (scheme === 'vmess') {
+    const value = uri.trim().slice(schemeMatch[0].length).split('#')[0].replace(/\/$/, '');
+    let data;
+    try {
+      data = JSON.parse(decodeBase64(value));
+    } catch (error) {
+      throw new Error(`VMess 分享链接无法解析：${error.message}`);
+    }
+    const server = data.add || data.server;
+    const port = Number(data.port);
+    const uuid = data.id || data.uuid;
+    if (!server || !uuid || !Number.isInteger(port) || port < 1 || port > 65535) {
+      throw new Error('VMess 分享链接缺少有效的服务器、端口或 UUID。');
+    }
+    const fragment = uri.trim().split('#').slice(1).join('#');
+    const proxy = {
+      name: fragment ? decodeUriValue(fragment) : (data.ps || `${server}:${port}`),
+      type: 'vmess',
+      server,
+      port,
+      uuid,
+      alterId: Number(data.aid || data.alterId || 0),
+      cipher: data.scy || data.cipher || 'auto',
+      udp: true,
+    };
+    const tls = data.tls === true || data.tls === 'tls' || data.tls === 'true';
+    const params = new Map();
+    for (const [key, value] of Object.entries({
+      sni: data.sni,
+      fp: data.fp,
+      alpn: data.alpn,
+      host: data.host,
+      path: data.path,
+    })) {
+      if (value !== undefined && value !== '') params.set(key, String(value));
+    }
+    applyTlsUriOptions(proxy, params, tls);
+    applyV2rayTransport(proxy, (data.net || data.network || 'tcp').toLowerCase(), params);
+    return proxy;
+  }
+
+  if (scheme === 'ssr') {
+    let payload;
+    try {
+      payload = decodeBase64(uri.trim().slice(schemeMatch[0].length));
+    } catch (error) {
+      throw new Error(`ShadowsocksR 分享链接无法解析：${error.message}`);
+    }
+    const [main, queryString = ''] = payload.split('/?');
+    const fields = main.split(':');
+    if (fields.length < 6) throw new Error('ShadowsocksR 分享链接格式不完整。');
+    const details = new Map();
+    for (const pair of queryString.split('&')) {
+      if (!pair) continue;
+      const separator = pair.indexOf('=');
+      const key = decodeUriValue(separator < 0 ? pair : pair.slice(0, separator), false);
+      const value = decodeUriValue(separator < 0 ? '' : pair.slice(separator + 1), false);
+      details.set(key, value);
+    }
+    const decodeField = (key) => details.has(key) ? decodeBase64(details.get(key)) : '';
+    const port = Number(fields[1]);
+    if (!fields[0] || !Number.isInteger(port) || port < 1 || port > 65535) {
+      throw new Error('ShadowsocksR 分享链接中的服务器地址或端口无效。');
+    }
+    return {
+      name: decodeField('remarks') || `${fields[0]}:${port}`,
+      type: 'ssr',
+      server: fields[0],
+      port,
+      protocol: fields[2],
+      cipher: fields[3],
+      obfs: fields[4],
+      password: decodeBase64(fields.slice(5).join(':')),
+      ...(decodeField('protoparam') ? { 'protocol-param': decodeField('protoparam') } : {}),
+      ...(decodeField('obfsparam') ? { 'obfs-param': decodeField('obfsparam') } : {}),
+      udp: true,
+    };
+  }
+
+  if (scheme === 'ss') {
+    let parts;
+    try {
+      parts = parseProxyUriParts(uri);
+    } catch {
+      const payload = uri.trim().slice(schemeMatch[0].length).split('#')[0].replace(/\/$/, '');
+      parts = parseProxyUriParts(`ss://${decodeBase64(payload)}${uri.includes('#') ? `#${uri.split('#').slice(1).join('#')}` : ''}`);
+    }
+    let userInfo = parts.password ? `${parts.user}:${parts.password}` : parts.user;
+    if (!userInfo.includes(':')) userInfo = decodeBase64(userInfo);
+    const separator = userInfo.indexOf(':');
+    if (separator < 1) throw new Error('Shadowsocks 分享链接缺少加密方式或密码。');
+    const proxy = {
+      name: parts.name,
+      type: 'ss',
+      server: parts.server,
+      port: parts.port,
+      cipher: userInfo.slice(0, separator),
+      password: userInfo.slice(separator + 1),
+      udp: true,
+    };
+    const plugin = parts.params.get('plugin');
+    if (plugin) {
+      const [pluginName, ...pluginParameters] = plugin.split(';');
+      const pluginOptions = {};
+      for (const parameter of pluginParameters) {
+        const [key, value = ''] = parameter.split('=');
+        pluginOptions[key] = value;
+      }
+      proxy.plugin = pluginName === 'obfs-local' ? 'obfs' : pluginName;
+      if (pluginName === 'obfs-local') {
+        proxy['plugin-opts'] = { mode: pluginOptions.obfs || 'http', host: pluginOptions['obfs-host'] || '' };
+      } else {
+        proxy['plugin-opts'] = pluginOptions;
+      }
+    }
+    return proxy;
+  }
+
+  const parts = parseProxyUriParts(uri);
+  const params = parts.params;
+  if (scheme === 'trojan') {
+    if (!parts.user) throw new Error('Trojan 分享链接缺少密码。');
+    const proxy = { name: parts.name, type: 'trojan', server: parts.server, port: parts.port, password: parts.user, udp: true };
+    applyTlsUriOptions(proxy, params, true);
+    applyV2rayTransport(proxy, params.get('type') || 'tcp', params);
+    return proxy;
+  }
+  if (scheme === 'socks' || scheme === 'socks5' || scheme === 'socks5h') {
+    const proxy = { name: parts.name, type: 'socks5', server: parts.server, port: parts.port, udp: uriBoolean(params.get('udp')) };
+    if (parts.user) proxy.username = parts.user;
+    if (parts.password) proxy.password = parts.password;
+    return proxy;
+  }
+  if (scheme === 'http' || scheme === 'https') {
+    const proxy = { name: parts.name, type: 'http', server: parts.server, port: parts.port };
+    if (parts.user) proxy.username = parts.user;
+    if (parts.password) proxy.password = parts.password;
+    applyTlsUriOptions(proxy, params, scheme === 'https');
+    return proxy;
+  }
+  if (scheme === 'hysteria2' || scheme === 'hy2') {
+    if (!parts.user) throw new Error('Hysteria2 分享链接缺少密码。');
+    const proxy = { name: parts.name, type: 'hysteria2', server: parts.server, port: parts.port, password: parts.user, udp: true };
+    applyTlsUriOptions(proxy, params, true);
+    for (const [source, target] of [['obfs', 'obfs'], ['obfs-password', 'obfs-password'], ['up', 'up'], ['down', 'down'], ['ports', 'ports'], ['hop-interval', 'hop-interval']]) {
+      if (params.has(source)) proxy[target] = params.get(source);
+    }
+    return proxy;
+  }
+  if (scheme === 'tuic') {
+    const credentials = parts.password ? `${parts.user}:${parts.password}` : parts.user;
+    const separator = credentials.indexOf(':');
+    if (separator < 1) throw new Error('TUIC 分享链接需要 UUID 和密码。');
+    const proxy = {
+      name: parts.name,
+      type: 'tuic',
+      server: parts.server,
+      port: parts.port,
+      uuid: credentials.slice(0, separator),
+      password: credentials.slice(separator + 1),
+      udp: true,
+    };
+    applyTlsUriOptions(proxy, params, true);
+    for (const [source, target] of [['congestion_control', 'congestion-controller'], ['udp_relay_mode', 'udp-relay-mode'], ['heartbeat', 'heartbeat-interval']]) {
+      if (params.has(source)) proxy[target] = params.get(source);
+    }
+    if (params.has('reduce_rtt')) proxy['reduce-rtt'] = uriBoolean(params.get('reduce_rtt'));
+    return proxy;
+  }
+  if (scheme === 'anytls') {
+    if (!parts.user) throw new Error('AnyTLS 分享链接缺少密码。');
+    const proxy = { name: parts.name, type: 'anytls', server: parts.server, port: parts.port, password: parts.user, udp: true };
+    applyTlsUriOptions(proxy, params, true);
+    for (const key of ['idle-session-check-interval', 'idle-session-timeout', 'min-idle-session']) {
+      if (params.has(key)) proxy[key] = Number(params.get(key));
+    }
+    return proxy;
+  }
+  if (scheme === 'hysteria') {
+    const proxy = { name: parts.name, type: 'hysteria', server: parts.server, port: parts.port, udp: true };
+    const auth = params.get('auth') || params.get('auth_str') || parts.user;
+    if (auth) proxy['auth-str'] = auth;
+    applyTlsUriOptions(proxy, params, true);
+    for (const [source, target] of [['protocol', 'protocol'], ['obfs', 'obfs'], ['up', 'up'], ['down', 'down'], ['ports', 'ports'], ['hop-interval', 'hop-interval']]) {
+      if (params.has(source)) proxy[target] = params.get(source);
+    }
+    return proxy;
+  }
+  if (scheme === 'snell') {
+    const proxy = { name: parts.name, type: 'snell', server: parts.server, port: parts.port, psk: params.get('psk') || parts.user };
+    if (params.has('version')) proxy.version = Number(params.get('version'));
+    if (params.has('obfs')) proxy['obfs-opts'] = { mode: params.get('obfs'), host: params.get('obfs-host') || '' };
+    return proxy;
+  }
+  if (scheme === 'ssh') {
+    const proxy = { name: parts.name, type: 'ssh', server: parts.server, port: parts.port, username: parts.user };
+    if (parts.password) proxy.password = parts.password;
+    for (const [source, target] of [['private-key', 'private-key'], ['private-key-passphrase', 'private-key-passphrase'], ['host-key', 'host-key'], ['client-version', 'client-version']]) {
+      if (params.has(source)) proxy[target] = params.get(source);
+    }
+    return proxy;
+  }
+  if (scheme === 'wireguard' || scheme === 'wg') {
+    const proxy = { name: parts.name, type: 'wireguard', server: parts.server, port: parts.port, 'private-key': parts.user, udp: true };
+    if (params.has('publickey')) proxy['public-key'] = params.get('publickey');
+    if (params.has('public-key')) proxy['public-key'] = params.get('public-key');
+    if (params.has('presharedkey')) proxy['pre-shared-key'] = params.get('presharedkey');
+    if (params.has('pre-shared-key')) proxy['pre-shared-key'] = params.get('pre-shared-key');
+    const addresses = (params.get('address') || params.get('ip') || '').split(',').filter(Boolean);
+    const ipv4 = addresses.find((address) => !address.includes(':'));
+    const ipv6 = addresses.find((address) => address.includes(':'));
+    if (ipv4) proxy.ip = ipv4.split('/')[0];
+    if (ipv6) proxy.ipv6 = ipv6.split('/')[0];
+    if (params.has('allowedips')) proxy['allowed-ips'] = params.get('allowedips').split(',').map((address) => address.trim()).filter(Boolean);
+    if (params.has('allowed-ips')) proxy['allowed-ips'] = params.get('allowed-ips').split(',').map((address) => address.trim()).filter(Boolean);
+    if (params.has('dns')) {
+      proxy.dns = params.get('dns').split(',').map((address) => address.trim()).filter(Boolean);
+      proxy['remote-dns-resolve'] = true;
+    }
+    const keepaliveText = params.get('persistentkeepalive') || params.get('persistent-keepalive');
+    if (keepaliveText) {
+      const keepalive = Number(keepaliveText);
+      if (!Number.isInteger(keepalive) || keepalive < 0) throw new Error('WireGuard 分享链接中的 PersistentKeepalive 必须是非负整数。');
+      proxy['persistent-keepalive'] = keepalive;
+    }
+    if (params.has('mtu')) {
+      const mtu = Number(params.get('mtu'));
+      if (!Number.isInteger(mtu) || mtu < 1) throw new Error('WireGuard 分享链接中的 MTU 必须是正整数。');
+      proxy.mtu = mtu;
+    }
+    if (params.has('reserved')) proxy.reserved = params.get('reserved').split(',').map(Number);
+    return proxy;
+  }
+  if (scheme === 'mierus' || scheme === 'mieru') {
+    if (!parts.user) throw new Error('Mieru 分享链接缺少用户名。');
+    const proxy = {
+      name: parts.name,
+      type: 'mieru',
+      server: parts.server,
+      port: parts.port,
+      username: parts.user,
+      password: parts.password,
+    };
+    for (const key of ['transport', 'multiplexing', 'bandwidth']) {
+      if (params.has(key)) proxy[key] = params.get(key);
+    }
+    return proxy;
+  }
+  throw new Error(`暂不支持该分享链接协议：${scheme}。请将节点填写为 CUSTOM_PROXIES 中的 Mihomo 格式对象。`);
+};
 
 // 去重并过滤空值；传 getter 时按字段去重
 const dedupe = (arr, getter) => {
@@ -205,6 +679,10 @@ const overwriteDns = (config, ctx) => {
   };
 
   const { proxyPolicy, fakeIpFilter } = buildNodeDomainDns(config, nodeDomains);
+  const echDnsPolicy = {};
+  for (const [queryServerName, resolver] of CUSTOM_ECH_DNS_SERVERS) {
+    echDnsPolicy[queryServerName] = [`${resolver}#DIRECT`];
+  }
 
   config['dns'] = {
     'enable': true,
@@ -245,6 +723,7 @@ const overwriteDns = (config, ctx) => {
     ],
     'nameserver-policy': {
       ...proxyPolicy, // 动态：节点域名走代理 DNS
+      ...echDnsPolicy,
       'rule-set:cn,games_cn,microsoft_cn,apple_cn,private,fakeipfilter_cn': [
         'https://dns.alidns.com/dns-query#disable-qtype-65=true',
         'https://doh.pub/dns-query#disable-qtype-65=true',
@@ -341,7 +820,7 @@ const overwriteRuleProviders = (config) => {
 
 // 策略组 (proxy-groups)
 const overwriteProxyGroups = (config, ctx) => {
-  const { topProxyNames, fallbackUse: FALLBACK_USE } = ctx;
+  const { topProxyNames, fallbackUse: FALLBACK_USE, manualProxyNames } = ctx;
 
   // 判断地区是否有节点：可读到节点名就按 filter 匹配（空地区组隐藏），
   // 读不到（远程 provider）则保持显示；(?i) 前缀转成 JS 的 i 标志
@@ -382,10 +861,10 @@ const overwriteProxyGroups = (config, ctx) => {
     'include-all': true,
     'exclude-type': 'DIRECT',
   };
-  const PROXIES_DEFAULT = ['PROXY', 'AUTO', 'HK', 'SG', 'JP', 'US', 'TW', 'KR', 'Other'];
+  const PROXIES_DEFAULT = ['PROXY', 'AUTO', 'HK', 'SG', 'JP', 'US', 'TW', 'KR', 'Other', ...(manualProxyNames.length > 0 ? ['Private'] : [])];
   const PROXIES_DIRECT = [...PROXIES_DEFAULT, 'DIRECT'];
-  const PROXIES_AI = ['PROXY', 'SG', 'JP', 'US', 'KR'];
-  const PROXIES_PROXY = ['AUTO', 'HK', 'JP', 'US', 'SG', 'TW', 'KR', 'Other', ...(CUSTOM_PROXIES.length > 0 ? ['手动节点'] : [])];
+  const PROXIES_AI = ['PROXY', 'SG', 'JP', 'US', 'KR', ...(manualProxyNames.length > 0 ? ['Private'] : [])];
+  const PROXIES_PROXY = ['AUTO', 'HK', 'JP', 'US', 'SG', 'TW', 'KR', 'Other', ...(manualProxyNames.length > 0 ? ['Private'] : [])];
 
   const FILTER_HK = '(?i)(🇭🇰|香港|(?<![A-Za-z])HKG?(?![A-Za-z])|hong\\s*kong)';
   const FILTER_JP = '(?i)(🇯🇵|日本|东京|大阪|京都|(?<![A-Za-z])JPN?(?![A-Za-z])|japan)';
@@ -407,7 +886,7 @@ const overwriteProxyGroups = (config, ctx) => {
     // 基础策略组（PROXY 在纯 provider 订阅时追加 use 兜底）
     { 'name': 'PROXY', ...RULE_GROUP, 'proxies': PROXIES_PROXY, ...(FALLBACK_USE ? { 'use': FALLBACK_USE } : {}), 'icon': group('Static') },
     { 'name': 'AUTO', ...RULE_GROUP_TEST, 'hidden': false, 'icon': group('Urltest') },
-    ...(CUSTOM_PROXIES.length > 0 ? [{ 'name': '手动节点', ...RULE_GROUP, 'proxies': CUSTOM_PROXIES.map((proxy) => proxy.name) }] : []),
+    ...(manualProxyNames.length > 0 ? [{ 'name': 'Private', ...RULE_GROUP, 'proxies': manualProxyNames, 'icon': group('Personal') }] : []),
     // 应用策略组
     ...(ruleOptionsEnable.YouTube ? [{ 'name': 'YouTube', ...RULE_GROUP, 'proxies': PROXIES_DEFAULT, 'icon': svg('youtube') }] : []),
     ...(ruleOptionsEnable.AI ? [{ 'name': 'AI', ...RULE_GROUP, 'proxies': PROXIES_AI, 'default-selected': 'US', 'icon': svg('deepseek') }] : []),
@@ -464,13 +943,27 @@ const overwriteRules = (config) => {
 // 入口：收集节点上下文后按区块依次覆写
 const main = (config) => {
   config = config || {};
-  if (CUSTOM_PROXIES.length > 0) {
+  const customProxies = getCustomProxies();
+  if (customProxies.length > 0) {
+    const existingNames = new Set(
+      (Array.isArray(config['proxies']) ? config['proxies'] : [])
+        .map((proxy) => (typeof proxy === 'string' ? proxy : proxy && proxy.name))
+        .filter(Boolean),
+    );
+    for (const proxy of customProxies) {
+      if (existingNames.has(proxy.name)) {
+        throw new Error(`手动节点名称与现有节点重复：${proxy.name}`);
+      }
+    }
     config['proxies'] = [
       ...(Array.isArray(config['proxies']) ? config['proxies'] : []),
-      ...CUSTOM_PROXIES,
+      ...customProxies,
     ];
   }
-  const ctx = collectNodeSources(config);
+  const ctx = {
+    ...collectNodeSources(config),
+    manualProxyNames: customProxies.map((proxy) => proxy.name),
+  };
   overwriteTun(config);
   overwriteSniffer(config);
   overwriteHosts(config);
@@ -479,4 +972,186 @@ const main = (config) => {
   overwriteProxyGroups(config, ctx);
   overwriteRules(config);
   return config;
+};
+
+const parseVlessUri = (uri) => {
+  const match = /^vless:\/\/([^/?#]+)(?:\?([^#]*))?(?:#(.*))?$/i.exec(uri.trim());
+  if (!match) throw new Error('手动节点链接必须是有效的 VLESS 分享链接。');
+  const authority = match[1];
+  const atIndex = authority.lastIndexOf('@');
+  if (atIndex < 1) throw new Error('VLESS 分享链接缺少 UUID。');
+  const decode = (value, formEncoded = false) => {
+    try {
+      return decodeURIComponent(formEncoded ? value.replace(/\+/g, ' ') : value);
+    } catch {
+      throw new Error('VLESS 分享链接包含无效的 URL 编码。');
+    }
+  };
+  const uuid = decode(authority.slice(0, atIndex));
+  const address = authority.slice(atIndex + 1);
+  let server;
+  let portText;
+  if (address.startsWith('[')) {
+    const closingBracket = address.indexOf(']');
+    if (closingBracket < 0 || address[closingBracket + 1] !== ':') {
+      throw new Error('VLESS 分享链接中的 IPv6 地址或端口无效。');
+    }
+    server = address.slice(1, closingBracket);
+    portText = address.slice(closingBracket + 2);
+  } else {
+    const separator = address.lastIndexOf(':');
+    if (separator < 1) throw new Error('VLESS 分享链接缺少服务器端口。');
+    server = address.slice(0, separator);
+    portText = address.slice(separator + 1);
+  }
+  const port = Number(portText);
+  if (!uuid || !server || !Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new Error('VLESS 分享链接必须包含有效的 UUID、服务器地址和端口。');
+  }
+
+  const params = new Map();
+  for (const pair of (match[2] || '').split('&')) {
+    if (!pair) continue;
+    const separator = pair.indexOf('=');
+    const key = decode(separator < 0 ? pair : pair.slice(0, separator), true);
+    if (!params.has(key)) params.set(key, decode(separator < 0 ? '' : pair.slice(separator + 1), key !== 'ech'));
+  }
+  const security = (params.get('security') || 'none').toLowerCase();
+  if (!['none', 'tls', 'reality'].includes(security)) {
+    throw new Error(`暂不支持 VLESS 安全类型：${security}`);
+  }
+
+  const name = match[3] ? decode(match[3]) : `${server}:${port}`;
+  const proxy = { name, type: 'vless', server, port, uuid, udp: true };
+  const encryption = params.get('encryption');
+  if (encryption && encryption.toLowerCase() !== 'none') proxy.encryption = encryption;
+  if (params.has('flow')) proxy.flow = params.get('flow');
+  if (security === 'tls' || security === 'reality') {
+    proxy.tls = true;
+    if (params.has('sni')) proxy.servername = params.get('sni');
+    if (params.has('fp')) proxy['client-fingerprint'] = params.get('fp');
+    if (params.has('alpn')) proxy.alpn = params.get('alpn').split(',').filter(Boolean);
+  }
+  if (params.has('ech')) {
+    if (security !== 'tls') throw new Error('VLESS ECH 需要 security=tls。');
+    const echValue = params.get('ech');
+    const separator = echValue.indexOf('+');
+    const queryServerName = (separator < 0 ? echValue : echValue.slice(0, separator)).trim();
+    if (!queryServerName) throw new Error('VLESS ECH 参数缺少查询域名。');
+    if (separator >= 0) {
+      const resolver = echValue.slice(separator + 1).trim();
+      if (!/^https:\/\/[^#\s]+$/i.test(resolver)) {
+        throw new Error('VLESS ECH 自定义 DNS 只支持有效的 HTTPS DoH 地址。');
+      }
+      const existingResolver = CUSTOM_ECH_DNS_SERVERS.get(queryServerName);
+      if (existingResolver && existingResolver !== resolver) {
+        throw new Error(`ECH 查询域名 ${queryServerName} 配置了多个不同的 DNS 服务器。`);
+      }
+      CUSTOM_ECH_DNS_SERVERS.set(queryServerName, resolver);
+    }
+    proxy['ech-opts'] = { enable: true, 'query-server-name': queryServerName };
+  }
+  if (security === 'reality') {
+    const realityOptions = {};
+    if (params.has('pbk')) realityOptions['public-key'] = params.get('pbk');
+    if (params.has('sid')) realityOptions['short-id'] = params.get('sid');
+    if (Object.keys(realityOptions).length > 0) proxy['reality-opts'] = realityOptions;
+  }
+
+  const network = (params.get('type') || 'tcp').toLowerCase();
+  if (!['tcp', 'ws', 'grpc', 'httpupgrade', 'xhttp'].includes(network)) {
+    throw new Error(`暂不支持 VLESS 传输类型：${network}`);
+  }
+  proxy.network = network;
+  if (network === 'xhttp') {
+    const xhttpOptions = {};
+    for (const key of ['host', 'path', 'mode']) {
+      if (params.has(key)) xhttpOptions[key] = params.get(key);
+    }
+
+    if (params.has('extra')) {
+      let extra;
+      try {
+        extra = JSON.parse(params.get('extra'));
+      } catch {
+        throw new Error('VLESS XHTTP 的 extra 参数不是有效的 JSON。');
+      }
+      if (!extra || typeof extra !== 'object' || Array.isArray(extra)) {
+        throw new Error('VLESS XHTTP 的 extra 参数必须是 JSON 对象。');
+      }
+      for (const key of ['host', 'path', 'mode']) {
+        if (!params.has(key) && typeof extra[key] === 'string') xhttpOptions[key] = extra[key];
+      }
+      if (extra.headers && typeof extra.headers === 'object' && !Array.isArray(extra.headers)) {
+        xhttpOptions.headers = extra.headers;
+      }
+      const stringFields = {
+        xPaddingBytes: 'x-padding-bytes',
+        xPaddingKey: 'x-padding-key',
+        xPaddingHeader: 'x-padding-header',
+        xPaddingPlacement: 'x-padding-placement',
+        xPaddingMethod: 'x-padding-method',
+        uplinkHTTPMethod: 'uplink-http-method',
+        sessionIDPlacement: 'session-placement',
+        sessionIDKey: 'session-key',
+        sessionIDTable: 'session-table',
+        sessionIDLength: 'session-length',
+        seqPlacement: 'seq-placement',
+        seqKey: 'seq-key',
+        uplinkDataPlacement: 'uplink-data-placement',
+        uplinkDataKey: 'uplink-data-key',
+        uplinkChunkSize: 'uplink-chunk-size',
+        scMaxEachPostBytes: 'sc-max-each-post-bytes',
+        scMinPostsIntervalMs: 'sc-min-posts-interval-ms',
+      };
+      for (const [source, target] of Object.entries(stringFields)) {
+        const value = extra[source];
+        if (typeof value === 'string' || (typeof value === 'number' && Number.isFinite(value))) {
+          xhttpOptions[target] = String(value);
+        }
+      }
+      if (typeof extra.xPaddingObfsMode === 'boolean') {
+        xhttpOptions['x-padding-obfs-mode'] = extra.xPaddingObfsMode;
+        if (extra.xPaddingObfsMode) {
+          if (!xhttpOptions['x-padding-key']) xhttpOptions['x-padding-key'] = 'x_padding';
+          if (!xhttpOptions['x-padding-header']) xhttpOptions['x-padding-header'] = 'X-Padding';
+          if (!xhttpOptions['x-padding-placement']) xhttpOptions['x-padding-placement'] = 'queryInHeader';
+          if (!xhttpOptions['x-padding-method']) xhttpOptions['x-padding-method'] = 'repeat-x';
+        }
+      }
+      if (typeof extra.noGRPCHeader === 'boolean') {
+        xhttpOptions['no-grpc-header'] = extra.noGRPCHeader;
+      }
+      if (extra.xmux && typeof extra.xmux === 'object' && !Array.isArray(extra.xmux)) {
+        const reuseSettings = {};
+        const reuseFields = {
+          maxConcurrency: 'max-concurrency',
+          maxConnections: 'max-connections',
+          cMaxReuseTimes: 'c-max-reuse-times',
+          hMaxRequestTimes: 'h-max-request-times',
+          hMaxReusableSecs: 'h-max-reusable-secs',
+        };
+        for (const [source, target] of Object.entries(reuseFields)) {
+          const value = extra.xmux[source];
+          if (typeof value === 'string' || (typeof value === 'number' && Number.isFinite(value))) {
+            reuseSettings[target] = String(value);
+          }
+        }
+        if (typeof extra.xmux.hKeepAlivePeriod === 'number' && Number.isFinite(extra.xmux.hKeepAlivePeriod)) {
+          reuseSettings['h-keep-alive-period'] = extra.xmux.hKeepAlivePeriod;
+        }
+        if (Object.keys(reuseSettings).length > 0) xhttpOptions['reuse-settings'] = reuseSettings;
+      }
+    }
+    proxy['xhttp-opts'] = xhttpOptions;
+  } else if (network === 'ws' || network === 'httpupgrade') {
+    const wsOptions = { path: params.get('path') || '/', headers: {} };
+    if (params.has('host')) wsOptions.headers.Host = params.get('host');
+    if (network === 'httpupgrade') wsOptions['v2ray-http-upgrade'] = true;
+    proxy.network = 'ws';
+    proxy['ws-opts'] = wsOptions;
+  } else if (network === 'grpc') {
+    proxy['grpc-opts'] = { 'grpc-service-name': params.get('serviceName') || '' };
+  }
+  return proxy;
 };
