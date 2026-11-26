@@ -846,7 +846,7 @@ const overwriteProxyGroups = (config, ctx) => {
   const regionHasNodes = makeRegionHasNodes(topProxyNames);
 
   const GROUP_COMMON = {
-    'timeout': 1500,
+    'timeout': 5000,
     'max-failed-times': 5,
     'empty-fallback': 'REJECT',
     'url': 'https://www.apple.com/library/test/success.html',

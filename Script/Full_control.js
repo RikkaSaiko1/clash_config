@@ -906,7 +906,7 @@ const overwriteProxyGroups = (config, ctx) => {
   };
   const regionHasNodes = makeRegionHasNodes(topProxyNames);
 
-  const GROUP_COMMON = {'timeout': 1500,'max-failed-times': 5,'empty-fallback': 'REJECT','url': 'https://www.apple.com/library/test/success.html','lazy': true,};
+  const GROUP_COMMON = {'timeout': 5000,'max-failed-times': 5,'empty-fallback': 'REJECT','url': 'https://www.apple.com/library/test/success.html','lazy': true,};
   const RULE_GROUP = { 'type': 'select', 'interval': 300, ...GROUP_COMMON };
   const RULE_GROUP_TEST = {'type': 'url-test','interval': 60,...GROUP_COMMON,'tolerance': 50,'include-all': true,'exclude-type': 'DIRECT',};
   const PROXIES_DEFAULT = ['PROXY','AUTO','HK','SG','JP','US','TW','KR','Other', ...(manualProxyNames.length > 0 ? ['Private'] : [])];

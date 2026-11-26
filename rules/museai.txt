@@ -1,0 +1,28 @@
+# 1. Muse AI 核心与云端沙盒
+DOMAIN-SUFFIX,muse.ai
+DOMAIN-SUFFIX,metaaiusercontent.com
+DOMAIN-SUFFIX,metaaivm.com
+
+# 2. Meta AI 接口与开发者服务 (Muse Code / API)
+DOMAIN-SUFFIX,meta.ai
+DOMAIN-SUFFIX,meta.com
+
+# 3. Meta 账号中心、登录与完整性校验
+DOMAIN-SUFFIX,facebook.com
+DOMAIN-SUFFIX,facebook.net
+DOMAIN-SUFFIX,fb.com
+DOMAIN-SUFFIX,fbcdn.net
+DOMAIN-SUFFIX,fbsbx.com
+
+# 4. 社交与消息联动端 (按需保留)
+DOMAIN-SUFFIX,messenger.com
+DOMAIN-SUFFIX,instagram.com
+DOMAIN-SUFFIX,cdninstagram.com
+DOMAIN-SUFFIX,whatsapp.com
+DOMAIN-SUFFIX,whatsapp.net
+
+# 5. 支付与风控人机验证
+DOMAIN-SUFFIX,stripe.com
+DOMAIN-SUFFIX,challenges.cloudflare.com
+DOMAIN-SUFFIX,recaptcha.net
+DOMAIN-SUFFIX,hcaptcha.com
